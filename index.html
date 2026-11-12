@@ -360,6 +360,56 @@
   #modalPesquisaFornecedoresCadastro th:last-child { text-align: right !important; padding-right: 25px !important; }
   #listaFornecedoresCadastroModal td:last-child { text-align: right !important; padding-right: 15px !important; }
 
+    /* ========================================================
+       ESTILOS EXCLUSIVOS DA ABA CAPA MALOTE (ISOLADOS COM #malote)
+       ======================================================== */
+    #malote .linha-dados-malote { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; width: 100%; }
+    #malote .lacre-input-container { display: flex; align-items: center; background: #fff; border: 1px solid #ced4da; border-radius: 4px; }
+    #malote .lacre-label { background: #e9ecef; font-weight: bold; font-size: 12px; padding: 8px 12px; border-right: 1px solid #ced4da; border-radius: 3px 0 0 3px; white-space: nowrap; }
+    #malote .lacre-field { border: none; padding: 8px; font-size: 14px; width: 100%; font-weight: bold; border-radius: 0 3px 3px 0; outline: none; }
+    #malote .mensagem-malote-print { display: none; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; color: #000; }
+    #malote .rodape-impressao { display: none; width: 100%; margin-top: auto; padding-top: 40px; }
+    #malote .tabela-lacre-print { width: 200px; border-collapse: collapse; margin-bottom: 40px; }
+    #malote .tabela-lacre-print td { border: 1px solid #000 !important; padding: 5px 10px !important; font-size: 13px !important; text-align: left !important; }
+    #malote .tabela-lacre-print td.lbl { font-weight: bold; background-color: #f2f2f2 !important; width: 60px; text-align: center !important; }
+    #malote .bloco-assinaturas { display: flex; justify-content: space-between; width: 100%; }
+    #malote .campo-assinatura { width: 42%; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: Arial, sans-serif; }
+    #malote .campo-assinatura div:first-child { width: 100%; display: flex; align-items: flex-end; margin-bottom: 5px; }
+
+    @media print {
+        #malote .linha-dados-malote, #malote #formMalote, #malote #statusBancoMaloteAba { display: none !important; }
+        #malote.active { display: block !important; width: 100%; box-sizing: border-box; }
+        #malote .container-planilha {
+            box-shadow: none !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 10mm 10mm !important;
+            box-sizing: border-box;
+            min-height: 100vh;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #malote .header-print { display: flex !important; flex-direction: column !important; align-items: flex-start !important; margin-bottom: 5px !important; border-bottom: 2px solid #ccc !important; padding-bottom: 6px !important; width: 100% !important; position: static !important; }
+        #malote .logo-img { max-height: 45px !important; width: auto !important; display: block !important; margin-top: -20px !important; }
+        #malote .nome-loja-titulo { font-size: 18px !important; font-weight: bold !important; text-transform: uppercase !important; margin-top: 5px !important; margin-bottom: 0px !important; color: #333 !important; text-align: center !important; width: 100% !important; position: relative !important; left: auto !important; transform: none !important; }
+        #malote .mensagem-malote-print { display: block !important; font-size: 12px !important; font-weight: bold !important; text-align: center !important; margin-bottom: 15px !important; text-transform: uppercase !important; color: #000 !important; }
+        #malote .table-container { margin-top: 0px !important; }
+        #malote table { width: 100% !important; border-collapse: collapse !important; margin-top: 2px !important; }
+        #malote th { border: 1px solid #000 !important; padding: 6px !important; text-align: center !important; font-size: 13px !important; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-weight: bold !important; text-transform: uppercase !important; }
+        #malote td { border: 1px solid #000 !important; padding: 5px 6px !important; text-align: center !important; font-size: 12px !important; }
+        #malote .tabela-lacre-print { width: 180px !important; max-width: 180px !important; border-collapse: collapse !important; margin-bottom: 40px !important; }
+        #malote .tabela-lacre-print td { border: 1px solid #000 !important; padding: 4px 8px !important; font-size: 12px !important; text-align: left !important; }
+        #malote .tabela-lacre-print td.lbl { font-weight: bold !important; background-color: #f2f2f2 !important; width: 65px !important; text-align: center !important; }
+        #malote .rodape-impressao {
+            display: block !important;
+            position: fixed !important;
+            bottom: 10mm !important;
+            left: 15mm !important;
+            right: 15mm !important;
+            width: calc(100% - 30mm) !important;
+            background: white !important;
+        }
+    }
 
 
     </style>
@@ -381,7 +431,8 @@
 <div class="tabs-nav">
     <button class="tab-btn active" data-tab="planilha" onclick="alternarAba('planilha')">📊 CONFERÊNCIA LAB</button>
     <button class="tab-btn" data-tab="relatorios" onclick="alternarAba('relatorios')">📈 RELATÓRIOS</button>
-    <button class="tab-btn" data-tab="cadastro" onclick="alternarAba('cadastro')">⚙️ CADASTRO</button> 
+    <button class="tab-btn" data-tab="cadastro" onclick="alternarAba('cadastro')">⚙️ CADASTRO</button>
+	<button class="tab-btn" data-tab="malote" onclick="alternarAba('malote')">📦 CAPA MALOTE</button>
     <button class="tab-btn" data-tab="talao" onclick="alternarAba('talao')">📋 TALÃO DE PEDIDOS</button>
 	
 	    <button type="button" class="tab-btn" onclick="sairDoSistemaSupabase()" style="margin-left: auto; background-color: #cc0000; color: white;">🚪 Sair</button>
@@ -401,7 +452,7 @@
 					<!-- Título centralizado na linha de forma absoluta -->
 					<div id="textoNomeLoja" class="nome-loja-titulo" style="position: absolute; left: 50%; transform: translateX(-50%); margin: 0; width: auto; text-align: center; z-index: 1;">02 ALCINDO CACELA</div>
 					
-					<!-- Botões posicionados em pixels (Ajuste o valor de 'right' como quiser) -->
+					<!-- Botões posicionados em pixels (Ajuste o valor de 'right' como quiser) 
 					<div style="display: flex; align-items: center; gap: 6px; position: absolute; right: 30px; top: 50%; transform: translateY(-50%); z-index: 2;">
 						<label for="arquivoCSV" id="btnImportarMalote" class="btn-importar-csv">📁 Importar</label>
 						<input type="file" id="arquivoCSV" accept=".csv" style="display: none;">
@@ -409,7 +460,14 @@
 						<button type="button" id="btnExportarCDAM" onclick="exportarNovosProdutosCSV()">📥 Exportar</button>
 				
 						<span id="statusBancoMalote" style="font-size: 12px; font-weight: bold; color: #856404; display: inline-flex; align-items: center; gap: 3px;">⚠️ Sem CSV</span>
+					</div> -->
+					
+					<!-- Status de Conexão da Conferência Lab -->
+					<div style="display: flex; align-items: center; gap: 6px; position: absolute; right: 30px; top: 50%; transform: translateY(-50%); z-index: 2;">
+						<span id="statusConexaoConferenciaAba" style="font-size: 12px; font-weight: bold; color: #856404; display: inline-flex; align-items: center; gap: 3px;">⏳ Verificando...</span>
 					</div>
+
+					
 				</div>
 				
 
@@ -749,6 +807,118 @@
             </div>
         </div>
     </div> <!-- ESTA TAG FECHA A DIV ID="CADASTRO" CORRETAMENTE -->
+	
+	    <!-- ABA CAPA MALOTE (PARA AS LOJAS ENVIAREM AO LABORATÓRIO) -->
+    <div id="malote" class="tab-content">
+        <div class="container-planilha">
+            <div id="mensagemMalotePrint" class="mensagem-malote-print"></div>
+
+            <div class="header-print" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 8px; position: relative;">
+                <div style="display: flex; align-items: center; gap: 20px; z-index: 2;">
+                    <img src="formas/logo_lider.png" alt="Ótica Líder" class="logo-img">
+                </div>
+                
+                <div id="textoNomeLojaMalote" class="nome-loja-titulo" style="position: absolute; left: 50%; transform: translateX(-50%); margin: 0; width: auto; text-align: center; z-index: 1;">02 ALCINDO CACELA</div>
+                
+                <div style="display: flex; align-items: center; gap: 6px; position: absolute; right: 30px; top: 50%; transform: translateY(-50%); z-index: 2;">
+				<span id="statusBancoMaloteAba" style="font-size: 12px; font-weight: bold; color: #856404; display: inline-flex; align-items: center; gap: 3px;">⏳ Verificando...</span>
+                </div>
+            </div>
+
+            <div class="config-loja-container">
+                <div class="config-loja-input">
+                    ✍️ Selecione a Loja Atual:
+                    <select id="selectLojaMalote" onchange="atualizarLojaMalote(this.value)">
+                        <option value="02" selected>02 ALCINDO CACELA</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="linha-dados-malote">
+                <div class="lacre-input-container" style="width: 200px; flex-shrink: 0;">
+                    <span class="lacre-label">Nº LACRE</span>
+                    <input type="text" id="inputLacreMalote" class="lacre-field" oninput="sincronizarCampoMalote('celulaLacrePrint', this.value)">
+                </div>
+                <div class="lacre-input-container" style="flex: 1;">
+                    <span class="lacre-label">RESPONSÁVEL PELO ENVIO</span>
+                    <input type="text" id="inputRespMalote" class="lacre-field" placeholder="Nome do responsável" oninput="sincronizarCampoMalote('nomeRespPrint', this.value.toUpperCase())">
+                </div>
+                <div class="lacre-input-container" style="flex: 1;">
+                    <span class="lacre-label">ENC. DE ÓTICA</span>
+                    <input type="text" id="inputEncMalote" class="lacre-field" placeholder="Nome do encarregado" oninput="sincronizarCampoMalote('nomeEncPrint', this.value.toUpperCase())">
+                </div>
+            </div>
+
+            <form id="formMalote">
+                <div class="form-group">
+                    <div class="input-box box-os"><label for="malote_os">OS</label><input type="text" id="malote_os" required></div>
+                    <div class="input-box box-cod-web"><label for="malote_cod_web">CÓD. WEB</label><input type="text" id="malote_cod_web" required></div>
+                    
+                    <div class="input-box box-cod-produto">
+                        <label for="malote_cod_produto">CÓD. PRODUTO</label>
+                        <div class="input-with-button">
+                            <input type="text" id="malote_cod_produto" required>
+                            <button type="button" class="btn-search-lupa" tabindex="-1" onclick="abrirModalPesquisaMalote()" title="Pesquisar Produto">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="input-box box-descricao"><label for="malote_descricao">DESCRIÇÃO (Automática)</label><input type="text" id="malote_descricao" readonly style="background-color: #e9ecef;"></div>
+                    <div class="input-box box-nome-cliente"><label for="malote_nome_cliente">NOME DO CLIENTE</label><input type="text" id="malote_nome_cliente" required></div>
+					<div class="input-box box-quantidade" style="width: 85px;"><label for="malote_quantidade">QUANTIDADE</label><input type="number" id="malote_quantidade" min="1" value="2" required></div>
+                    <div class="input-box box-data"><label for="malote_data">DATA</label><input type="date" id="malote_data" required></div>
+                </div>
+                
+                <div class="botoes-formulario-container">
+                    <button type="submit" class="btn-submit">Adicionar na Planilha</button>
+                    <button type="button" onclick="limparTabelaMaloteToda()" class="btn-clear">🔄 Limpar Tudo</button>
+                    <button type="button" onclick="gerarPDFMaloteEEnviarNuvem()" class="btn-pdf">🖨️ Salvar em PDF / Imprimir</button>
+                </div>
+            </form>
+
+            <div class="table-container">
+                <table id="tabelaDadosMalote">
+                    <thead>
+                        <tr>
+                            <th>OS</th><th>CÓD. WEB</th><th>CÓD. PRODUTO</th><th>DESCRIÇÃO</th><th>NOME DO CLIENTE</th><th>QUANTIDADE</th><th>DATA</th><th class="col-actions">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabelaMalote"></tbody>
+                </table>
+            </div>
+
+            <div class="rodape-impressao">
+                <table class="tabela-lacre-print">
+                    <tbody>
+                        <tr>
+                            <td class="lbl">Nº LACRE</td>
+                            <td id="celulaLacrePrint"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="bloco-assinaturas" style="margin-top: 50px;">
+                    <div class="campo-assinatura">
+                        <div>
+                            <span style="font-size: 14px; font-weight: bold; margin-right: 5px; white-space: nowrap;">ASS:</span>
+                            <div style="flex-grow: 1; border-bottom: 1px solid #000; height: 1px;"></div>
+                        </div>
+                        <div id="nomeRespPrint" style="font-size: 11px; font-weight: normal; text-transform: uppercase; margin-bottom: 4px; min-height: 14px;"></div>
+                        <div style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #000;">RESPONSÁVEL PELO ENVIO</div>
+                    </div>
+
+                    <div class="campo-assinatura">
+                        <div>
+                            <span style="font-size: 14px; font-weight: bold; margin-right: 5px; white-space: nowrap;">ASS:</span>
+                            <div style="flex-grow: 1; border-bottom: 1px solid #000; height: 1px;"></div>
+                        </div>
+                        <div id="nomeEncPrint" style="font-size: 11px; font-weight: normal; text-transform: uppercase; margin-bottom: 4px; min-height: 14px;"></div>
+                        <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #000;">ENC. ÓTICA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- A partir daqui a estrutura do seu Talão passa a funcionar normalmente -->
     <div id="talao" class="tab-content">
@@ -1040,6 +1210,7 @@
             return;
         }
         document.getElementById("telaLoginOverlay").style.display = "none";
+        aplicarPermissoesUsuario(session.user.email);
         await carregarDadosDaNuvem();
     }
 
@@ -1061,13 +1232,14 @@
 
         try {
             await iniciarClienteSupabase();
-            const { error } = await dbSupabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await dbSupabase.auth.signInWithPassword({ email, password });
 
             if (error) {
                 msgErro.innerText = "❌ E-mail ou senha incorretos!";
                 msgErro.style.display = "block";
             } else {
                 document.getElementById("telaLoginOverlay").style.display = "none";
+                if (data && data.user) aplicarPermissoesUsuario(data.user.email);
                 await carregarDadosDaNuvem();
             }
         } catch (err) {
@@ -1079,11 +1251,24 @@
         }
     }
 
-
     async function sairDoSistemaSupabase() {
         if (confirm("Deseja sair do sistema?")) {
             await dbSupabase.auth.signOut();
             location.reload();
+        }
+    }
+	
+	    function aplicarPermissoesUsuario(emailUsuario) {
+        const ehLoja = (emailUsuario || "").toLowerCase().trim() === "lojas@oticalider.com";
+        const abasRestritasLab = ["planilha", "relatorios", "cadastro"];
+
+        abasRestritasLab.forEach(tab => {
+            const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+            if (btn) btn.style.display = ehLoja ? "none" : "inline-block";
+        });
+
+        if (ehLoja) {
+            alternarAba("malote");
         }
     }
 
@@ -1123,7 +1308,10 @@
             atualizarLayoutHistorico(historicoProducao.length);
             if (document.getElementById("rep_data_inicio").value) filtrarHistoricoProducao();
         }
+		
+        atualizarStatusConexaoMalote(true);
     }
+
 
 
     // ========================================================
@@ -1341,8 +1529,25 @@
             });
             selectRelatorio.value = valorAntigoRel || "TODAS";
         }
-    }
+        // 3. Atualiza o seletor da aba Capa Malote e restaura a última loja salva
+        var selectMalote = document.getElementById("selectLojaMalote");
+        if (selectMalote) {
+            var lojaSalvaMalote = localStorage.getItem("ultimaLojaCapaMaloteLider") || selectMalote.value;
+            selectMalote.innerHTML = "";
+            lojasParaExibir.forEach(l => {
+                var opt = new Option(l.num + " " + l.nome, l.num);
+                selectMalote.add(opt);
+            });
+            if ([...selectMalote.options].some(o => o.value === lojaSalvaMalote)) {
+                selectMalote.value = lojaSalvaMalote;
+            }
+            var textoAtualMalote = selectMalote.options[selectMalote.selectedIndex]?.text || "";
+            var divTituloMalote = document.getElementById("textoNomeLojaMalote");
+            if (divTituloMalote) divTituloMalote.innerText = textoAtualMalote;
+        }
 
+	
+	}
 
     // ========================================================
     // CENTRAL DE ATALHOS DO TECLADO INTEGRADA
@@ -2461,7 +2666,7 @@ if (document.getElementById("arquivoCSV")) {
     }
 
 
-function gerarPDFouImprimir() {
+async function gerarPDFouImprimir() {
     var nomeConferente = document.getElementById("conferenteInput").value.trim();
     if (nomeConferente === "") {
         alert("⚠️ Atenção! Por favor, preencha o NOME DO CONFERENTE antes de Salvar em PDF ou imprimir!");
@@ -2471,6 +2676,8 @@ function gerarPDFouImprimir() {
 
     var linhasTabela = document.querySelectorAll("#corpoTabela tr");
     if (linhasTabela.length > 0) {
+        var loteParaNuvem = [];
+
         linhasTabela.forEach(function(linha) {
             var celulas = linha.getElementsByTagName("td");
             if (celulas.length < 10) return; 
@@ -2501,7 +2708,7 @@ function gerarPDFouImprimir() {
                 cod_produto: celulas[3].innerText.trim(),                      
                 descricao: celulas[4].innerText.trim(),							
                 fornecedor: linha.dataset.fornecedorItem || "BRASLAB",
-				nome_cliente: celulas[5].innerText.trim(),                    
+                nome_cliente: celulas[5].innerText.trim(),                    
                 quantidade: parseFloat(celulas[6].innerText.trim()) || 0,      
                 data: dataFormatada,                                           
                 valor_nf: celulas[7].innerText.trim().replace("R$ ", ""),      
@@ -2509,8 +2716,6 @@ function gerarPDFouImprimir() {
                 conferente: nomeConferente
             };
 
-            // --- BLOCO CORRIGIDO PARA EVITAR DUPLICIDADE ---
-            // --- BLOCO ATUALIZADO: PROCURA POR OS + NF + DATA ---
             var indexDuplicado = historicoProducao.findIndex(h => 
                 String(h.os).trim() === String(registro.os).trim() && 
                 String(h.nf).trim() === String(registro.nf).trim() &&
@@ -2518,51 +2723,53 @@ function gerarPDFouImprimir() {
             );
             
             if (indexDuplicado !== -1) {
-                // SE ENCONTRAR NA MESMA DATA: Substitui os dados antigos (como a Loja) pelos novos da tela
                 historicoProducao[indexDuplicado] = registro;
             } else {
-                // SE NÃO ENCONTRAR (OU SE FOR OUTRA DATA): Adiciona normalmente
                 historicoProducao.push(registro);
             }
- 
 
+            loteParaNuvem.push({
+                os: registro.os,
+                loja: registro.loja,
+                cod_web: registro.cod_web,
+                cod_produto: registro.cod_produto,
+                descricao: registro.descricao,
+                nome_cliente: registro.nome_cliente,
+                quantidade: registro.quantidade,
+                valor_nf: registro.valor_nf,
+                nf: registro.nf,
+                data: registro.data,
+                conferente: registro.conferente,
+                fornecedor: registro.fornecedor
+            });
         });
 
         localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
-		        // Envia os novos registros da impressão para a tabela 'relatorios' no Supabase
-        linhasTabela.forEach(async function(linha) {
-            var celulas = linha.getElementsByTagName("td");
-            if (celulas.length < 10) return;
-            var spanWeb = celulas[2].querySelector(".cell-web-container span");
-            var codWebTexto = spanWeb ? spanWeb.innerText.trim() : celulas[2].innerText.trim();
-            var textoData = celulas[9].innerText.trim();
-            var dataFormatada = textoData.includes("/") ? textoData.split("/").reverse().join("-") : obterDataBrasilia();
 
-            const { data } = await dbSupabase.from("relatorios").insert([{
-                os: celulas[0].innerText.trim(),
-                loja: celulas[1].innerText.trim(),
-                cod_web: codWebTexto,
-                cod_produto: celulas[3].innerText.trim(),
-                descricao: celulas[4].innerText.trim(),
-                nome_cliente: celulas[5].innerText.trim(),
-                quantidade: parseFloat(celulas[6].innerText.trim()) || 0,
-                valor_nf: celulas[7].innerText.trim().replace("R$ ", ""),
-                nf: celulas[8].innerText.trim(),
-                data: dataFormatada,
-                conferente: nomeConferente,
-                fornecedor: linha.dataset.fornecedorItem || "BRASLAB"
-            }]).select();
-
-            if (data && data[0]) {
-                var itemLocal = historicoProducao.find(h => h.os === data[0].os && h.nf === data[0].nf && h.data === data[0].data && !h.id);
-                if (itemLocal) itemLocal.id = data[0].id;
+        // Grava o lote inteiro na nuvem ANTES de abrir a janela de impressão
+        if (loteParaNuvem.length > 0 && dbSupabase) {
+            const { data, error } = await dbSupabase.from("relatorios").insert(loteParaNuvem).select();
+            if (error) {
+                alert("⚠️ Aviso: Não foi possível salvar na nuvem (" + error.message + ").");
+            } else if (data && data.length > 0) {
+                data.forEach(function(itemNuvem) {
+                    var itemLocal = historicoProducao.find(h =>
+                        h.os === itemNuvem.os &&
+                        h.nf === itemNuvem.nf &&
+                        h.cod_produto === itemNuvem.cod_produto &&
+                        h.data === itemNuvem.data &&
+                        !h.id
+                    );
+                    if (itemLocal) itemLocal.id = itemNuvem.id;
+                });
                 localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
             }
-        });
+        }
 
         if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
         if (typeof filtrarHistoricoProducao === "function") filtrarHistoricoProducao();
     }
+
 
     var novaJanela = window.open('', '_blank');
     
@@ -2744,18 +2951,22 @@ function gerarPDFouImprimir() {
             tbody.innerHTML = '<tr><td colspan="3" class="no-data-talao">Nenhuma lente na memória. Faça o upload na Planilha primeiro.</td></tr>';
             return;
         }
-        dados.forEach(function(produto) {
+
+        // Ordena pelo Código do Produto igual à lupa da aba Conferência
+        var dadosOrdenados = [...dados].sort((a, b) => parseFloat(a.codigo) - parseFloat(b.codigo));
+
+        dadosOrdenados.forEach(function(produto) {
             var linha = document.createElement("tr");
             
             var tdCodWeb = document.createElement("td"); 
             tdCodWeb.innerText = produto.cod_web || "";
-            tdCodWeb.style.textAlign = "left"; // Alterado para a esquerda
+            tdCodWeb.style.textAlign = "left";
             tdCodWeb.style.paddingLeft = "10px";
             
             var tdCodigo = document.createElement("td"); 
             tdCodigo.innerText = produto.codigo; 
             tdCodigo.style.fontWeight = "normal";
-            tdCodigo.style.textAlign = "left"; // Alterado para a esquerda
+            tdCodigo.style.textAlign = "left";
             tdCodigo.style.paddingLeft = "10px";
             
             var tdDescricao = document.createElement("td"); 
@@ -2767,7 +2978,6 @@ function gerarPDFouImprimir() {
             linha.appendChild(tdCodigo); 
             linha.appendChild(tdDescricao);
 
-            
             linha.dataset.codigoLente = produto.codigo;
             linha.dataset.descricaoLente = produto.descricao;
             linha.dataset.codWebLente = produto.cod_web || "";
@@ -2777,7 +2987,6 @@ function gerarPDFouImprimir() {
         });
         indiceSelecionadoTalao = -1; 
     }
-
 
     function selecionarLenteEspecifica(descricao, codigo, codWeb) {
         document.getElementById("campoCodWebTalao").value = codWeb;
@@ -4123,6 +4332,349 @@ function limparBancoDadosCadastro() {
         });
     }
 
+    // ========================================================
+    // MOTOR DA ABA CAPA MALOTE - PARTE A (BUSCAS E MODAL)
+    // ========================================================
+    var modoPesquisaModalPlanilha = "planilha";
+
+    function atualizarLojaMalote(valor) {
+        var select = document.getElementById("selectLojaMalote");
+        if (select) {
+            document.getElementById("textoNomeLojaMalote").innerText = select.options[select.selectedIndex].text;
+            localStorage.setItem("ultimaLojaCapaMaloteLider", valor);
+        }
+    }
+    function atualizarStatusConexaoMalote(conectado) {
+        var idsStatus = ["statusBancoMaloteAba", "statusConexaoConferenciaAba"];
+        idsStatus.forEach(function(idEl) {
+            var el = document.getElementById(idEl);
+            if (!el) return;
+            if (conectado) {
+                el.innerText = "☁️ Conectado";
+                el.style.color = "#155724";
+            } else {
+                el.innerText = "⚠️ Desconectado";
+                el.style.color = "#cc0000";
+            }
+        });
+    }
+
+
+    window.addEventListener("online", () => atualizarStatusConexaoMalote(true));
+    window.addEventListener("offline", () => atualizarStatusConexaoMalote(false));
+
+
+    function sincronizarCampoMalote(idAlvo, valor) {
+        var el = document.getElementById(idAlvo);
+        if (el) el.innerText = valor;
+    }
+
+    function abrirModalPesquisaMalote() {
+        modoPesquisaModalPlanilha = "malote";
+        abrirModalPesquisa();
+    }
+
+    const renderizarTabelaModalOriginal = renderizarTabelaModal;
+    renderizarTabelaModal = function(dados) {
+        renderizarTabelaModalOriginal(dados);
+        var linhas = document.querySelectorAll("#listaProdutosModal tr");
+        linhas.forEach(function(linha, idx) {
+            if (idx === 0) return;
+            var tds = linha.getElementsByTagName("td");
+            if (tds.length < 3) return;
+            var web = tds.innerText === "-" ? "" : tds.innerText;
+            var cod = tds.innerText;
+            var desc = tds.innerText;
+
+            linha.ondblclick = function() {
+                if (modoPesquisaModalPlanilha === "malote") {
+                    document.getElementById("malote_cod_web").value = web;
+                    document.getElementById("malote_cod_produto").value = cod;
+                    var campoDescM = document.getElementById("malote_descricao");
+                    campoDescM.value = desc;
+                    campoDescM.readOnly = true;
+                    campoDescM.style.backgroundColor = "#e9ecef";
+                    fecharModalPesquisa();
+                    document.getElementById("malote_nome_cliente").focus();
+                    modoPesquisaModalPlanilha = "planilha";
+                } else {
+                    var prodObj = bancoDadosProdutos.find(p => String(p.codigo).trim() === cod && String(p.cod_web || "").trim() === web);
+                    document.getElementById("cod_web").value = web;
+                    document.getElementById("cod_produto").value = cod;
+                    document.getElementById("descricao").value = desc;
+                    document.getElementById("descricao").dataset.fornecedorAtual = (prodObj && prodObj.fornecedor) ? prodObj.fornecedor : "BRASLAB";
+                    var campoDescP = document.getElementById("descricao");
+                    campoDescP.readOnly = true;
+                    campoDescP.style.backgroundColor = "#e9ecef";
+                    fecharModalPesquisa();
+                    document.getElementById("nome_cliente").focus();
+                }
+            };
+        });
+    };
+
+    function fazerBuscaAutomaticaMalote(campoDisparador, valor) {
+        valor = valor.trim();
+        var campoWeb = document.getElementById("malote_cod_web");
+        var campoProd = document.getElementById("malote_cod_produto");
+        var campoDesc = document.getElementById("malote_descricao");
+
+        if (valor === "") {
+            if (campoWeb.value === "" && campoProd.value === "") {
+                campoDesc.value = "";
+                campoDesc.placeholder = "Preenchimento automático...";
+            }
+            return;
+        }
+
+        var codigosLivres = ["200", "201", "202", "203", "204", "205"];
+        if (campoDisparador === "produto" && codigosLivres.includes(valor)) {
+            var enc = bancoDadosProdutos.find(p => p.codigo === valor);
+            if (enc) {
+                campoProd.value = enc.codigo;
+                campoDesc.value = enc.descricao;
+                campoDesc.readOnly = true;
+                campoDesc.style.backgroundColor = "#e9ecef";
+                campoWeb.value = "";
+            }
+            return;
+        }
+        if (campoDisparador === "web" && codigosLivres.includes(campoProd.value)) return;
+
+        var encontrado = bancoDadosProdutos.find(function(p) {
+            if (campoDisparador === "web") return String(p.cod_web).trim() === valor;
+            if (campoDisparador === "produto") return String(p.codigo).trim() === valor;
+            return false;
+        });
+
+        if (encontrado) {
+            campoWeb.value = encontrado.cod_web || "";
+            campoProd.value = encontrado.codigo;
+            campoDesc.value = encontrado.descricao;
+            campoDesc.readOnly = true;
+            campoDesc.style.backgroundColor = "#e9ecef";
+        } else {
+            campoDesc.placeholder = "Código novo! Digite a descrição manualmente...";
+            campoDesc.value = "";
+            campoDesc.readOnly = false;
+            campoDesc.style.backgroundColor = "#ffffff";
+        }
+    }
+
+    if (document.getElementById("malote_cod_web")) {
+        document.getElementById("malote_cod_web").addEventListener("change", function() {
+            fazerBuscaAutomaticaMalote("web", this.value);
+        });
+    }
+    if (document.getElementById("malote_cod_produto")) {
+        document.getElementById("malote_cod_produto").addEventListener("change", function() {
+            fazerBuscaAutomaticaMalote("produto", this.value);
+        });
+    }
+    if (document.getElementById("malote_data")) {
+        document.getElementById("malote_data").value = obterDataBrasilia();
+    }
+	    ["inputLacreMalote", "inputRespMalote", "inputEncMalote"].forEach((id, idx, arr) => {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    var proximo = idx + 1 < arr.length ? document.getElementById(arr[idx + 1]) : document.getElementById("malote_os");
+                    if (proximo) proximo.focus();
+                }
+            });
+        }
+    });
+
+
+    if (document.getElementById("formMalote")) {
+        document.getElementById("formMalote").addEventListener("submit", function(e) {
+            e.preventDefault();
+            var tbody = document.getElementById("corpoTabelaMalote");
+            var novaLinha = tbody.insertRow();
+
+            novaLinha.insertCell(0).innerText = document.getElementById("malote_os").value.trim();
+
+            var celulaWeb = novaLinha.insertCell(1);
+            var containerWeb = document.createElement("div");
+            containerWeb.className = "cell-web-container";
+            var spanTexto = document.createElement("span");
+            spanTexto.innerText = document.getElementById("malote_cod_web").value.trim();
+
+            var btnLapis = document.createElement("button");
+            btnLapis.type = "button";
+            btnLapis.className = "btn-edit-inline";
+            btnLapis.innerHTML = "✏️";
+            btnLapis.onclick = function() {
+                if (containerWeb.querySelector("input")) return;
+                var inputTemp = document.createElement("input");
+                inputTemp.type = "text";
+                inputTemp.className = "input-edit-inline";
+                inputTemp.value = spanTexto.innerText;
+                function salvarEd() {
+                    spanTexto.innerText = inputTemp.value.trim();
+                    inputTemp.replaceWith(spanTexto);
+                    btnLapis.style.display = "inline-flex";
+                }
+                inputTemp.onblur = salvarEd;
+                inputTemp.onkeydown = function(evt) { if (evt.key === "Enter") salvarEd(); };
+                spanTexto.replaceWith(inputTemp);
+                btnLapis.style.display = "none";
+                inputTemp.focus();
+            };
+
+            containerWeb.appendChild(spanTexto);
+            containerWeb.appendChild(btnLapis);
+            celulaWeb.appendChild(containerWeb);
+
+            novaLinha.insertCell(2).innerText = document.getElementById("malote_cod_produto").value.trim();
+            novaLinha.insertCell(3).innerText = document.getElementById("malote_descricao").value.trim();
+            novaLinha.insertCell(4).innerText = document.getElementById("malote_nome_cliente").value.trim();
+            novaLinha.insertCell(5).innerText = document.getElementById("malote_quantidade").value;
+            novaLinha.insertCell(6).innerText = document.getElementById("malote_data").value.split("-").reverse().join("/");
+
+            var celulaAcoes = novaLinha.insertCell(7);
+            celulaAcoes.className = "cell-actions";
+            celulaAcoes.innerHTML = '<button type="button" onclick="if(confirm(\'Remover esta linha?\')) this.parentNode.parentNode.remove()" class="btn-delete">🗑️</button>';
+
+            document.getElementById("formMalote").reset();
+            document.getElementById("malote_data").value = obterDataBrasilia();
+            document.getElementById("malote_os").focus();
+        });
+    }
+
+    function limparTabelaMaloteToda() {
+        if (confirm("⚠️ Deseja excluir todas as linhas da Capa Malote?")) {
+            document.getElementById("corpoTabelaMalote").innerHTML = "";
+            document.getElementById("malote_os").focus();
+        }
+    }
+
+    async function gerarPDFMaloteEEnviarNuvem() {
+        var linhas = document.querySelectorAll("#corpoTabelaMalote tr");
+        var lojaNum = document.getElementById("selectLojaMalote").value;
+        var lacre = document.getElementById("inputLacreMalote").value.trim();
+        var resp = document.getElementById("inputRespMalote").value.trim();
+        var enc = document.getElementById("inputEncMalote").value.trim();
+
+        if (linhas.length > 0 && dbSupabase) {
+            var loteMalote = [];
+            linhas.forEach(function(linha) {
+                var c = linha.getElementsByTagName("td");
+                if (c.length < 7) return;
+                var spanW = c[1].querySelector("span");
+                var codW = spanW ? spanW.innerText.trim() : c[1].innerText.trim();
+                var dataTxt = c[6].innerText.trim();
+                var dataISO = dataTxt.includes("/") ? dataTxt.split("/").reverse().join("-") : obterDataBrasilia();
+
+                loteMalote.push({
+                    loja: String(lojaNum).padStart(2, '0'),
+                    lacre: lacre,
+                    responsavel: resp,
+                    encarregado: enc,
+                    os: c[0].innerText.trim(),
+                    cod_web: codW,
+                    cod_produto: c[2].innerText.trim(),
+                    descricao: c[3].innerText.trim(),
+                    nome_cliente: c[4].innerText.trim(),
+                    quantidade: parseFloat(c[5].innerText.trim()) || 2,
+                    data: dataISO
+                });
+            });
+
+            if (loteMalote.length > 0) {
+                const { error } = await dbSupabase.from("malotes_enviados").insert(loteMalote);
+                if (error) {
+                    alert("⚠️ Erro ao enviar dados do malote para o laboratório: " + error.message);
+                }
+            }
+        }
+
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const ano = hoje.getFullYear();
+        const tituloOriginal = document.title;
+        document.title = `Capa Malote ${dia}-${mes}-${ano}`;
+
+        var divMensagem = document.getElementById("mensagemMalotePrint");
+        divMensagem.innerText = "CAPA MALOTE DA LOJA " + lojaNum + " PARA ENVIO AO CDAM (Laboratório)";
+        window.print();
+        setTimeout(function() { document.title = tituloOriginal; }, 1000);
+    }
+
+    // ========================================================
+    // BLOCO 4: PREENCHIMENTO AUTOMÁTICO POR OS (CONFERÊNCIA LAB)
+    // ========================================================
+    async function buscarDadosMalotePorOS(osDigitada) {
+        osDigitada = osDigitada.trim();
+        if (osDigitada === "" || !dbSupabase) return;
+
+        var lojaSelecionada = String(numeroLojaAtual).padStart(2, '0');
+
+        const { data, error } = await dbSupabase
+            .from("malotes_enviados")
+            .select("*")
+            .eq("loja", lojaSelecionada)
+            .eq("os", osDigitada)
+            .order("id", { ascending: false })
+            .limit(1);
+
+        if (error || !data || data.length === 0) {
+            return; // Se não encontrar no malote, mantém livre para digitação manual normal
+        }
+
+        var item = data[0];
+        var campoWeb = document.getElementById("cod_web");
+        var campoProd = document.getElementById("cod_produto");
+        var campoDesc = document.getElementById("descricao");
+        var campoCliente = document.getElementById("nome_cliente");
+        var campoQtd = document.getElementById("quantidade");
+
+        if (campoWeb) campoWeb.value = item.cod_web || "";
+        if (campoProd) campoProd.value = item.cod_produto || "";
+        if (campoCliente) campoCliente.value = item.nome_cliente || "";
+        if (campoQtd) campoQtd.value = item.quantidade || 2;
+
+        // Cruza com o cadastro de lentes para puxar o fornecedor e descrição atualizados
+        var lenteCadastrada = bancoDadosProdutos.find(p =>
+            (item.cod_produto && String(p.codigo).trim() === String(item.cod_produto).trim()) ||
+            (item.cod_web && String(p.cod_web).trim() === String(item.cod_web).trim())
+        );
+
+        if (campoDesc) {
+            if (lenteCadastrada) {
+                campoDesc.value = lenteCadastrada.descricao;
+                campoDesc.dataset.fornecedorAtual = lenteCadastrada.fornecedor || "BRASLAB";
+                campoDesc.readOnly = true;
+                campoDesc.style.backgroundColor = "#e9ecef";
+            } else {
+                campoDesc.value = item.descricao || "";
+                campoDesc.dataset.fornecedorAtual = "BRASLAB";
+                campoDesc.readOnly = false;
+                campoDesc.style.backgroundColor = "#ffffff";
+            }
+        }
+
+        // Pula o foco direto para o campo VALOR NF para agilizar sua conferência
+        var campoValor = document.getElementById("valor_nf");
+        if (campoValor) campoValor.focus();
+    }
+
+    // Dispara a busca ao sair do campo OS (Tab) ou pressionar Enter dentro dele
+    var campoOsConferencia = document.getElementById("os");
+    if (campoOsConferencia) {
+        campoOsConferencia.addEventListener("change", function() {
+            buscarDadosMalotePorOS(this.value);
+        });
+        campoOsConferencia.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                buscarDadosMalotePorOS(this.value);
+            }
+        });
+    }
 
 </script>
 </body>
