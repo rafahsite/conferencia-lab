@@ -1524,8 +1524,9 @@ function filtrarHistoricoProducao() {
         btnDel.style.cssText = "background: #cc0000; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold;";
         
         btnDel.onclick = function() {
-            excluirRegistroRelatorio(item.os, item.loja, item.cod_produto, item.descricao, item.valor_nf, item.nf, item.data);
+            excluirRegistroRelatorio(item.id, item.os, item.loja, item.cod_produto, item.descricao, item.valor_nf, item.nf, item.data);
         };
+
         celulaDel.appendChild(btnDel);
     });
 
@@ -1667,8 +1668,9 @@ function executarBuscaGlobalRelatorio(termo) {
         btnDel.style.cssText = "background: #cc0000; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold;";
         
         btnDel.onclick = function() {
-            excluirRegistroRelatorio(item.os, item.loja, item.cod_produto, item.descricao, item.valor_nf, item.nf, item.data);
+            excluirRegistroRelatorio(item.id, item.os, item.loja, item.cod_produto, item.descricao, item.valor_nf, item.nf, item.data);
         };
+
         celulaDel.appendChild(btnDel);
     });
 
@@ -2536,7 +2538,7 @@ function gerarPDFouImprimir() {
             var textoData = celulas[9].innerText.trim();
             var dataFormatada = textoData.includes("/") ? textoData.split("/").reverse().join("-") : obterDataBrasilia();
 
-            await dbSupabase.from("relatorios").insert([{
+            const { data } = await dbSupabase.from("relatorios").insert([{
                 os: celulas[0].innerText.trim(),
                 loja: celulas[1].innerText.trim(),
                 cod_web: codWebTexto,
@@ -2549,9 +2551,15 @@ function gerarPDFouImprimir() {
                 data: dataFormatada,
                 conferente: nomeConferente,
                 fornecedor: linha.dataset.fornecedorItem || "BRASLAB"
-            }]);
+            }]).select();
+
+            if (data && data[0]) {
+                var itemLocal = historicoProducao.find(h => h.os === data[0].os && h.nf === data[0].nf && h.data === data[0].data && !h.id);
+                if (itemLocal) itemLocal.id = data[0].id;
+                localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
+            }
         });
-		
+
         if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
         if (typeof filtrarHistoricoProducao === "function") filtrarHistoricoProducao();
     }
@@ -2969,14 +2977,24 @@ function salvarLentePeloCadastro() {
     var web = document.getElementById("config_cad_web").value.trim();
     var prod = document.getElementById("config_cad_produto").value.trim();
     var desc = document.getElementById("config_cad_descricao").value.trim();
-	var forn = document.getElementById("config_cad_fornecedor").value; 
+    var forn = document.getElementById("config_cad_fornecedor").value; 
     
-      var idNuvemLente = null;
+    var textoBotao = document.getElementById("btnSalvarLenteCadastro").innerText.trim();
 
+    if (web === "" || prod === "" || desc === "") {
+        alert("⚠️ Por favor, preencha todos os campos da lente!");
+        return;
+    }
+
+    var idNuvemLente = null;
+
+    // MODO ALTERAR: Atualiza o registro existente mantendo o mesmo ID
     if (textoBotao === "Alterar Lente") {
         if (indexSendoEditadoCadastro === null) {
             var indexEncontrado = bancoDadosProdutos.findIndex(p => p.codigo === prod || p.cod_web === web);
-            if (indexEncontrado !== -1) indexSendoEditadoCadastro = indexEncontrado;
+            if (indexEncontrado !== -1) {
+                indexSendoEditadoCadastro = indexEncontrado;
+            }
         }
 
         if (indexSendoEditadoCadastro !== null) {
@@ -2993,32 +3011,45 @@ function salvarLentePeloCadastro() {
             alert("❌ Erro: Não foi possível localizar o registro original para alteração.");
             return;
         }
-    } else {
+    } 
+    // MODO CADASTRAR NOVO: Bloqueia se o CÓD. WEB já existir
+    else {
         var duplicado = bancoDadosProdutos.find(item => item.cod_web === web);
         if (duplicado) {
             alert("❌ Erro: Não é possível cadastrar! O CÓD. WEB '" + web + "' já está cadastrado no produto: " + duplicado.descricao + " (" + duplicado.codigo + ")");
             return;
         }
+        
         bancoDadosProdutos.push({ cod_web: web, codigo: prod, fornecedor: forn, descricao: desc });
         alert("🎉 Nova lente cadastrada com sucesso!");
     }
 
     localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
 		
+    // Sincroniza a lente cadastrada ou editada direto no Supabase pelo ID
     (async function() {
         if (idNuvemLente) {
-            await dbSupabase.from("lentes").update({ cod_web: web, codigo: prod, descricao: desc, fornecedor: forn }).eq("id", idNuvemLente);
+            await dbSupabase.from("lentes").update({ 
+                cod_web: web, 
+                codigo: prod, 
+                descricao: desc, 
+                fornecedor: forn 
+            }).eq("id", idNuvemLente);
         } else {
-            const { data } = await dbSupabase.from("lentes").insert([{ cod_web: web, codigo: prod, descricao: desc, fornecedor: forn }]).select();
-            if (data && data[0]) {
+            const { data } = await dbSupabase.from("lentes").insert([{ 
+                cod_web: web, 
+                codigo: prod, 
+                descricao: desc, 
+                fornecedor: forn 
+            }]).select();
+            
+            if (data && data.length > 0) {
                 bancoDadosProdutos[bancoDadosProdutos.length - 1].id = data[0].id;
                 localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
             }
         }
     })();
 
-
-	
     activarLayoutBancoCarregado(bancoDadosProdutos.length);
     atualizarStatusTalao(bancoDadosProdutos.length);
     atualizarStatusCadastro(bancoDadosProdutos.length);
@@ -3592,7 +3623,7 @@ function renderizarTabelaLentesCadastroModal(dados) {
     tbody.innerHTML = "";
 
     if (dados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="no-data">Nenhuma lente encontrada.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nenhuma lente encontrada.</td></tr>';
         return;
     }
 
@@ -3627,7 +3658,7 @@ function renderizarTabelaLentesCadastroModal(dados) {
         btnEdit.className = "btn-modal-action btn-modal-edit";
         btnEdit.onclick = function(e) {
             e.stopPropagation();
-            indexSendoEditadoCadastro = indexReal; // Vincula o ID absoluto correto
+            indexSendoEditadoCadastro = indexReal;
             document.getElementById("config_cad_web").value = produto.cod_web || "";
             document.getElementById("config_cad_produto").value = produto.codigo;
             document.getElementById("config_cad_fornecedor").value = produto.fornecedor || "BRASLAB";
@@ -3646,9 +3677,11 @@ function renderizarTabelaLentesCadastroModal(dados) {
             if (confirm("Deseja remover permanentemente do sistema a lente:\n" + produto.descricao + "?")) {
                 var idParaDeletar = produto.id;
                 var codParaDeletar = produto.codigo;
+                
                 bancoDadosProdutos.splice(indexReal, 1);
                 localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
                 
+                // Apaga a lente diretamente na nuvem pelo ID
                 (async function() {
                     if (idParaDeletar) {
                         await dbSupabase.from("lentes").delete().eq("id", idParaDeletar);
@@ -3663,7 +3696,6 @@ function renderizarTabelaLentesCadastroModal(dados) {
                 filtrarLentesCadastroModal();
             }
         };
-
         
         linha.ondblclick = function() {
             indexSendoEditadoCadastro = indexReal;
@@ -3681,7 +3713,6 @@ function renderizarTabelaLentesCadastroModal(dados) {
         celulaAcoes.appendChild(btnDel);
     });
 }
-
 
     // --- RENDERIZAR TABELA DE LOJAS NO MODAL ---
 function renderizarTabelaLojasCadastroModal(dados) {
@@ -3914,24 +3945,31 @@ function alternarModoEdicaoRelatorio() {
     });
 }
 
-function excluirRegistroRelatorio(os, loja, cod_produto, descricao, valor_nf, nf, dataOriginal) {
-    if (confirm("⚠️ Deseja remover permanentemente a OS: " + os + " Produto: " + cod_produto + " Valor NF: R$ " + valor_nf + " e NF: " + nf + " do histórico local?")) {
+async function excluirRegistroRelatorio(idNuvem, os, loja, cod_produto, descricao, valor_nf, nf, dataOriginal) {
+    if (confirm("⚠️ Deseja remover permanentemente a OS: " + os + " | Produto: " + cod_produto + " | Valor NF: R$ " + valor_nf + " | NF: " + nf + "?")) {
         
-        // TRAVA DE SEGURANÇA: Só exclui se todos os campos baterem perfeitamente
-        historicoProducao = historicoProducao.filter(function(item) {
-            return !(String(item.os).trim() === String(os).trim() &&
-                     String(item.loja).padStart(2, '0') === String(loja).padStart(2, '0') && 
-                     String(item.cod_produto).trim() === String(cod_produto).trim() &&
-                     String(item.descricao).trim() === String(descricao).trim() &&
-                     String(item.valor_nf).trim() === String(valor_nf).trim() &&
-                     String(item.nf).trim() === String(nf).trim() && 
-                     item.data === dataOriginal);
-        });
+        if (idNuvem) {
+            const { error } = await dbSupabase.from("relatorios").delete().eq("id", idNuvem);
+            if (error) {
+                alert("❌ Erro ao apagar na nuvem: " + error.message);
+                return;
+            }
+            historicoProducao = historicoProducao.filter(item => item.id !== idNuvem);
+        } else {
+            historicoProducao = historicoProducao.filter(function(item) {
+                return !(String(item.os).trim() === String(os).trim() &&
+                         String(item.loja).padStart(2, '0') === String(loja).padStart(2, '0') && 
+                         String(item.cod_produto).trim() === String(cod_produto).trim() &&
+                         String(item.descricao).trim() === String(descricao).trim() &&
+                         String(item.valor_nf).trim() === String(valor_nf).trim() &&
+                         String(item.nf).trim() === String(nf).trim() && 
+                         item.data === dataOriginal);
+            });
+        }
 
         localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
         if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
         
-        // Recarrega a tabela mantendo o modo de edição ativo
         var estadoEdicaoSalvo = modoEdicaoRelatorioAtivo;
         filtrarHistoricoProducao();
         if (estadoEdicaoSalvo) {
@@ -3940,7 +3978,6 @@ function excluirRegistroRelatorio(os, loja, cod_produto, descricao, valor_nf, nf
         }
     }
 }
-
 
 
 // Remove permanentemente o banco de dados de lentes e filiais configuradas do computador
