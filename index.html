@@ -4567,6 +4567,7 @@ function limparBancoDadosCadastro() {
                 var codW = spanW ? spanW.innerText.trim() : c[1].innerText.trim();
                 var dataTxt = c[6].innerText.trim();
                 var dataISO = dataTxt.includes("/") ? dataTxt.split("/").reverse().join("-") : obterDataBrasilia();
+                var dataHoraBrasil = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }).replace(",", "");
 
                 loteMalote.push({
                     loja: String(lojaNum).padStart(2, '0'),
@@ -4579,8 +4580,10 @@ function limparBancoDadosCadastro() {
                     descricao: c[3].innerText.trim(),
                     nome_cliente: c[4].innerText.trim(),
                     quantidade: parseFloat(c[5].innerText.trim()) || 2,
-                    data: dataISO
+                    data: dataISO,
+                    criado_em: dataHoraBrasil
                 });
+
             });
 
             if (loteMalote.length > 0) {
