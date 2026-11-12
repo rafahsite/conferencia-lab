@@ -3179,8 +3179,11 @@ function renderizarTabelaCadastroLentes() {
             return;
         }
 
+        var idNuvemLoja = null;
+
         if (indexSendoEditadoLoja !== null) {
-            listaLojasConfiguradas[indexSendoEditadoLoja] = { num: num, nome: nome };
+            idNuvemLoja = listaLojasConfiguradas[indexSendoEditadoLoja].id || null;
+            listaLojasConfiguradas[indexSendoEditadoLoja] = { id: idNuvemLoja, num: num, nome: nome };
             alert("✏️ Loja alterada com sucesso!");
         } else {
             listaLojasConfiguradas.push({ num: num, nome: nome });
@@ -3188,13 +3191,26 @@ function renderizarTabelaCadastroLentes() {
         }
 
         localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
-        document.getElementById("config_loja_num").value = "";
-        document.getElementById("config_loja_nome").value = "";
-        indexSendoEditadoLoja = null;
-            
+
+        // Sincroniza a loja criada ou editada direto no Supabase
+        (async function() {
+            if (idNuvemLoja) {
+                await dbSupabase.from("lojas").update({ num: num, nome: nome }).eq("id", idNuvemLoja);
+            } else {
+                const { data } = await dbSupabase.from("lojas").upsert([{ num: num, nome: nome }], { onConflict: "num" }).select();
+                if (data && data.length > 0) {
+                    var lojaLocal = listaLojasConfiguradas.find(l => l.num === num);
+                    if (lojaLocal) lojaLocal.id = data[0].id;
+                    localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
+                }
+            }
+        })();
+
+        limparFormCadastroLojas();
         atualizarSelectsDeLojas();
         renderizarTabelaCadastroLojas();
     }
+
 
 function renderizarTabelaCadastroLojas() {
     var termo = document.getElementById("filtro_cadastro_lojas").value.toLowerCase().trim();
@@ -3267,6 +3283,7 @@ function renderizarTabelaCadastroLojas() {
 
     function salvarFornecedorPeloCadastro() {
         var nome = document.getElementById("config_fornecedor_nome").value.trim().toUpperCase();
+        var textoBotao = document.getElementById("btnSalvarFornecedorCadastro").innerText.trim();
 
         if (nome === "") {
             alert("⚠️ Por favor, digite o nome do fornecedor!");
@@ -3279,19 +3296,45 @@ function renderizarTabelaCadastroLojas() {
             return;
         }
 
-        if (indexSendoEditadoFornecedor !== null) {
-            listaFornecedoresConfigurados[indexSendoEditadoFornecedor] = { nome: nome };
-            alert("✏️ Fornecedor alterada com sucesso!");
+        var idNuvemForn = null;
+
+        // Verifica o texto do botão ("Alterar Forn.") ou o índice em edição
+        if (textoBotao.includes("Alterar Forn.") || indexSendoEditadoFornecedor !== null) {
+            if (indexSendoEditadoFornecedor !== null) {
+                idNuvemForn = listaFornecedoresConfigurados[indexSendoEditadoFornecedor].id || null;
+                listaFornecedoresConfigurados[indexSendoEditadoFornecedor] = { id: idNuvemForn, nome: nome };
+                alert("✏️ Fornecedor alterado com sucesso!");
+            } else {
+                alert("❌ Erro: Não foi possível localizar o fornecedor original para alteração.");
+                return;
+            }
         } else {
             listaFornecedoresConfigurados.push({ nome: nome });
             alert("🏭 Novo fornecedor incluído no sistema!");
         }
 
         localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
+
+        // Sincroniza o fornecedor criado ou editado direto no Supabase
+        (async function() {
+            if (idNuvemForn) {
+                await dbSupabase.from("fornecedores").update({ nome: nome }).eq("id", idNuvemForn);
+            } else {
+                const { data } = await dbSupabase.from("fornecedores").upsert([{ nome: nome }], { onConflict: "nome" }).select();
+                if (data && data.length > 0) {
+                    var fornLocal = listaFornecedoresConfigurados.find(f => f.nome === nome);
+                    if (fornLocal) fornLocal.id = data.id;
+                    localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
+                }
+            }
+        })();
+
         limparFormCadastroFornecedores();
         atualizarSelectsDeFornecedores();
         if (typeof renderizarTabelaCadastroFornecedores === "function") renderizarTabelaCadastroFornecedores();
     }
+
+
 
     function limparFormCadastroFornecedores() {
         document.getElementById("config_fornecedor_nome").value = "";
@@ -3377,8 +3420,8 @@ function renderizarTabelaCadastroLojas() {
 
     function fecharModalFornecedoresCadastro() {
         document.getElementById("modalPesquisaFornecedoresCadastro").style.display = "none";
-        indexSendoEditadoFornecedor = null;
     }
+
 
     function filtrarFornecedoresCadastroModal() {
         var termo = document.getElementById("filtroPesquisaFornecedoresCad").value.toLowerCase().trim();
@@ -3435,13 +3478,27 @@ function renderizarTabelaCadastroLojas() {
                     return;
                 }
                 if (confirm("Deseja apagar permanentemente o fornecedor " + forn.nome + "?")) {
+                    var idParaDeletar = forn.id;
+                    var nomeParaDeletar = forn.nome;
+
                     listaFornecedoresConfigurados.splice(indexReal, 1);
                     localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
+
+                    // Apaga o fornecedor diretamente na nuvem
+                    (async function() {
+                        if (idParaDeletar) {
+                            await dbSupabase.from("fornecedores").delete().eq("id", idParaDeletar);
+                        } else {
+                            await dbSupabase.from("fornecedores").delete().eq("nome", nomeParaDeletar);
+                        }
+                    })();
+
                     limparFormCadastroFornecedores();
                     atualizarSelectsDeFornecedores();
                     filtrarFornecedoresCadastroModal();
                 }
             };
+
 
             celulaAcoes.appendChild(btnEdit);
             celulaAcoes.appendChild(btnDel);
@@ -3767,13 +3824,27 @@ function renderizarTabelaLojasCadastroModal(dados) {
         btnDel.onclick = function(e) {
             e.stopPropagation();
             if (confirm("Deseja apagar permanentemente a loja " + loja.num + " - " + loja.nome + "?")) {
+                var idParaDeletar = loja.id;
+                var numParaDeletar = loja.num;
+
                 listaLojasConfiguradas.splice(indexReal, 1);
                 localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
+
+                // Apaga a loja diretamente na nuvem
+                (async function() {
+                    if (idParaDeletar) {
+                        await dbSupabase.from("lojas").delete().eq("id", idParaDeletar);
+                    } else {
+                        await dbSupabase.from("lojas").delete().eq("num", numParaDeletar);
+                    }
+                })();
+
                 limparFormCadastroLojas();
                 atualizarSelectsDeLojas();
                 filtrarLojasCadastroModal();
             }
         };
+
         
         linha.ondblclick = function() {
             indexSendoEditadoLoja = indexReal;
