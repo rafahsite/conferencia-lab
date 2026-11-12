@@ -2971,58 +2971,52 @@ function salvarLentePeloCadastro() {
     var desc = document.getElementById("config_cad_descricao").value.trim();
 	var forn = document.getElementById("config_cad_fornecedor").value; 
     
-    
-    // Captura o texto atual do botão para saber qual ação o usuário quer fazer
-    var textoBotao = document.getElementById("btnSalvarLenteCadastro").innerText.trim();
+      var idNuvemLente = null;
 
-    if (web === "" || prod === "" || desc === "") {
-        alert("⚠️ Por favor, preencha todos os campos da lente!");
-        return;
-    }
-
-    // MODO ALTERAR: Se o botão for de "Alterar Lente", atualiza direto na linha
     if (textoBotao === "Alterar Lente") {
-        // Se por acaso o index se perdeu, localiza a linha pelo código do produto ou web digitado
         if (indexSendoEditadoCadastro === null) {
             var indexEncontrado = bancoDadosProdutos.findIndex(p => p.codigo === prod || p.cod_web === web);
-            if (indexEncontrado !== -1) {
-                indexSendoEditadoCadastro = indexEncontrado;
-            }
+            if (indexEncontrado !== -1) indexSendoEditadoCadastro = indexEncontrado;
         }
 
         if (indexSendoEditadoCadastro !== null) {
+            idNuvemLente = bancoDadosProdutos[indexSendoEditadoCadastro].id || null;
             bancoDadosProdutos[indexSendoEditadoCadastro] = { 
+                id: idNuvemLente,
                 cod_web: web, 
                 codigo: prod,
-				descricao: desc,	
+                descricao: desc,	
                 fornecedor: forn 
-                 
             };
             alert("✏️ Lente alterada com sucesso no registro!");
         } else {
             alert("❌ Erro: Não foi possível localizar o registro original para alteração.");
             return;
         }
-    } 
-    // MODO CADASTRAR NOVO: Se for "Cadastrar Nova Lente", bloqueia estritamente se o CÓD. WEB já existir
-    else {
+    } else {
         var duplicado = bancoDadosProdutos.find(item => item.cod_web === web);
         if (duplicado) {
             alert("❌ Erro: Não é possível cadastrar! O CÓD. WEB '" + web + "' já está cadastrado no produto: " + duplicado.descricao + " (" + duplicado.codigo + ")");
             return;
         }
-        
         bancoDadosProdutos.push({ cod_web: web, codigo: prod, fornecedor: forn, descricao: desc });
         alert("🎉 Nova lente cadastrada com sucesso!");
     }
 
     localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
-	    
-		// Sincroniza a lente cadastrada/editada com a nuvem
+		
     (async function() {
-        await dbSupabase.from("lentes").delete().eq("codigo", prod);
-        await dbSupabase.from("lentes").insert([{ cod_web: web, codigo: prod, descricao: desc, fornecedor: forn }]);
+        if (idNuvemLente) {
+            await dbSupabase.from("lentes").update({ cod_web: web, codigo: prod, descricao: desc, fornecedor: forn }).eq("id", idNuvemLente);
+        } else {
+            const { data } = await dbSupabase.from("lentes").insert([{ cod_web: web, codigo: prod, descricao: desc, fornecedor: forn }]).select();
+            if (data && data[0]) {
+                bancoDadosProdutos[bancoDadosProdutos.length - 1].id = data[0].id;
+                localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
+            }
+        }
     })();
+
 
 	
     activarLayoutBancoCarregado(bancoDadosProdutos.length);
@@ -3650,14 +3644,26 @@ function renderizarTabelaLentesCadastroModal(dados) {
         btnDel.onclick = function(e) {
             e.stopPropagation();
             if (confirm("Deseja remover permanentemente do sistema a lente:\n" + produto.descricao + "?")) {
+                var idParaDeletar = produto.id;
+                var codParaDeletar = produto.codigo;
                 bancoDadosProdutos.splice(indexReal, 1);
                 localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
+                
+                (async function() {
+                    if (idParaDeletar) {
+                        await dbSupabase.from("lentes").delete().eq("id", idParaDeletar);
+                    } else {
+                        await dbSupabase.from("lentes").delete().eq("codigo", codParaDeletar);
+                    }
+                })();
+
                 atualizarStatusTalao(bancoDadosProdutos.length);
                 activarLayoutBancoCarregado(bancoDadosProdutos.length);
                 atualizarStatusCadastro(bancoDadosProdutos.length);
                 filtrarLentesCadastroModal();
             }
         };
+
         
         linha.ondblclick = function() {
             indexSendoEditadoCadastro = indexReal;
