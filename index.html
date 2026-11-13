@@ -2340,7 +2340,9 @@ if (document.getElementById("arquivoCSV")) {
 
     function fecharModalPesquisa() {
         document.getElementById("modalPesquisa").style.display = "none";
+        modoPesquisaModalPlanilha = "planilha";
     }
+
 
     // ADICIONE AS DUAS FUNÇÕES LOGO AQUI ABAIXO:
     function fecharModalTalao() {
@@ -4382,11 +4384,11 @@ function limparBancoDadosCadastro() {
             if (idx === 0) return;
             var tds = linha.getElementsByTagName("td");
             if (tds.length < 3) return;
-            var web = tds.innerText === "-" ? "" : tds.innerText;
-            var cod = tds.innerText;
-            var desc = tds.innerText;
+            var web = tds[0].innerText === "-" ? "" : tds[0].innerText;
+            var cod = tds[1].innerText;
+            var desc = tds[2].innerText;
 
-            linha.ondblclick = function() {
+            linha.onclick = function() {
                 if (modoPesquisaModalPlanilha === "malote") {
                     document.getElementById("malote_cod_web").value = web;
                     document.getElementById("malote_cod_produto").value = cod;
@@ -4412,6 +4414,7 @@ function limparBancoDadosCadastro() {
             };
         });
     };
+
 
     function fazerBuscaAutomaticaMalote(campoDisparador, valor) {
         valor = valor.trim();
