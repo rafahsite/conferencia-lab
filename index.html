@@ -433,6 +433,7 @@
     <button class="tab-btn" data-tab="relatorios" onclick="alternarAba('relatorios')">📈 RELATÓRIOS</button>
     <button class="tab-btn" data-tab="cadastro" onclick="alternarAba('cadastro')">⚙️ CADASTRO</button>
 	<button class="tab-btn" data-tab="malote" onclick="alternarAba('malote')">📦 CAPA MALOTE</button>
+	<button class="tab-btn" data-tab="malotes_recebidos" onclick="alternarAba('malotes_recebidos')">📥 MALOTES RECEBIDOS</button>
     <button class="tab-btn" data-tab="talao" onclick="alternarAba('talao')">📋 TALÃO DE PEDIDOS</button>
 	
 	    <button type="button" class="tab-btn" onclick="sairDoSistemaSupabase()" style="margin-left: auto; background-color: #cc0000; color: white;">🚪 Sair</button>
@@ -919,6 +920,98 @@
         </div>
     </div>
 
+    <!-- NOVA ABA: CONTROLE DE MALOTES RECEBIDOS (EXCLUSIVA DO LABORATÓRIO) -->
+    <div id="malotes_recebidos" class="tab-content">
+        <div class="container-planilha">
+            
+            <!-- Cabeçalho -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 8px; margin-bottom: 15px;">
+                <h2 style="margin: 0; color: #333; font-size: 20px;">📥 Controle de Malotes Recebidos das Lojas</h2>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" id="btnExcluirSelecionadosMalote" style="background-color: #cc0000; font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 6px; display: none;">🗑️ Excluir Selecionados (0)</button>
+                    <span id="statusMalotesRecebidos" style="font-size: 12px; font-weight: bold; color: #155724;">☁️ Sincronizado</span>
+                </div>
+            </div>
+
+            <!-- Painel de Filtros (Mesmo padrão visual dos Relatórios) -->
+            <div style="background: #f1f3f5; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; border: 1px solid #dee2e6;">
+                
+                <div style="display: flex; flex-direction: column; width: 250px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">🏢 Selecione a Loja:</label>
+                    <select id="mr_select_loja" style="font-size: 13px; font-weight: bold; border: 1px solid #ced4da; padding: 7px; border-radius: 4px; background: white; cursor: pointer; width: 100%;">
+                        <option value="TODAS">— TODAS AS LOJAS —</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; width: 130px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">📅 Data Inicial:</label>
+                    <input type="date" id="mr_data_inicio" style="padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                </div>
+
+                <div style="display: flex; flex-direction: column; width: 130px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">📅 Data Final:</label>
+                    <input type="date" id="mr_data_fim" style="padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                </div>
+
+                <div style="display: flex; flex-direction: column; width: 150px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">🔎 Buscar OS ou Cliente : </label>
+                    <input type="text" id="mr_busca_os" placeholder="Digite a OS..." style="padding: 7px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; outline: none;">
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="btnFiltrarMalotesRecebidos" class="btn-submit" style="height: 35px; padding: 0 16px; font-size: 12px;">🔍 Filtrar Envios</button>
+                </div>
+            </div>
+
+            <!-- Cartões de Resumo e Contadores -->
+            <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; width: 100%;">
+                <div style="flex: 1; min-width: 180px; background: #fff; border: 1px solid #dee2e6; border-top: 4px solid #0056b3; padding: 8px; border-radius: 4px; text-align: center;">
+                    <div style="font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase;">Loja Selecionada</div>
+                    <div id="mr_card_loja" style="font-size: 16px; font-weight: bold; color: #0056b3; margin-top: 3px;">TODAS AS LOJAS</div>
+                </div>
+                <div style="flex: 1; min-width: 180px; background: #fff; border: 1px solid #dee2e6; border-top: 4px solid #17a2b8; padding: 8px; border-radius: 4px; text-align: center;">
+                    <div style="font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase;">Total de Serviços Enviados</div>
+                    <div id="mr_card_total_servicos" style="font-size: 20px; font-weight: bold; color: #17a2b8; margin-top: 3px;">0</div>
+                </div>
+                <div style="flex: 1; min-width: 180px; background: #fff; border: 1px solid #dee2e6; border-top: 4px solid #28a745; padding: 8px; border-radius: 4px; text-align: center;">
+                    <div style="font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase;">Quantidade de OS (Únicas/Dia)</div>
+                    <div id="mr_card_total_os_unicas" style="font-size: 20px; font-weight: bold; color: #28a745; margin-top: 3px;">0</div>
+                </div>
+            </div>
+
+            <!-- Tabela com Checkboxes de Seleção e Ações -->
+            <div class="table-container">
+                <table id="tabelaMalotesRecebidos">
+                    <thead>
+                        <tr>
+                            <th style="width: 20px; text-align: center;">
+                                <input type="checkbox" id="mr_check_todos" title="Selecionar todos" style="width: 16px; height: 16px; cursor: pointer; accent-color: #0056b3;">
+                            </th>
+                            <th>LOJA</th>                            
+                            <th>OS</th>
+                            <th>CÓD. WEB</th>
+                            <th>CÓD. PRODUTO</th>
+                            <th>DESCRIÇÃO</th>
+                            <th>NOME DO CLIENTE</th>
+                            <th>QTD</th>
+                            <th>DATA</th>
+                            <th>RESPONSÁVEL</th>
+                            <th style="width: 85px;">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabelaMalotesRecebidos">
+                        <tr>
+                            <td colspan="12" style="text-align: center; color: #666; font-style: italic; padding: 15px;">
+                                🔍 Selecione o filtro acima para visualizar os malotes recebidos das lojas.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
 
     <!-- A partir daqui a estrutura do seu Talão passa a funcionar normalmente -->
     <div id="talao" class="tab-content">
@@ -1047,7 +1140,7 @@
                 <div class="field-box" style="margin-bottom: 4px;">Condições do aro:<input type="text" id="talao_condicoes_aro" name="talao_condicoes_aro"></div>
                 <div class="shapes-title" style="text-align: left; margin-bottom: 2px;">INFORMAÇÕES DO USUÁRIO:</div>
                 <div class="top-grid" style="grid-template-columns: 3fr 1fr;">
-                    <div class="field-box">NOME:<input type="text" id="talao_nome_usuario" name="talao_nome_usuario"></div>
+                    <div class="field-box">NOME:<input type="text" id="talao_nome_cliente_pedido" name="talao_nome_cliente_pedido" autocomplete="one-time-code"></div>
                     <div class="field-box">INICIAIS:<input type="text" id="talao_iniciais_usuario" name="talao_iniciais_usuario"></div>
                 </div>
                 <div class="top-grid" style="grid-template-columns: 1.8fr 1.6fr 0.6fr; margin-bottom: 0;">
@@ -1258,9 +1351,9 @@
         }
     }
 	
-	    function aplicarPermissoesUsuario(emailUsuario) {
+    function aplicarPermissoesUsuario(emailUsuario) {
         const ehLoja = (emailUsuario || "").toLowerCase().trim() === "lojas@oticalider.com";
-        const abasRestritasLab = ["planilha", "relatorios", "cadastro"];
+        const abasRestritasLab = ["planilha", "relatorios", "cadastro", "malotes_recebidos"];
 
         abasRestritasLab.forEach(tab => {
             const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
@@ -1271,6 +1364,7 @@
             alternarAba("malote");
         }
     }
+
 
     async function carregarDadosDaNuvem() {
         // 1. Carrega Lentes
@@ -1362,7 +1456,7 @@
             var campoOs = document.getElementById("os");
             if (campoOs) campoOs.focus();
         } else if (tabId === 'talao') {
-            var campoProdTalao = document.getElementById("campoProdutoTalao");
+            var campoProdTalao = document.getElementById("talao_cod");
             if (campoProdTalao) campoProdTalao.focus();
         }
     }
@@ -1425,6 +1519,9 @@
         if (document.getElementById("data")) document.getElementById("data").value = obterDataBrasilia();
         if (document.getElementById("rep_data_inicio")) document.getElementById("rep_data_inicio").value = obterDataBrasilia();
         if (document.getElementById("rep_data_fim")) document.getElementById("rep_data_fim").value = obterDataBrasilia();
+		        if (document.getElementById("mr_data_inicio")) document.getElementById("mr_data_inicio").value = obterDataBrasilia();
+        if (document.getElementById("mr_data_fim")) document.getElementById("mr_data_fim").value = obterDataBrasilia();
+
         
         const campoDataTalao = document.getElementById('data-atual');
         if (campoDataTalao) campoDataTalao.value = obterDataBrasilia();
@@ -1544,6 +1641,17 @@
             var textoAtualMalote = selectMalote.options[selectMalote.selectedIndex]?.text || "";
             var divTituloMalote = document.getElementById("textoNomeLojaMalote");
             if (divTituloMalote) divTituloMalote.innerText = textoAtualMalote;
+        }
+		        // 4. Atualiza o seletor da aba Malotes Recebidos
+        var selectMR = document.getElementById("mr_select_loja");
+        if (selectMR) {
+            var valorAntigoMR = selectMR.value;
+            selectMR.innerHTML = '<option value="TODAS">— TODAS AS LOJAS —</option>';
+            lojasParaExibir.forEach(l => {
+                var opt = new Option(l.num + " " + l.nome, l.num);
+                selectMR.add(opt);
+            });
+            selectMR.value = valorAntigoMR || "TODAS";
         }
 
 	
@@ -4359,6 +4467,18 @@ function limparBancoDadosCadastro() {
                 el.style.color = "#cc0000";
             }
         });
+		
+	        var elMR = document.getElementById("statusMalotesRecebidos");
+        if (elMR) {
+            if (conectado) {
+                elMR.innerText = "☁️ Sincronizado";
+                elMR.style.color = "#155724";
+            } else {
+                elMR.innerText = "⚠️ Sem Internet";
+                elMR.style.color = "#cc0000";
+            }
+        }
+
     }
 
 
@@ -4593,8 +4713,11 @@ function limparBancoDadosCadastro() {
                 const { error } = await dbSupabase.from("malotes_enviados").insert(loteMalote);
                 if (error) {
                     alert("⚠️ Erro ao enviar dados do malote para o laboratório: " + error.message);
+                } else {
+                    alert("✅ Os dados foram enviados com sucesso!");
                 }
             }
+
         }
 
         const hoje = new Date();
@@ -4613,8 +4736,11 @@ function limparBancoDadosCadastro() {
     // ========================================================
     // BLOCO 4: PREENCHIMENTO AUTOMÁTICO POR OS (CONFERÊNCIA LAB)
     // ========================================================
+    var segundoItemMalotePendente = null;
+
     async function buscarDadosMalotePorOS(osDigitada) {
         osDigitada = osDigitada.trim();
+        segundoItemMalotePendente = null;
         var campoWeb = document.getElementById("cod_web");
 
         if (osDigitada === "" || !dbSupabase) {
@@ -4624,35 +4750,51 @@ function limparBancoDadosCadastro() {
 
         var lojaSelecionada = String(numeroLojaAtual).padStart(2, '0');
 
+        // Busca os últimos 2 registros dessa OS e loja ordenados do mais recente para o mais antigo
         const { data, error } = await dbSupabase
             .from("malotes_enviados")
             .select("*")
             .eq("loja", lojaSelecionada)
             .eq("os", osDigitada)
             .order("id", { ascending: false })
-            .limit(1);
+            .limit(2);
 
         if (error || !data || data.length === 0) {
-            // Se não encontrar no malote, pula para o campo CÓD. WEB igual à tecla Tab
             if (campoWeb) campoWeb.focus();
             return;
         }
 
-        var item = data[0];
+        var itemPrincipal = data[0];
+
+        // Verifica se há um par (2 lentes na mesma OS, Qtd 1 e 1, mesmo cliente e códigos diferentes)
+        if (data.length === 2) {
+            var maisRecente = data[0];
+            var anterior = data[1];
+            var mesmoCliente = String(maisRecente.nome_cliente || "").trim().toUpperCase() === String(anterior.nome_cliente || "").trim().toUpperCase();
+            var ambasQtd1 = parseFloat(maisRecente.quantidade) === 1 && parseFloat(anterior.quantidade) === 1;
+            var codigosDiferentes = String(maisRecente.cod_web || "").trim() !== String(anterior.cod_web || "").trim() ||
+                                    String(maisRecente.cod_produto || "").trim() !== String(anterior.cod_produto || "").trim();
+
+            if (mesmoCliente && ambasQtd1 && codigosDiferentes) {
+                // Ordena na mesma sequência em que foram lançadas (anterior = 1ª lente, maisRecente = 2ª lente)
+                itemPrincipal = anterior;
+                segundoItemMalotePendente = maisRecente;
+            }
+        }
+
         var campoProd = document.getElementById("cod_produto");
         var campoDesc = document.getElementById("descricao");
         var campoCliente = document.getElementById("nome_cliente");
         var campoQtd = document.getElementById("quantidade");
 
-        if (campoWeb) campoWeb.value = item.cod_web || "";
-        if (campoProd) campoProd.value = item.cod_produto || "";
-        if (campoCliente) campoCliente.value = item.nome_cliente || "";
-        if (campoQtd) campoQtd.value = item.quantidade || 2;
+        if (campoWeb) campoWeb.value = itemPrincipal.cod_web || "";
+        if (campoProd) campoProd.value = itemPrincipal.cod_produto || "";
+        if (campoCliente) campoCliente.value = itemPrincipal.nome_cliente || "";
+        if (campoQtd) campoQtd.value = itemPrincipal.quantidade || 2;
 
-        // Cruza com o cadastro de lentes para puxar o fornecedor e descrição atualizados
         var lenteCadastrada = bancoDadosProdutos.find(p =>
-            (item.cod_produto && String(p.codigo).trim() === String(item.cod_produto).trim()) ||
-            (item.cod_web && String(p.cod_web).trim() === String(item.cod_web).trim())
+            (itemPrincipal.cod_produto && String(p.codigo).trim() === String(itemPrincipal.cod_produto).trim()) ||
+            (itemPrincipal.cod_web && String(p.cod_web).trim() === String(itemPrincipal.cod_web).trim())
         );
 
         if (campoDesc) {
@@ -4662,16 +4804,102 @@ function limparBancoDadosCadastro() {
                 campoDesc.readOnly = true;
                 campoDesc.style.backgroundColor = "#e9ecef";
             } else {
-                campoDesc.value = item.descricao || "";
+                campoDesc.value = itemPrincipal.descricao || "";
                 campoDesc.dataset.fornecedorAtual = "BRASLAB";
                 campoDesc.readOnly = false;
                 campoDesc.style.backgroundColor = "#ffffff";
             }
         }
 
-        // Pula o foco direto para o campo VALOR NF para agilizar sua conferência
         var campoValor = document.getElementById("valor_nf");
         if (campoValor) campoValor.focus();
+    }
+
+    // Insere automaticamente a 2ª lente na planilha quando a OS tiver par (Qtd 1 e 1)
+    var formPlanilhaConferencia = document.getElementById("planilhaForm");
+    if (formPlanilhaConferencia) {
+        formPlanilhaConferencia.addEventListener("submit", function() {
+            if (!segundoItemMalotePendente) return;
+
+            var item2 = segundoItemMalotePendente;
+            segundoItemMalotePendente = null;
+
+            setTimeout(function() {
+                var tbody = document.getElementById("corpoTabela");
+                var linhas = tbody.getElementsByTagName("tr");
+                if (linhas.length === 0) return;
+
+                // Pega a linha recém-criada da 1ª lente como referência para manter Loja, Valor Unitário, NF e Data idênticos
+                var primeiraLinha = linhas[linhas.length - 1];
+                var tdsPrimeira = primeiraLinha.getElementsByTagName("td");
+
+                var novaLinha2 = tbody.insertRow();
+                var idUnico2 = "ID_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                novaLinha2.dataset.idUnico = idUnico2;
+
+                var lente2Cad = bancoDadosProdutos.find(p =>
+                    (item2.cod_produto && String(p.codigo).trim() === String(item2.cod_produto).trim()) ||
+                    (item2.cod_web && String(p.cod_web).trim() === String(item2.cod_web).trim())
+                );
+                novaLinha2.dataset.fornecedorItem = (lente2Cad && lente2Cad.fornecedor) ? lente2Cad.fornecedor : "BRASLAB";
+
+                novaLinha2.insertCell(0).innerText = tdsPrimeira[0].innerText; // OS
+                novaLinha2.insertCell(1).innerText = tdsPrimeira[1].innerText; // LOJA
+
+                // CÓD. WEB com lápis de edição inline
+                var celulaWeb2 = novaLinha2.insertCell(2);
+                var containerWeb2 = document.createElement("div");
+                containerWeb2.className = "cell-web-container";
+                var spanTexto2 = document.createElement("span");
+                spanTexto2.innerText = item2.cod_web || "";
+                var btnLapis2 = document.createElement("button");
+                btnLapis2.type = "button";
+                btnLapis2.className = "btn-edit-inline";
+                btnLapis2.innerHTML = "✏️";
+                btnLapis2.title = "Editar código";
+                btnLapis2.onclick = function() {
+                    if (containerWeb2.querySelector("input")) return;
+                    var inputTemp = document.createElement("input");
+                    inputTemp.type = "text";
+                    inputTemp.className = "input-edit-inline";
+                    inputTemp.value = spanTexto2.innerText;
+                    function salvarEd() {
+                        spanTexto2.innerText = inputTemp.value.trim();
+                        inputTemp.replaceWith(spanTexto2);
+                        btnLapis2.style.display = "inline-flex";
+                    }
+                    inputTemp.onblur = salvarEd;
+                    inputTemp.onkeydown = function(evt) { if (evt.key === "Enter") salvarEd(); };
+                    spanTexto2.replaceWith(inputTemp);
+                    btnLapis2.style.display = "none";
+                    inputTemp.focus();
+                    inputTemp.select();
+                };
+                containerWeb2.appendChild(spanTexto2);
+                containerWeb2.appendChild(btnLapis2);
+                celulaWeb2.appendChild(containerWeb2);
+
+                novaLinha2.insertCell(3).innerText = item2.cod_produto || "";
+                novaLinha2.insertCell(4).innerText = lente2Cad ? lente2Cad.descricao : (item2.descricao || "");
+                novaLinha2.insertCell(5).innerText = tdsPrimeira[5].innerText; // NOME DO CLIENTE
+                novaLinha2.insertCell(6).innerText = "1"; // QUANTIDADE 1
+
+                var celulaValor2 = novaLinha2.insertCell(7);
+                celulaValor2.innerText = tdsPrimeira[7].innerText; // Mesmo valor unitário dividido por 2
+                celulaValor2.className = "col-valor-nf";
+
+                novaLinha2.insertCell(8).innerText = tdsPrimeira[8].innerText; // NF
+                novaLinha2.insertCell(9).innerText = tdsPrimeira[9].innerText; // DATA
+
+                var celulaAcoes2 = novaLinha2.insertCell(10);
+                celulaAcoes2.className = "cell-actions";
+                var btnRemover2 = document.createElement("button");
+                btnRemover2.className = "btn-delete";
+                btnRemover2.innerHTML = "🗑️";
+                btnRemover2.onclick = function() { deletarLinhaPorReferencia(idUnico2); };
+                celulaAcoes2.appendChild(btnRemover2);
+            }, 30);
+        });
     }
 
     // Dispara a busca ao sair do campo OS (Tab) ou pressionar Enter dentro dele
@@ -4688,6 +4916,291 @@ function limparBancoDadosCadastro() {
         });
     }
 
+    // ========================================================
+    // MOTOR DA ABA MALOTES RECEBIDOS - PARTE 1 (BUSCA E TABELA)
+    // ========================================================
+    var listaMalotesRecebidosAtual = [];
+
+    function removerAcentosTexto(texto) {
+        return String(texto || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase()
+            .trim();
+    }
+
+    async function filtrarMalotesRecebidos() {
+        if (!dbSupabase) return;
+
+        var lojaSel = document.getElementById("mr_select_loja").value;
+        var dataIni = document.getElementById("mr_data_inicio").value;
+        var dataFim = document.getElementById("mr_data_fim").value;
+        var buscaTermo = removerAcentosTexto(document.getElementById("mr_busca_os").value);
+
+        var tbody = document.getElementById("corpoTabelaMalotesRecebidos");
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 15px; color: #0056b3; font-weight: bold;">⏳ Buscando envios na nuvem...</td></tr>';
+
+        var query = dbSupabase.from("malotes_enviados").select("*").order("id", { ascending: true });
+
+        // Filtra no banco pela Loja e pelo Período de Datas selecionados
+        if (lojaSel !== "TODAS") query = query.eq("loja", String(lojaSel).padStart(2, '0'));
+        if (dataIni) query = query.gte("data", dataIni);
+        if (dataFim) query = query.lte("data", dataFim);
+
+        const { data, error } = await query;
+
+        if (error) {
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #cc0000; padding: 15px;">❌ Erro ao buscar malotes: ' + error.message + '</td></tr>';
+            return;
+        }
+
+        var resultados = data || [];
+
+        // Filtra localmente ignorando acentos (ex: JOAO encontra JOÃO, CONCEICAO encontra CONCEIÇÃO)
+        if (buscaTermo !== "") {
+            resultados = resultados.filter(function(item) {
+                var osLimpa = removerAcentosTexto(item.os);
+                var clienteLimpo = removerAcentosTexto(item.nome_cliente);
+                return osLimpa.includes(buscaTermo) || clienteLimpo.includes(buscaTermo);
+            });
+        }
+
+        listaMalotesRecebidosAtual = resultados;
+        renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+    }
+
+
+    function renderizarTabelaMalotesRecebidos(dados) {
+        var tbody = document.getElementById("corpoTabelaMalotesRecebidos");
+        var selectLoja = document.getElementById("mr_select_loja");
+        var textoLojaCard = selectLoja.value === "TODAS" ? "TODAS AS LOJAS" : selectLoja.options[selectLoja.selectedIndex].text;
+        if (document.getElementById("mr_busca_os").value.trim() !== "") {
+            textoLojaCard = selectLoja.value === "TODAS" ? "BUSCA (TODAS AS LOJAS)" : textoLojaCard;
+        }
+
+        document.getElementById("mr_card_loja").innerText = textoLojaCard;
+        document.getElementById("mr_card_total_servicos").innerText = dados.length;
+
+        // Contador de OS Únicas por Dia (se a mesma OS repetir no mesmo dia e loja, conta apenas 1 vez)
+        var chavesOsUnicasDia = new Set();
+        dados.forEach(function(item) {
+            var chave = String(item.loja).padStart(2, '0') + "_" + String(item.os).trim() + "_" + String(item.data).trim();
+            chavesOsUnicasDia.add(chave);
+        });
+        document.getElementById("mr_card_total_os_unicas").innerText = chavesOsUnicasDia.size;
+
+        // Reseta checkbox mestre e botão de exclusão em lote
+        var checkTodos = document.getElementById("mr_check_todos");
+        if (checkTodos) checkTodos.checked = false;
+        atualizarBotaoExcluirSelecionadosMalote();
+
+        tbody.innerHTML = "";
+
+        if (dados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #666; font-style: italic; padding: 15px;">Nenhum envio encontrado para o filtro selecionado.</td></tr>';
+            return;
+        }
+
+        dados.forEach(function(item) {
+            var tr = tbody.insertRow();
+            tr.dataset.idRegistro = item.id;
+
+            // Coluna 0: Checkbox individual
+            var tdCheck = tr.insertCell(0);
+            tdCheck.style.textAlign = "center";
+            var chk = document.createElement("input");
+            chk.type = "checkbox";
+            chk.className = "mr-check-item";
+            chk.value = item.id;
+            chk.style.cssText = "width: 16px; height: 16px; cursor: pointer; accent-color: #0056b3;";
+            chk.onchange = atualizarBotaoExcluirSelecionadosMalote;
+            tdCheck.appendChild(chk);
+
+            // Colunas de dados (1 a 9)
+            tr.insertCell(1).innerText = String(item.loja || "").padStart(2, '0');
+            tr.insertCell(2).innerText = item.os || "";
+            tr.insertCell(3).innerText = item.cod_web || "";
+            tr.insertCell(4).innerText = item.cod_produto || "";
+            tr.insertCell(5).innerText = item.descricao || "";
+            tr.insertCell(6).innerText = item.nome_cliente || "";
+            tr.insertCell(7).innerText = item.quantidade || 1;
+
+            var dataBR = item.data || "";
+            if (dataBR.includes("-")) {
+                var p = dataBR.split("-");
+                dataBR = p[2] + "/" + p[1] + "/" + p[0];
+            }
+            tr.insertCell(8).innerText = dataBR;
+            tr.insertCell(9).innerText = item.responsavel || "-";
+
+            // Coluna 10: Ações (Editar e Excluir)
+            var tdAcoes = tr.insertCell(10);
+            tdAcoes.style.textAlign = "center";
+            tdAcoes.style.whiteSpace = "nowrap";
+
+            var btnEdit = document.createElement("button");
+            btnEdit.type = "button";
+            btnEdit.innerHTML = "✏️";
+            btnEdit.title = "Editar envio";
+            btnEdit.style.cssText = "background: transparent; border: none; cursor: pointer; font-size: 13px; padding: 2px 4px;";
+            btnEdit.onclick = function() { ativarEdicaoLinhaMalote(tr, item); };
+
+            var btnDel = document.createElement("button");
+            btnDel.type = "button";
+            btnDel.innerHTML = "🗑️";
+            btnDel.title = "Excluir envio";
+            btnDel.style.cssText = "background: transparent; border: none; cursor: pointer; font-size: 13px; padding: 2px 4px;";
+            btnDel.onclick = function() { excluirUnicoMaloteRecebido(item.id, item.os); };
+
+            tdAcoes.appendChild(btnEdit);
+            tdAcoes.appendChild(btnDel);
+        });
+    }
+
+    // ========================================================
+    // MOTOR DA ABA MALOTES RECEBIDOS - PARTE 2 (EDITAR E EXCLUIR)
+    // ========================================================
+    function atualizarBotaoExcluirSelecionadosMalote() {
+        var marcados = document.querySelectorAll(".mr-check-item:checked");
+        var btnLote = document.getElementById("btnExcluirSelecionadosMalote");
+        if (!btnLote) return;
+
+        if (marcados.length > 0) {
+            btnLote.style.display = "inline-block";
+            btnLote.innerText = "🗑️ Excluir Selecionados (" + marcados.length + ")";
+        } else {
+            btnLote.style.display = "none";
+        }
+    }
+
+    // Marcar ou desmarcar todos os checkboxes
+    var checkMestreMR = document.getElementById("mr_check_todos");
+    if (checkMestreMR) {
+        checkMestreMR.addEventListener("change", function() {
+            var estado = this.checked;
+            document.querySelectorAll(".mr-check-item").forEach(function(chk) {
+                chk.checked = estado;
+            });
+            atualizarBotaoExcluirSelecionadosMalote();
+        });
+    }
+
+    // Excluir vários marcados de uma vez
+    var btnExcluirLoteMR = document.getElementById("btnExcluirSelecionadosMalote");
+    if (btnExcluirLoteMR) {
+        btnExcluirLoteMR.onclick = async function() {
+            var marcados = Array.from(document.querySelectorAll(".mr-check-item:checked"));
+            if (marcados.length === 0) return;
+
+            if (!confirm("⚠️ Deseja excluir permanentemente os " + marcados.length + " itens selecionados?")) return;
+
+            var idsParaApagar = marcados.map(chk => parseInt(chk.value, 10));
+            const { error } = await dbSupabase.from("malotes_enviados").delete().in("id", idsParaApagar);
+
+            if (error) {
+                alert("❌ Erro ao excluir selecionados: " + error.message);
+                return;
+            }
+
+            listaMalotesRecebidosAtual = listaMalotesRecebidosAtual.filter(item => !idsParaApagar.includes(item.id));
+            renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+        };
+    }
+
+    // Excluir item individual pela lixeira
+    async function excluirUnicoMaloteRecebido(idRegistro, osNum) {
+        if (!confirm("⚠️ Deseja excluir o envio da OS " + osNum + "?")) return;
+
+        const { error } = await dbSupabase.from("malotes_enviados").delete().eq("id", idRegistro);
+        if (error) {
+            alert("❌ Erro ao excluir: " + error.message);
+            return;
+        }
+
+        listaMalotesRecebidosAtual = listaMalotesRecebidosAtual.filter(item => item.id !== idRegistro);
+        renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+    }
+
+
+    // Edição discreta direto na linha ao clicar no lápis (✏️)
+    function ativarEdicaoLinhaMalote(tr, item) {
+        if (tr.dataset.editando === "true") return;
+        tr.dataset.editando = "true";
+
+        var tds = tr.getElementsByTagName("td");
+        // Campos editáveis: OS(2), COD_WEB(3), COD_PRODUTO(4), DESCRICAO(5), CLIENTE(6), QTD(7)
+        var valoresAtuais = {
+            os: item.os || "",
+            cod_web: item.cod_web || "",
+            cod_produto: item.cod_produto || "",
+            descricao: item.descricao || "",
+            nome_cliente: item.nome_cliente || "",
+            quantidade: item.quantidade || 1
+        };
+
+        tds[2].innerHTML = `<input type="text" value="${valoresAtuais.os}" style="width: 55px; text-align: center; font-size: 12px; border: 1px solid #0056b3; border-radius: 3px;">`;
+        tds[3].innerHTML = `<input type="text" value="${valoresAtuais.cod_web}" style="width: 65px; text-align: center; font-size: 12px; border: 1px solid #0056b3; border-radius: 3px;">`;
+        tds[4].innerHTML = `<input type="text" value="${valoresAtuais.cod_produto}" style="width: 90px; text-align: center; font-size: 12px; border: 1px solid #0056b3; border-radius: 3px;">`;
+        tds[5].innerHTML = `<input type="text" value="${valoresAtuais.descricao}" style="width: 95%; font-size: 12px; border: 1px solid #0056b3; border-radius: 3px;">`;
+        tds[6].innerHTML = `<input type="text" value="${valoresAtuais.nome_cliente}" style="width: 95%; text-transform: uppercase; font-size: 12px; border: 1px solid #0056b3; border-radius: 3px;">`;
+        tds[7].innerHTML = `<input type="number" min="1" value="${valoresAtuais.quantidade}" style="width: 45px; text-align: center; font-size: 12px; border: 1px solid #0056b3; border-radius: 3px;">`;
+
+        // Troca os botões da coluna Ações por Salvar (✅) e Cancelar (❌)
+        tds[10].innerHTML = "";
+
+        var btnSalvar = document.createElement("button");
+        btnSalvar.type = "button";
+        btnSalvar.innerHTML = "✅";
+        btnSalvar.title = "Salvar alterações";
+        btnSalvar.style.cssText = "background: transparent; border: none; cursor: pointer; font-size: 13px; padding: 2px 4px;";
+        btnSalvar.onclick = async function() {
+            var dadosAtualizados = {
+                os: tds[2].querySelector("input").value.trim(),
+                cod_web: tds[3].querySelector("input").value.trim(),
+                cod_produto: tds[4].querySelector("input").value.trim(),
+                descricao: tds[5].querySelector("input").value.trim(),
+                nome_cliente: tds[6].querySelector("input").value.trim().toUpperCase(),
+                quantidade: parseFloat(tds[7].querySelector("input").value) || 1
+            };
+
+            const { error } = await dbSupabase.from("malotes_enviados").update(dadosAtualizados).eq("id", item.id);
+            if (error) {
+                alert("❌ Erro ao salvar edição: " + error.message);
+                return;
+            }
+
+            Object.assign(item, dadosAtualizados);
+            tr.dataset.editando = "false";
+            renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+        };
+
+        var btnCancelar = document.createElement("button");
+        btnCancelar.type = "button";
+        btnCancelar.innerHTML = "❌";
+        btnCancelar.title = "Cancelar edição";
+        btnCancelar.style.cssText = "background: transparent; border: none; cursor: pointer; font-size: 13px; padding: 2px 4px;";
+        btnCancelar.onclick = function() {
+            tr.dataset.editando = "false";
+            renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+        };
+
+        tds[10].appendChild(btnSalvar);
+        tds[10].appendChild(btnCancelar);
+    }
+
+    // Vincula o botão Filtrar Envios e a tecla Enter na busca por OS
+    var btnFiltrarMR = document.getElementById("btnFiltrarMalotesRecebidos");
+    if (btnFiltrarMR) btnFiltrarMR.onclick = filtrarMalotesRecebidos;
+
+    var inputBuscaOsMR = document.getElementById("mr_busca_os");
+    if (inputBuscaOsMR) {
+        inputBuscaOsMR.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                filtrarMalotesRecebidos();
+            }
+        });
+    }
 
 </script>
 </body>
