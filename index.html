@@ -4615,7 +4615,12 @@ function limparBancoDadosCadastro() {
     // ========================================================
     async function buscarDadosMalotePorOS(osDigitada) {
         osDigitada = osDigitada.trim();
-        if (osDigitada === "" || !dbSupabase) return;
+        var campoWeb = document.getElementById("cod_web");
+
+        if (osDigitada === "" || !dbSupabase) {
+            if (campoWeb) campoWeb.focus();
+            return;
+        }
 
         var lojaSelecionada = String(numeroLojaAtual).padStart(2, '0');
 
@@ -4628,11 +4633,12 @@ function limparBancoDadosCadastro() {
             .limit(1);
 
         if (error || !data || data.length === 0) {
-            return; // Se não encontrar no malote, mantém livre para digitação manual normal
+            // Se não encontrar no malote, pula para o campo CÓD. WEB igual à tecla Tab
+            if (campoWeb) campoWeb.focus();
+            return;
         }
 
         var item = data[0];
-        var campoWeb = document.getElementById("cod_web");
         var campoProd = document.getElementById("cod_produto");
         var campoDesc = document.getElementById("descricao");
         var campoCliente = document.getElementById("nome_cliente");
@@ -4681,6 +4687,7 @@ function limparBancoDadosCadastro() {
             }
         });
     }
+
 
 </script>
 </body>
