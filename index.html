@@ -375,6 +375,9 @@
     #malote .bloco-assinaturas { display: flex; justify-content: space-between; width: 100%; }
     #malote .campo-assinatura { width: 42%; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: Arial, sans-serif; }
     #malote .campo-assinatura div:first-child { width: 100%; display: flex; align-items: flex-end; margin-bottom: 5px; }
+	#malote .botoes-formulario-container { gap: 8px; margin-top: 12px; }
+    #malote .botoes-formulario-container button { height: 25px; padding: 0 11px; font-size: 13px; border-radius: 5px; }
+
 
     @media print {
         #malote .linha-dados-malote, #malote #formMalote, #malote #statusBancoMaloteAba { display: none !important; }
@@ -872,8 +875,10 @@
                 <div class="botoes-formulario-container">
                     <button type="submit" class="btn-submit">Adicionar na Planilha</button>
                     <button type="button" onclick="limparTabelaMaloteToda()" class="btn-clear">🔄 Limpar Tudo</button>
-                    <button type="button" onclick="gerarPDFMaloteEEnviarNuvem()" class="btn-pdf">🖨️ Salvar em PDF / Imprimir</button>
+                    <button type="button" id="btnSalvarImprimirMalote" onclick="imprimirSomenteCapaMalote()" class="btn-pdf">🖨️ Salvar em PDF / Imprimir</button>
+                    <button type="button" id="btnEnviarDadosMalote" onclick="enviarDadosCapaMaloteNuvem()" style="background-color: #28a745; color: white;" onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">📤 Enviar Dados</button>
                 </div>
+
             </form>
 
             <div class="table-container">
@@ -974,7 +979,7 @@
                     <div id="mr_card_total_servicos" style="font-size: 20px; font-weight: bold; color: #17a2b8; margin-top: 3px;">0</div>
                 </div>
                 <div style="flex: 1; min-width: 180px; background: #fff; border: 1px solid #dee2e6; border-top: 4px solid #28a745; padding: 8px; border-radius: 4px; text-align: center;">
-                    <div style="font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase;">Quantidade de OS (Únicas/Dia)</div>
+                    <div style="font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase;">Quantidade de Vendas</div>
                     <div id="mr_card_total_os_unicas" style="font-size: 20px; font-weight: bold; color: #28a745; margin-top: 3px;">0</div>
                 </div>
             </div>
@@ -1268,6 +1273,15 @@
         </div>
     </div>
 
+    <!-- MODAL PRÓPRIO DE AVISO E CONFIRMAÇÃO (ANTI-BLOQUEIO DE NAVEGADOR) -->
+    <div id="modalAvisoSistema" class="modal-overlay" style="z-index: 999999;">
+        <div class="modal-box" style="max-width: 380px; text-align: center; padding: 25px 20px; border-top: 5px solid #28a745;" id="boxAvisoSistema">
+            <div id="iconeAvisoSistema" style="font-size: 38px; margin-bottom: 10px;">✅</div>
+            <h3 id="tituloAvisoSistema" style="margin: 0 0 8px 0; color: #333; font-size: 18px;">Sucesso!</h3>
+            <p id="textoAvisoSistema" style="margin: 0 0 20px 0; color: #555; font-size: 14px; line-height: 1.4;">Os dados foram enviados com sucesso!</p>
+            <button type="button" id="btnOkAvisoSistema" onclick="fecharModalAvisoSistema()" style="background-color: #28a745; color: white; border: none; padding: 8px 30px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">OK</button>
+        </div>
+    </div>
 
 <script>
     // ========================================================
@@ -1445,6 +1459,7 @@
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         
         var abaAlvo = document.getElementById(tabId);
+        var abaAlvo = document.getElementById(tabId);
         var botaoAlvo = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
         
         if (abaAlvo) abaAlvo.classList.add('active');
@@ -1456,9 +1471,13 @@
             var campoOs = document.getElementById("os");
             if (campoOs) campoOs.focus();
         } else if (tabId === 'talao') {
-            var campoProdTalao = document.getElementById("talao_cod");
-            if (campoProdTalao) campoProdTalao.focus();
+            var campoCodTalao = document.getElementById("talao_cod");
+            if (campoCodTalao) campoCodTalao.focus();
+        } else if (tabId === 'malote') {
+            var campoOsMalote = document.getElementById("malote_os");
+            if (campoOsMalote) campoOsMalote.focus();
         }
+
     }
 
     // CARREGAMENTO INICIAL DA MEMÓRIA COMPARTILHADA
@@ -1666,10 +1685,14 @@
             e.preventDefault();
             if (document.getElementById("planilha").classList.contains("active")) {
                 gerarPDFouImprimir();
+            } else if (document.getElementById("malote").classList.contains("active")) {
+                imprimirSomenteCapaMalote();
             } else {
                 window.print();
             }
         }
+
+
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'l') {
             if (document.getElementById("planilha").classList.contains("active")) {
                 e.preventDefault();
@@ -1681,13 +1704,21 @@
             e.preventDefault();
             if (document.getElementById("planilha").classList.contains("active")) {
                 abrirModalPesquisa();
+            } else if (document.getElementById("malote").classList.contains("active")) {
+                abrirModalPesquisaMalote();
             } else if (document.getElementById("talao").classList.contains("active")) {
                 abrirModalTalao();
             }
         }
 
+
         // Atalho Esc - Fecha qualquer modal que esteja aberto
         if (e.key === "Escape") {
+            var modalAviso = document.getElementById("modalAvisoSistema");
+            if (modalAviso && modalAviso.style.display === "flex") {
+                fecharModalAvisoSistema();
+                return;
+            }
             var modalPlanilha = document.getElementById("modalPesquisa");
             var modalTalao = document.getElementById("modalPesquisaTalao");
             if (modalPlanilha && modalPlanilha.style.display === "flex") {
@@ -1697,6 +1728,7 @@
                 fecharModalTalao();
             }
         }
+
         // Tecla Enter para avançar campos (Apenas no Talão)
         if (e.key === 'Enter') {
             if (document.getElementById("talao").classList.contains("active")) {
@@ -4674,14 +4706,87 @@ function limparBancoDadosCadastro() {
         }
     }
 
-    async function gerarPDFMaloteEEnviarNuvem() {
-        var linhas = document.querySelectorAll("#corpoTabelaMalote tr");
+    // 1. Apenas gera o PDF / Imprime a folha da Capa Malote (sem enviar ao banco)
+    function imprimirSomenteCapaMalote() {
         var lojaNum = document.getElementById("selectLojaMalote").value;
-        var lacre = document.getElementById("inputLacreMalote").value.trim();
-        var resp = document.getElementById("inputRespMalote").value.trim();
-        var enc = document.getElementById("inputEncMalote").value.trim();
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const ano = hoje.getFullYear();
+        const tituloOriginal = document.title;
+        document.title = `Capa Malote ${dia}-${mes}-${ano}`;
 
-        if (linhas.length > 0 && dbSupabase) {
+        var divMensagem = document.getElementById("mensagemMalotePrint");
+        if (divMensagem) {
+            divMensagem.innerText = "CAPA MALOTE DA LOJA " + lojaNum + " PARA ENVIO AO CDAM (Laboratório)";
+        }
+        window.print();
+        setTimeout(function() { document.title = tituloOriginal; }, 1000);
+    }
+
+    // 2. Envia os dados da tabela da Capa Malote para o Supabase (com trava contra clique duplo)
+    function abrirModalAvisoSistema(titulo, mensagem, tipo = "sucesso") {
+        var modal = document.getElementById("modalAvisoSistema");
+        var box = document.getElementById("boxAvisoSistema");
+        var icone = document.getElementById("iconeAvisoSistema");
+        var elTitulo = document.getElementById("tituloAvisoSistema");
+        var elTexto = document.getElementById("textoAvisoSistema");
+        var btnOk = document.getElementById("btnOkAvisoSistema");
+
+        if (!modal) return;
+
+        elTitulo.innerText = titulo;
+        elTexto.innerText = mensagem;
+
+        if (tipo === "erro") {
+            box.style.borderTopColor = "#cc0000";
+            icone.innerText = "❌";
+            btnOk.style.backgroundColor = "#cc0000";
+        } else if (tipo === "aviso") {
+            box.style.borderTopColor = "#ffc107";
+            icone.innerText = "⚠️";
+            btnOk.style.backgroundColor = "#e0a800";
+        } else {
+            box.style.borderTopColor = "#28a745";
+            icone.innerText = "✅";
+            btnOk.style.backgroundColor = "#28a745";
+        }
+
+        modal.style.display = "flex";
+        setTimeout(function() { btnOk.focus(); }, 50);
+    }
+
+    function fecharModalAvisoSistema() {
+        var modal = document.getElementById("modalAvisoSistema");
+        if (modal) modal.style.display = "none";
+    }
+
+    // 2. Envia os dados da tabela da Capa Malote para o Supabase (com modal próprio anti-bloqueio)
+    async function enviarDadosCapaMaloteNuvem() {
+        var linhas = document.querySelectorAll("#corpoTabelaMalote tr");
+        if (linhas.length === 0) {
+            abrirModalAvisoSistema("Atenção", "A tabela está vazia! Adicione pelo menos uma OS antes de enviar os dados.", "aviso");
+            document.getElementById("malote_os").focus();
+            return;
+        }
+
+        if (!dbSupabase) {
+            abrirModalAvisoSistema("Sem Conexão", "Banco de dados desconectado. Verifique sua internet.", "erro");
+            return;
+        }
+
+        var btnEnviar = document.getElementById("btnEnviarDadosMalote");
+        if (btnEnviar) {
+            btnEnviar.disabled = true;
+            btnEnviar.innerText = "⏳ Enviando...";
+        }
+
+        try {
+            var lojaNum = document.getElementById("selectLojaMalote").value;
+            var lacre = document.getElementById("inputLacreMalote").value.trim();
+            var resp = document.getElementById("inputRespMalote").value.trim().toUpperCase();
+            var enc = document.getElementById("inputEncMalote").value.trim().toUpperCase();
+
             var loteMalote = [];
             linhas.forEach(function(linha) {
                 var c = linha.getElementsByTagName("td");
@@ -4706,32 +4811,24 @@ function limparBancoDadosCadastro() {
                     data: dataISO,
                     criado_em: dataHoraBrasil
                 });
-
             });
 
             if (loteMalote.length > 0) {
                 const { error } = await dbSupabase.from("malotes_enviados").insert(loteMalote);
                 if (error) {
-                    alert("⚠️ Erro ao enviar dados do malote para o laboratório: " + error.message);
+                    abrirModalAvisoSistema("Erro ao Enviar", "Não foi possível enviar os dados para o laboratório: " + error.message, "erro");
                 } else {
-                    alert("✅ Os dados foram enviados com sucesso!");
+                    abrirModalAvisoSistema("Envio Concluído", "Os dados foram enviados com sucesso!", "sucesso");
                 }
             }
-
+        } finally {
+            if (btnEnviar) {
+                btnEnviar.disabled = false;
+                btnEnviar.innerText = "📤 Enviar Dados";
+            }
         }
-
-        const hoje = new Date();
-        const dia = String(hoje.getDate()).padStart(2, '0');
-        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-        const ano = hoje.getFullYear();
-        const tituloOriginal = document.title;
-        document.title = `Capa Malote ${dia}-${mes}-${ano}`;
-
-        var divMensagem = document.getElementById("mensagemMalotePrint");
-        divMensagem.innerText = "CAPA MALOTE DA LOJA " + lojaNum + " PARA ENVIO AO CDAM (Laboratório)";
-        window.print();
-        setTimeout(function() { document.title = tituloOriginal; }, 1000);
     }
+
 
     // ========================================================
     // BLOCO 4: PREENCHIMENTO AUTOMÁTICO POR OS (CONFERÊNCIA LAB)
@@ -4981,13 +5078,33 @@ function limparBancoDadosCadastro() {
         document.getElementById("mr_card_loja").innerText = textoLojaCard;
         document.getElementById("mr_card_total_servicos").innerText = dados.length;
 
-        // Contador de OS Únicas por Dia (se a mesma OS repetir no mesmo dia e loja, conta apenas 1 vez)
+        // Códigos que NÃO são vendas (Transferências de lojas e serviços internos 200 a 205)
+        var codigosNaoVenda = [
+            "2", "3", "5", "7", "9", "12", "17", "18", "24", "28", "31", "32", "33", "37", "40", "42", "48",
+            "02", "03", "05", "07", "09",
+            "200", "201", "202", "203", "204", "205"
+        ];
+
+        // Contador de Vendas (OS únicas por dia/loja, ignorando transferências e serviços 200-205)
         var chavesOsUnicasDia = new Set();
         dados.forEach(function(item) {
-            var chave = String(item.loja).padStart(2, '0') + "_" + String(item.os).trim() + "_" + String(item.data).trim();
-            chavesOsUnicasDia.add(chave);
+            var codProd = String(item.cod_produto || "").trim();
+            var codWeb = String(item.cod_web || "").trim();
+            var descUpper = String(item.descricao || "").toUpperCase().trim();
+
+            // Ignora se o código estiver na lista ou se a descrição começar com "TRANSFERÊNCIA"
+            var ehNaoVenda = codigosNaoVenda.includes(codProd) ||
+                             codigosNaoVenda.includes(codWeb) ||
+                             descUpper.startsWith("TRANSFERÊNCIA") ||
+                             descUpper.startsWith("TRANSFERENCIA");
+
+            if (!ehNaoVenda) {
+                var chave = String(item.loja).padStart(2, '0') + "_" + String(item.os).trim() + "_" + String(item.data).trim();
+                chavesOsUnicasDia.add(chave);
+            }
         });
         document.getElementById("mr_card_total_os_unicas").innerText = chavesOsUnicasDia.size;
+
 
         // Reseta checkbox mestre e botão de exclusão em lote
         var checkTodos = document.getElementById("mr_check_todos");
