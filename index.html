@@ -427,6 +427,8 @@
         <input type="password" id="loginSenha" placeholder="Senha" onkeydown="if(event.key==='Enter') fazerLoginSupabase()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
         <button type="button" id="btnEntrarSupabase" onclick="fazerLoginSupabase()" style="width: 100%; background: #0056b3; color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar no Sistema</button>
         <div id="msgErroLogin" style="color: #cc0000; font-size: 12px; font-weight: bold; margin-top: 10px; display: none;"></div>
+		<button type="button" id="btnModoOfflineLocal" onclick="document.getElementById('telaLoginOverlay').style.display='none'; atualizarStatusConexaoMalote(false);" style="display: none; width: 100%; background: #6c757d; color: white; padding: 8px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 12px;">🔌 Entrar em Modo Offline (Local)</button>
+
     </div>
 </div>
 
@@ -438,6 +440,8 @@
 	<button class="tab-btn" data-tab="malote" onclick="alternarAba('malote')">📦 CAPA MALOTE</button>
 	<button class="tab-btn" data-tab="malotes_recebidos" onclick="alternarAba('malotes_recebidos')">📥 MALOTES RECEBIDOS</button>
     <button class="tab-btn" data-tab="talao" onclick="alternarAba('talao')">📋 TALÃO DE PEDIDOS</button>
+    <button class="tab-btn" data-tab="talao_recebidos" onclick="alternarAba('talao_recebidos')">📥 TALÃO RECEBIDOS</button>
+
 	
 	    <button type="button" class="tab-btn" onclick="sairDoSistemaSupabase()" style="margin-left: auto; background-color: #cc0000; color: white;">🚪 Sair</button>
 
@@ -1017,7 +1021,6 @@
         </div>
     </div>
 
-
     <!-- A partir daqui a estrutura do seu Talão passa a funcionar normalmente -->
     <div id="talao" class="tab-content">
         <div class="talao-container">
@@ -1030,7 +1033,10 @@
                 <div class="logo" style="margin-top: 0px; margin-bottom: -1px;">
                     <img src="formas/logo_lider_transparente.png" alt="Logo" style="max-height: 38px; width: auto; display: inline-block; vertical-align: top;">
                 </div>
-                <button type="button" class="btn-print-top" onclick="window.print()">🖨️ Imprimir</button>
+                <button type="button" class="btn-print-top" onclick="imprimirTalaoComNome()">🖨️ Imprimir</button>
+                <button type="button" class="btn-print-top" id="btnCopiarBraslab" onclick="copiarTalaoParaBraslab()" style="right: 88px; left: auto; background: #0056b3 !important;">📋 Braslab</button>
+                <button type="button" class="btn-print-top" id="btnEnviarTalao" onclick="enviarTalao()" style="left: 90px; right: auto; background: #28a745 !important;">📤 Enviar Talão</button>
+
             </div>
 
                         <div class="top-grid" style="grid-template-columns: 1fr 1.5fr 1.5fr 1fr;">
@@ -1155,6 +1161,82 @@
                 </div>
             </div>
 		</div>
+		
+    <!-- ABA: TALÕES RECEBIDOS DAS LOJAS -->
+    <div id="talao_recebidos" class="tab-content">
+        <div class="container-planilha">
+            
+            <!-- Cabeçalho no mesmo padrão de Malotes Recebidos -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 8px; margin-bottom: 15px;">
+                <h2 style="margin: 0; color: #333; font-size: 20px;">📥 Talões Recebidos das Lojas</h2>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="contadorTaloesRecebidos" style="font-size: 12px; font-weight: bold; color: #0056b3;">0 talões</span>
+                    <button type="button" onclick="if(typeof carregarTaloesRecebidos === 'function') carregarTaloesRecebidos()" style="background-color: #0056b3; font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 6px;">🔄 Atualizar Lista</button>
+                    <span id="statusTaloesRecebidos" style="font-size: 12px; font-weight: bold; color: #155724;">☁️ Sincronizado</span>
+                </div>
+
+            </div>
+
+            <!-- Painel de Filtros (Mesmo padrão visual de Malotes Recebidos) -->
+            <div style="background: #f1f3f5; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; border: 1px solid #dee2e6;">
+                
+                <div style="display: flex; flex-direction: column; width: 250px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">🏢 Selecione a Loja:</label>
+                    <select id="filtroRecebidosLoja" onchange="filtrarTaloesRecebidos()" style="font-size: 13px; font-weight: bold; border: 1px solid #ced4da; padding: 7px; border-radius: 4px; background: white; cursor: pointer; width: 100%;">
+                        <option value="">— TODAS AS LOJAS —</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; width: 135px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">📅 Data Inicial:</label>
+                    <input type="date" id="filtroRecebidosDataInicio" onchange="filtrarTaloesRecebidos()" style="padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                </div>
+
+                <div style="display: flex; flex-direction: column; width: 135px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">📅 Data Final:</label>
+                    <input type="date" id="filtroRecebidosDataFim" onchange="filtrarTaloesRecebidos()" style="padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                </div>
+
+
+                <div style="display: flex; flex-direction: column; width: 180px;">
+                    <label style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #495057;">🔎 Buscar Nº OS ou Cliente:</label>
+                    <input type="text" id="filtroRecebidosOS" placeholder="Digite a OS..." oninput="filtrarTaloesRecebidos()" style="padding: 7px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; outline: none;">
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" onclick="limparFiltrosRecebidos()" class="btn-clear" style="height: 35px; padding: 0 16px; font-size: 12px;">🔄 Limpar</button>
+                </div>
+
+            </div>
+
+            <!-- Tabela no padrão container-planilha -->
+            <div class="table-container">
+                <table id="tabelaTaloesRecebidos">
+                    <thead>
+                        <tr>
+                            <th>DATA / HORA</th>
+                            <th>LOJA</th>
+                            <th>Nº OS</th>
+                            <th>CLIENTE</th>
+                            <th>CÓD. WEB / LENTE</th>
+                            <th>STATUS</th>
+                            <th style="width: 140px;">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaTaloesRecebidosBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #666; font-style: italic; padding: 20px;">
+                                Nenhum talão recebido ainda. Quando as lojas enviarem pelo botão verde <b>"Enviar Talão"</b>, os pedidos aparecerão aqui.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
 	
     <!-- MODAL DE PESQUISA DA PLANILHA -->
     <div id="modalPesquisa" class="modal-overlay" onclick="fecharModalAoClicarFora(event, 'modalPesquisa')">
@@ -1283,6 +1365,33 @@
         </div>
     </div>
 
+    <!-- MODAL EXCLUSIVO DE CONFIRMAÇÃO DA ABA CONFERÊNCIA LAB -->
+    <div id="modalConfirmacaoConferencia" class="modal-overlay" style="z-index: 999999;">
+        <div class="modal-box" style="max-width: 400px; text-align: center; padding: 25px 20px; border-top: 5px solid #0056b3;">
+            <div style="font-size: 38px; margin-bottom: 10px;">📋</div>
+            <h3 id="tituloConfirmacaoConferencia" style="margin: 0 0 8px 0; color: #333; font-size: 18px;">Confirmação de Valor</h3>
+            <p id="textoConfirmacaoConferencia" style="margin: 0 0 20px 0; color: #555; font-size: 14px; line-height: 1.4;"></p>
+            <div style="display: flex; justify-content: center; gap: 12px;">
+                <button type="button" id="btnOkConfirmacaoConferencia" onclick="confirmarModalConferencia()" style="background-color: #28a745; color: white; border: none; padding: 8px 28px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">OK</button>
+                <button type="button" id="btnCancelarConfirmacaoConferencia" onclick="cancelarModalConferencia()" style="background-color: #6c757d; color: white; border: none; padding: 8px 22px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EXCLUSIVO DE CONFIRMAÇÃO DA ABA CAPA MALOTE -->
+    <div id="modalConfirmacaoMalote" class="modal-overlay" style="z-index: 999999;">
+        <div class="modal-box" style="max-width: 400px; text-align: center; padding: 25px 20px; border-top: 5px solid #cc0000;">
+            <div id="iconeConfirmacaoMalote" style="font-size: 38px; margin-bottom: 10px;">🗑️</div>
+            <h3 id="tituloConfirmacaoMalote" style="margin: 0 0 8px 0; color: #333; font-size: 18px;">Confirmar Ação</h3>
+            <p id="textoConfirmacaoMalote" style="margin: 0 0 20px 0; color: #555; font-size: 14px; line-height: 1.4;"></p>
+            <div style="display: flex; justify-content: center; gap: 12px;">
+                <button type="button" id="btnOkConfirmacaoMalote" onclick="confirmarModalMalote()" style="background-color: #28a745; color: white; border: none; padding: 8px 28px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">OK</button>
+                <button type="button" id="btnCancelarConfirmacaoMalote" onclick="fecharModalConfirmacaoMalote()" style="background-color: #6c757d; color: white; border: none; padding: 8px 22px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+
 <script>
     // ========================================================
     // CONEXÃO COM O BANCO DE DADOS NA NUVEM (SUPABASE)
@@ -1367,17 +1476,21 @@
 	
     function aplicarPermissoesUsuario(emailUsuario) {
         const ehLoja = (emailUsuario || "").toLowerCase().trim() === "lojas@oticalider.com";
-        const abasRestritasLab = ["planilha", "relatorios", "cadastro", "malotes_recebidos"];
+        const abasRestritasLab = ["planilha", "relatorios", "cadastro", "malotes_recebidos", "talao_recebidos"];
 
         abasRestritasLab.forEach(tab => {
             const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
             if (btn) btn.style.display = ehLoja ? "none" : "inline-block";
         });
 
+        const btnBraslab = document.getElementById("btnCopiarBraslab");
+        if (btnBraslab) btnBraslab.style.display = ehLoja ? "none" : "inline-flex";
+
         if (ehLoja) {
             alternarAba("malote");
         }
     }
+
 
 
     async function carregarDadosDaNuvem() {
@@ -1417,7 +1530,9 @@
             if (document.getElementById("rep_data_inicio").value) filtrarHistoricoProducao();
         }
 		
+        if (typeof carregarTaloesRecebidos === "function") await carregarTaloesRecebidos();
         atualizarStatusConexaoMalote(true);
+
     }
 
 
@@ -1476,12 +1591,19 @@
         } else if (tabId === 'malote') {
             var campoOsMalote = document.getElementById("malote_os");
             if (campoOsMalote) campoOsMalote.focus();
+        } else if (tabId === 'talao_recebidos') {
+            if (typeof carregarTaloesRecebidos === 'function') carregarTaloesRecebidos();
         }
 
     }
 
     // CARREGAMENTO INICIAL DA MEMÓRIA COMPARTILHADA
     window.addEventListener("DOMContentLoaded", function() {
+	        if (window.location.protocol === "file:") {
+            const btnOff = document.getElementById("btnModoOfflineLocal");
+            if (btnOff) btnOff.style.display = "block";
+        }
+
         var lojasSalvas = localStorage.getItem("LojasConfiguradasLider");
         if (lojasSalvas) {
             try { listaLojasConfiguradas = JSON.parse(lojasSalvas); } catch(e) { console.error(e); }
@@ -1538,8 +1660,10 @@
         if (document.getElementById("data")) document.getElementById("data").value = obterDataBrasilia();
         if (document.getElementById("rep_data_inicio")) document.getElementById("rep_data_inicio").value = obterDataBrasilia();
         if (document.getElementById("rep_data_fim")) document.getElementById("rep_data_fim").value = obterDataBrasilia();
-		        if (document.getElementById("mr_data_inicio")) document.getElementById("mr_data_inicio").value = obterDataBrasilia();
+		if (document.getElementById("mr_data_inicio")) document.getElementById("mr_data_inicio").value = obterDataBrasilia();
         if (document.getElementById("mr_data_fim")) document.getElementById("mr_data_fim").value = obterDataBrasilia();
+        if (document.getElementById("filtroRecebidosDataInicio")) document.getElementById("filtroRecebidosDataInicio").value = obterDataBrasilia();
+        if (document.getElementById("filtroRecebidosDataFim")) document.getElementById("filtroRecebidosDataFim").value = obterDataBrasilia();
 
         
         const campoDataTalao = document.getElementById('data-atual');
@@ -1672,8 +1796,20 @@
             });
             selectMR.value = valorAntigoMR || "TODAS";
         }
+		        // 5. Atualiza o seletor da aba Talão Recebidos com todas as lojas do sistema
+        var selectTR = document.getElementById("filtroRecebidosLoja");
+        if (selectTR) {
+            var valorAntigoTR = selectTR.value;
+            selectTR.innerHTML = '<option value="">— TODAS AS LOJAS —</option>';
+            lojasParaExibir.forEach(l => {
+                var opt = new Option(l.num + " " + l.nome, l.nome);
+                selectTR.add(opt);
+            });
+            if ([...selectTR.options].some(o => o.value === valorAntigoTR)) {
+                selectTR.value = valorAntigoTR;
+            }
+        }
 
-	
 	}
 
     // ========================================================
@@ -1714,6 +1850,18 @@
 
         // Atalho Esc - Fecha qualquer modal que esteja aberto
         if (e.key === "Escape") {
+		    var modalConfMalote = document.getElementById("modalConfirmacaoMalote");
+            if (modalConfMalote && modalConfMalote.style.display === "flex") {
+                fecharModalConfirmacaoMalote();
+                return;
+            }
+		
+		    var modalConfLab = document.getElementById("modalConfirmacaoConferencia");
+            if (modalConfLab && modalConfLab.style.display === "flex") {
+                cancelarModalConferencia();
+                return;
+            }
+
             var modalAviso = document.getElementById("modalAvisoSistema");
             if (modalAviso && modalAviso.style.display === "flex") {
                 fecharModalAvisoSistema();
@@ -2660,44 +2808,83 @@ if (document.getElementById("arquivoCSV")) {
     // ========================================================
     // ENVIO DO FORMULÁRIO E IMPRESSÃO (PLANILHA COM FORNECEDOR)
     // ========================================================
+    var acaoOkConfirmacaoConferencia = null;
+    var acaoCancelarConfirmacaoConferencia = null;
+
+    function abrirModalConfirmacaoConferencia(mensagem, onOk, onCancelar, titulo = "Confirmação de Valor", icone = "📋", corBorda = "#0056b3") {
+        var modal = document.getElementById("modalConfirmacaoConferencia");
+        var box = modal ? modal.querySelector(".modal-box") : null;
+        var elIcone = box ? box.querySelector("div") : null;
+        var elTitulo = document.getElementById("tituloConfirmacaoConferencia");
+        var elTexto = document.getElementById("textoConfirmacaoConferencia");
+        var btnOk = document.getElementById("btnOkConfirmacaoConferencia");
+        if (!modal || !elTexto) return;
+
+        acaoOkConfirmacaoConferencia = onOk || null;
+        acaoCancelarConfirmacaoConferencia = onCancelar || null;
+
+        if (box) box.style.borderTopColor = corBorda;
+        if (elIcone) elIcone.innerText = icone;
+        if (elTitulo) elTitulo.innerText = titulo;
+        elTexto.innerText = mensagem;
+
+        modal.style.display = "flex";
+        setTimeout(function() { if (btnOk) btnOk.focus(); }, 50);
+    }
+
+
+    function confirmarModalConferencia() {
+        var acao = acaoOkConfirmacaoConferencia;
+        fecharModalConfirmacaoConferencia();
+        if (typeof acao === "function") acao();
+    }
+
+    function cancelarModalConferencia() {
+        var acao = acaoCancelarConfirmacaoConferencia;
+        fecharModalConfirmacaoConferencia();
+        if (typeof acao === "function") acao();
+    }
+
+    function fecharModalConfirmacaoConferencia() {
+        var modal = document.getElementById("modalConfirmacaoConferencia");
+        if (modal) modal.style.display = "none";
+        acaoOkConfirmacaoConferencia = null;
+        acaoCancelarConfirmacaoConferencia = null;
+    }
+
     document.getElementById("planilhaForm").addEventListener("submit", function(e) {
         e.preventDefault();
         
-        // --- NOVO BLOCO: REGRAS ESPECÍFICAS DE QUANTIDADE E VALOR ---
         var vQuantidadeDigitada = parseFloat(document.getElementById("quantidade").value) || 0;
         var vValorNfOriginal = document.getElementById("valor_nf").value.trim();
-        
-        // Converte o texto da moeda da tela para número real para podermos calcular
         var valorNumericoNF = parseFloat(vValorNfOriginal.replace(/\./g, "").replace(",", ".")) || 0;
         
-        var vQtd = vQuantidadeDigitada; // Variável padrão que vai para a planilha
+        var vQtd = vQuantidadeDigitada;
 
         if (vQuantidadeDigitada === 1) {
-            // REGRA 1: Se digitar 1, divide o valor por 2 e mantém quantidade 1
             valorNumericoNF = valorNumericoNF / 2;
             vQtd = 1;
-        } 
-        else if (vQuantidadeDigitada === 2) {
-            // REGRA 2: Se digitar 2, mantém o valor original e a quantidade 2
+        } else if (vQuantidadeDigitada === 2) {
             vQtd = 2;
-        } 
-        else if (vQuantidadeDigitada === 0.5) {
-            // REGRA 3: Se digitar 0.5, mantém o valor original cheio e transforma a quantidade em 1 na planilha
+        } else if (vQuantidadeDigitada === 0.5) {
             vQtd = 1;
         }
 
-        // Formata o valor calculado de volta para o formato de moeda brasileiro (Ex: "100,00")
         var vValorNf = valorNumericoNF.toFixed(2).replace(".", ",");
-        // ----------------------------------------------------------------------------
 
-        var confirmarValor = confirm("📋 CONFIRMAÇÃO DE VALOR:\n\nO valor que será incluído na planilha é: R$ " + vValorNf + "\n\nDeseja confirmar e incluir este serviço na planilha ou Cancelar para ajustar?");
-        
-        if (!confirmarValor) {
-            document.getElementById("valor_nf").focus();
-            document.getElementById("valor_nf").select();
-            return; 
-        }
+        abrirModalConfirmacaoConferencia(
+            "O valor que será incluído na planilha é: R$ " + vValorNf + "\n\nDeseja confirmar e incluir este serviço na planilha ou Cancelar para ajustar?",
+            function() {
+                gravarLinhaNaPlanilhaConferencia(vQtd, vValorNf);
+            },
+            function() {
+                document.getElementById("valor_nf").focus();
+                document.getElementById("valor_nf").select();
+            }
+        );
+    });
 
+    function gravarLinhaNaPlanilhaConferencia(vQtd, vValorNf) {
         var tbody = document.getElementById("corpoTabela");
         var novaLinha = tbody.insertRow();
         
@@ -2711,7 +2898,6 @@ if (document.getElementById("arquivoCSV")) {
         var vDesc = document.getElementById("descricao").value;
         var vFornecedor = document.getElementById("descricao").dataset.fornecedorAtual || "BRASLAB"; 
 		
-        // Salva de forma oculta na linha criada para a função de impressão ler depois
         novaLinha.dataset.fornecedorItem = vFornecedor; 
 
         novaLinha.insertCell(0).innerText = vOs;
@@ -2758,7 +2944,7 @@ if (document.getElementById("arquivoCSV")) {
 
         novaLinha.insertCell(3).innerText = vCodProd;
         novaLinha.insertCell(4).innerText = vDesc;
-        novaLinha.insertCell(5).innerText = vCliente = document.getElementById("nome_cliente").value .toUpperCase(); // Correção na atribuição direta da variável de escopo externo
+        novaLinha.insertCell(5).innerText = document.getElementById("nome_cliente").value.toUpperCase();
         novaLinha.insertCell(6).innerText = vQtd;
 		
         var celulaValor = novaLinha.insertCell(7);
@@ -2777,11 +2963,14 @@ if (document.getElementById("arquivoCSV")) {
         btnRemover.onclick = function() { deletarLinhaPorReferencia(idUnicoAbsoluto); };
         celulaAcoes.appendChild(btnRemover);
 
+        if (typeof adicionarSegundaLentePendenteNaTabela === "function") {
+            adicionarSegundaLentePendenteNaTabela();
+        }
+
         document.getElementById("planilhaForm").reset();
         document.getElementById("data").value = obterDataBrasilia(); 
         document.getElementById("os").focus();
-    });
-
+    }
 
     // ========================================================
     // BLOCO 3 - PARTE 2: FUNÇÕES DE REMOÇÃO DA CONFERÊNCIA
@@ -2789,22 +2978,43 @@ if (document.getElementById("arquivoCSV")) {
 
     // Remove a linha correta baseada no ID Único gerado no momento do envio
     function deletarLinhaPorReferencia(idAlvo) {
-        if (confirm("Deseja remover esta linha da conferência?")) {
-            var linhas = document.querySelectorAll("#corpoTabela tr");
-            linhas.forEach(function(linha) {
-                if (linha.dataset.idUnico === idAlvo) {
-                    linha.parentNode.removeChild(linha);
-                }
-            });
-        }
+        abrirModalConfirmacaoConferencia(
+            "Deseja remover esta linha da conferência?",
+            function() {
+                var linhas = document.querySelectorAll("#corpoTabela tr");
+                linhas.forEach(function(linha) {
+                    if (linha.dataset.idUnico === idAlvo) {
+                        linha.parentNode.removeChild(linha);
+                    }
+                });
+                document.getElementById("os").focus();
+            },
+            null,
+            "Excluir Linha",
+            "🗑️",
+            "#cc0000"
+        );
     }
 
     // Limpa a tabela mantendo o foco inicial no campo de OS
     function limparTabelaToda() {
-        if (confirm("⚠️ Deseja excluir todas as linhas da tabela?")) {
-            document.getElementById("corpoTabela").innerHTML = ""; 
+        var linhas = document.querySelectorAll("#corpoTabela tr");
+        if (linhas.length === 0) {
             document.getElementById("os").focus();
+            return;
         }
+
+        abrirModalConfirmacaoConferencia(
+            "Deseja excluir todas as linhas da tabela?",
+            function() {
+                document.getElementById("corpoTabela").innerHTML = ""; 
+                document.getElementById("os").focus();
+            },
+            null,
+            "Limpar Tabela",
+            "🔄",
+            "#cc0000"
+        );
     }
 
 
@@ -3179,6 +3389,21 @@ async function gerarPDFouImprimir() {
             target.style.color = "#fff"; 
             target.scrollIntoView({ block: "nearest" }); 
         }
+    }
+
+    function imprimirTalaoComNome() {
+        const numOS = (document.getElementById("talao_os_input")?.value || "").trim() || "SEM-OS";
+        const dataCampo = (document.getElementById("data-atual")?.value || obterDataBrasilia()).trim();
+        const dataFormatada = dataCampo.includes("-") ? dataCampo.split("-").reverse().join("-") : dataCampo.replace(/\//g, "-");
+
+        const tituloOriginal = document.title;
+        document.title = `Talão OS ${numOS} ${dataFormatada}`;
+
+        window.print();
+
+        setTimeout(() => {
+            document.title = tituloOriginal;
+        }, 1000);
     }
 
     // ========================================================
@@ -4499,18 +4724,19 @@ function limparBancoDadosCadastro() {
                 el.style.color = "#cc0000";
             }
         });
-		
-	        var elMR = document.getElementById("statusMalotesRecebidos");
-        if (elMR) {
-            if (conectado) {
-                elMR.innerText = "☁️ Sincronizado";
-                elMR.style.color = "#155724";
-            } else {
-                elMR.innerText = "⚠️ Sem Internet";
-                elMR.style.color = "#cc0000";
-            }
-        }
 
+        ["statusMalotesRecebidos", "statusTaloesRecebidos"].forEach(function(idStatus) {
+            var elStatus = document.getElementById(idStatus);
+            if (elStatus) {
+                if (conectado) {
+                    elStatus.innerText = "☁️ Sincronizado";
+                    elStatus.style.color = "#155724";
+                } else {
+                    elStatus.innerText = "⚠️ Sem Internet";
+                    elStatus.style.color = "#cc0000";
+                }
+            }
+        });
     }
 
 
@@ -4691,7 +4917,12 @@ function limparBancoDadosCadastro() {
 
             var celulaAcoes = novaLinha.insertCell(7);
             celulaAcoes.className = "cell-actions";
-            celulaAcoes.innerHTML = '<button type="button" onclick="if(confirm(\'Remover esta linha?\')) this.parentNode.parentNode.remove()" class="btn-delete">🗑️</button>';
+            var btnDelMalote = document.createElement("button");
+            btnDelMalote.type = "button";
+            btnDelMalote.className = "btn-delete";
+            btnDelMalote.innerHTML = "🗑️";
+            btnDelMalote.onclick = function() { removerLinhaTabelaMalote(novaLinha); };
+            celulaAcoes.appendChild(btnDelMalote);
 
             document.getElementById("formMalote").reset();
             document.getElementById("malote_data").value = obterDataBrasilia();
@@ -4699,12 +4930,69 @@ function limparBancoDadosCadastro() {
         });
     }
 
-    function limparTabelaMaloteToda() {
-        if (confirm("⚠️ Deseja excluir todas as linhas da Capa Malote?")) {
-            document.getElementById("corpoTabelaMalote").innerHTML = "";
-            document.getElementById("malote_os").focus();
-        }
+    var acaoOkConfirmacaoMalote = null;
+
+    function abrirModalConfirmacaoMalote(mensagem, onOk, titulo = "Confirmar Exclusão", icone = "🗑️") {
+        var modal = document.getElementById("modalConfirmacaoMalote");
+        var elIcone = document.getElementById("iconeConfirmacaoMalote");
+        var elTitulo = document.getElementById("tituloConfirmacaoMalote");
+        var elTexto = document.getElementById("textoConfirmacaoMalote");
+        var btnOk = document.getElementById("btnOkConfirmacaoMalote");
+        if (!modal || !elTexto) return;
+
+        acaoOkConfirmacaoMalote = onOk || null;
+        if (elIcone) elIcone.innerText = icone;
+        if (elTitulo) elTitulo.innerText = titulo;
+        elTexto.innerText = mensagem;
+
+        modal.style.display = "flex";
+        setTimeout(function() { if (btnOk) btnOk.focus(); }, 50);
     }
+
+    function confirmarModalMalote() {
+        var acao = acaoOkConfirmacaoMalote;
+        fecharModalConfirmacaoMalote();
+        if (typeof acao === "function") acao();
+    }
+
+    function fecharModalConfirmacaoMalote() {
+        var modal = document.getElementById("modalConfirmacaoMalote");
+        if (modal) modal.style.display = "none";
+        acaoOkConfirmacaoMalote = null;
+    }
+
+    function removerLinhaTabelaMalote(linhaAlvo) {
+        abrirModalConfirmacaoMalote(
+            "Deseja remover esta linha da Capa Malote?",
+            function() {
+                if (linhaAlvo && linhaAlvo.parentNode) {
+                    linhaAlvo.parentNode.removeChild(linhaAlvo);
+                }
+                document.getElementById("malote_os").focus();
+            },
+            "Excluir Linha",
+            "🗑️"
+        );
+    }
+
+    function limparTabelaMaloteToda() {
+        var linhas = document.querySelectorAll("#corpoTabelaMalote tr");
+        if (linhas.length === 0) {
+            document.getElementById("malote_os").focus();
+            return;
+        }
+
+        abrirModalConfirmacaoMalote(
+            "Deseja excluir todas as linhas da Capa Malote?",
+            function() {
+                document.getElementById("corpoTabelaMalote").innerHTML = "";
+                document.getElementById("malote_os").focus();
+            },
+            "Limpar Capa Malote",
+            "🔄"
+        );
+    }
+
 
     // 1. Apenas gera o PDF / Imprime a folha da Capa Malote (sem enviar ao banco)
     function imprimirSomenteCapaMalote() {
@@ -4913,91 +5201,89 @@ function limparBancoDadosCadastro() {
     }
 
     // Insere automaticamente a 2ª lente na planilha quando a OS tiver par (Qtd 1 e 1)
-    var formPlanilhaConferencia = document.getElementById("planilhaForm");
-    if (formPlanilhaConferencia) {
-        formPlanilhaConferencia.addEventListener("submit", function() {
-            if (!segundoItemMalotePendente) return;
+    function adicionarSegundaLentePendenteNaTabela() {
+        if (!segundoItemMalotePendente) return;
 
-            var item2 = segundoItemMalotePendente;
-            segundoItemMalotePendente = null;
+        var item2 = segundoItemMalotePendente;
+        segundoItemMalotePendente = null;
 
-            setTimeout(function() {
-                var tbody = document.getElementById("corpoTabela");
-                var linhas = tbody.getElementsByTagName("tr");
-                if (linhas.length === 0) return;
+        setTimeout(function() {
+            var tbody = document.getElementById("corpoTabela");
+            var linhas = tbody.getElementsByTagName("tr");
+            if (linhas.length === 0) return;
 
-                // Pega a linha recém-criada da 1ª lente como referência para manter Loja, Valor Unitário, NF e Data idênticos
-                var primeiraLinha = linhas[linhas.length - 1];
-                var tdsPrimeira = primeiraLinha.getElementsByTagName("td");
+            // Pega a linha recém-criada da 1ª lente como referência para manter Loja, Valor Unitário, NF e Data idênticos
+            var primeiraLinha = linhas[linhas.length - 1];
+            var tdsPrimeira = primeiraLinha.getElementsByTagName("td");
 
-                var novaLinha2 = tbody.insertRow();
-                var idUnico2 = "ID_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-                novaLinha2.dataset.idUnico = idUnico2;
+            var novaLinha2 = tbody.insertRow();
+            var idUnico2 = "ID_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+            novaLinha2.dataset.idUnico = idUnico2;
 
-                var lente2Cad = bancoDadosProdutos.find(p =>
-                    (item2.cod_produto && String(p.codigo).trim() === String(item2.cod_produto).trim()) ||
-                    (item2.cod_web && String(p.cod_web).trim() === String(item2.cod_web).trim())
-                );
-                novaLinha2.dataset.fornecedorItem = (lente2Cad && lente2Cad.fornecedor) ? lente2Cad.fornecedor : "BRASLAB";
+            var lente2Cad = bancoDadosProdutos.find(p =>
+                (item2.cod_produto && String(p.codigo).trim() === String(item2.cod_produto).trim()) ||
+                (item2.cod_web && String(p.cod_web).trim() === String(item2.cod_web).trim())
+            );
+            novaLinha2.dataset.fornecedorItem = (lente2Cad && lente2Cad.fornecedor) ? lente2Cad.fornecedor : "BRASLAB";
 
-                novaLinha2.insertCell(0).innerText = tdsPrimeira[0].innerText; // OS
-                novaLinha2.insertCell(1).innerText = tdsPrimeira[1].innerText; // LOJA
+            novaLinha2.insertCell(0).innerText = tdsPrimeira[0].innerText; // OS
+            novaLinha2.insertCell(1).innerText = tdsPrimeira[1].innerText; // LOJA
 
-                // CÓD. WEB com lápis de edição inline
-                var celulaWeb2 = novaLinha2.insertCell(2);
-                var containerWeb2 = document.createElement("div");
-                containerWeb2.className = "cell-web-container";
-                var spanTexto2 = document.createElement("span");
-                spanTexto2.innerText = item2.cod_web || "";
-                var btnLapis2 = document.createElement("button");
-                btnLapis2.type = "button";
-                btnLapis2.className = "btn-edit-inline";
-                btnLapis2.innerHTML = "✏️";
-                btnLapis2.title = "Editar código";
-                btnLapis2.onclick = function() {
-                    if (containerWeb2.querySelector("input")) return;
-                    var inputTemp = document.createElement("input");
-                    inputTemp.type = "text";
-                    inputTemp.className = "input-edit-inline";
-                    inputTemp.value = spanTexto2.innerText;
-                    function salvarEd() {
-                        spanTexto2.innerText = inputTemp.value.trim();
-                        inputTemp.replaceWith(spanTexto2);
-                        btnLapis2.style.display = "inline-flex";
-                    }
-                    inputTemp.onblur = salvarEd;
-                    inputTemp.onkeydown = function(evt) { if (evt.key === "Enter") salvarEd(); };
-                    spanTexto2.replaceWith(inputTemp);
-                    btnLapis2.style.display = "none";
-                    inputTemp.focus();
-                    inputTemp.select();
-                };
-                containerWeb2.appendChild(spanTexto2);
-                containerWeb2.appendChild(btnLapis2);
-                celulaWeb2.appendChild(containerWeb2);
+            // CÓD. WEB com lápis de edição inline
+            var celulaWeb2 = novaLinha2.insertCell(2);
+            var containerWeb2 = document.createElement("div");
+            containerWeb2.className = "cell-web-container";
+            var spanTexto2 = document.createElement("span");
+            spanTexto2.innerText = item2.cod_web || "";
+            var btnLapis2 = document.createElement("button");
+            btnLapis2.type = "button";
+            btnLapis2.className = "btn-edit-inline";
+            btnLapis2.innerHTML = "✏️";
+            btnLapis2.title = "Editar código";
+            btnLapis2.onclick = function() {
+                if (containerWeb2.querySelector("input")) return;
+                var inputTemp = document.createElement("input");
+                inputTemp.type = "text";
+                inputTemp.className = "input-edit-inline";
+                inputTemp.value = spanTexto2.innerText;
+                function salvarEd() {
+                    spanTexto2.innerText = inputTemp.value.trim();
+                    inputTemp.replaceWith(spanTexto2);
+                    btnLapis2.style.display = "inline-flex";
+                }
+                inputTemp.onblur = salvarEd;
+                inputTemp.onkeydown = function(evt) { if (evt.key === "Enter") salvarEd(); };
+                spanTexto2.replaceWith(inputTemp);
+                btnLapis2.style.display = "none";
+                inputTemp.focus();
+                inputTemp.select();
+            };
+            containerWeb2.appendChild(spanTexto2);
+            containerWeb2.appendChild(btnLapis2);
+            celulaWeb2.appendChild(containerWeb2);
 
-                novaLinha2.insertCell(3).innerText = item2.cod_produto || "";
-                novaLinha2.insertCell(4).innerText = lente2Cad ? lente2Cad.descricao : (item2.descricao || "");
-                novaLinha2.insertCell(5).innerText = tdsPrimeira[5].innerText; // NOME DO CLIENTE
-                novaLinha2.insertCell(6).innerText = "1"; // QUANTIDADE 1
+            novaLinha2.insertCell(3).innerText = item2.cod_produto || "";
+            novaLinha2.insertCell(4).innerText = lente2Cad ? lente2Cad.descricao : (item2.descricao || "");
+            novaLinha2.insertCell(5).innerText = tdsPrimeira[5].innerText; // NOME DO CLIENTE
+            novaLinha2.insertCell(6).innerText = "1"; // QUANTIDADE 1
 
-                var celulaValor2 = novaLinha2.insertCell(7);
-                celulaValor2.innerText = tdsPrimeira[7].innerText; // Mesmo valor unitário dividido por 2
-                celulaValor2.className = "col-valor-nf";
+            var celulaValor2 = novaLinha2.insertCell(7);
+            celulaValor2.innerText = tdsPrimeira[7].innerText; // Mesmo valor unitário dividido por 2
+            celulaValor2.className = "col-valor-nf";
 
-                novaLinha2.insertCell(8).innerText = tdsPrimeira[8].innerText; // NF
-                novaLinha2.insertCell(9).innerText = tdsPrimeira[9].innerText; // DATA
+            novaLinha2.insertCell(8).innerText = tdsPrimeira[8].innerText; // NF
+            novaLinha2.insertCell(9).innerText = tdsPrimeira[9].innerText; // DATA
 
-                var celulaAcoes2 = novaLinha2.insertCell(10);
-                celulaAcoes2.className = "cell-actions";
-                var btnRemover2 = document.createElement("button");
-                btnRemover2.className = "btn-delete";
-                btnRemover2.innerHTML = "🗑️";
-                btnRemover2.onclick = function() { deletarLinhaPorReferencia(idUnico2); };
-                celulaAcoes2.appendChild(btnRemover2);
-            }, 30);
-        });
+            var celulaAcoes2 = novaLinha2.insertCell(10);
+            celulaAcoes2.className = "cell-actions";
+            var btnRemover2 = document.createElement("button");
+            btnRemover2.className = "btn-delete";
+            btnRemover2.innerHTML = "🗑️";
+            btnRemover2.onclick = function() { deletarLinhaPorReferencia(idUnico2); };
+            celulaAcoes2.appendChild(btnRemover2);
+        }, 30);
     }
+
 
     // Dispara a busca ao sair do campo OS (Tab) ou pressionar Enter dentro dele
     var campoOsConferencia = document.getElementById("os");
@@ -5318,7 +5604,411 @@ function limparBancoDadosCadastro() {
             }
         });
     }
+	
+    function popularFiltroLojasTaloesRecebidos() {
+        if (typeof atualizarSelectsDeLojas === "function") {
+            atualizarSelectsDeLojas();
+        }
+    }
 
+    function formatarTextoContadorTaloes(qtd) {
+        return qtd === 1 ? "1 talão filtrado" : `${qtd} Talões Filtrados`;
+    }
+
+    function limparFiltrosRecebidos() {
+        const os = document.getElementById("filtroRecebidosOS");
+        const loja = document.getElementById("filtroRecebidosLoja");
+        const dataIni = document.getElementById("filtroRecebidosDataInicio");
+        const dataFim = document.getElementById("filtroRecebidosDataFim");
+        const hoje = obterDataBrasilia();
+        if (os) os.value = "";
+        if (loja) loja.value = "";
+        if (dataIni) dataIni.value = hoje;
+        if (dataFim) dataFim.value = hoje;
+        filtrarTaloesRecebidos();
+    }
+
+    async function filtrarTaloesRecebidos() {
+        if (listaTaloesRecebidosCache.length === 0 && dbSupabase) {
+            await carregarTaloesRecebidos();
+            return;
+        }
+
+        const norm = (txt) => String(txt || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+        const termoOS = norm(document.getElementById("filtroRecebidosOS")?.value);
+        const termoLoja = norm(document.getElementById("filtroRecebidosLoja")?.value);
+        const dataInicio = (document.getElementById("filtroRecebidosDataInicio")?.value || "").trim();
+        const dataFim = (document.getElementById("filtroRecebidosDataFim")?.value || "").trim();
+
+        const linhas = document.querySelectorAll("#tabelaTaloesRecebidosBody tr[data-os]");
+        let visiveis = 0;
+
+        linhas.forEach(tr => {
+            const os = norm(tr.getAttribute("data-os"));
+            const cliente = norm(tr.cells?.[3]?.innerText);
+            const loja = norm(tr.getAttribute("data-loja"));
+            let dataReg = (tr.getAttribute("data-data") || "").trim();
+
+            if (dataReg.includes("/")) {
+                const p = dataReg.split(" ")[0].split("/");
+                if (p.length === 3) dataReg = `${p[2]}-${p[1]}-${p[0]}`;
+            } else if (dataReg.includes("T")) {
+                dataReg = dataReg.split("T")[0];
+            }
+
+            const bateOSOuCliente = !termoOS || os.includes(termoOS) || cliente.includes(termoOS);
+            const bateLoja = !termoLoja || loja.includes(termoLoja) || termoLoja.includes(loja);
+            const bateDataIni = !dataInicio || (dataReg && dataReg >= dataInicio);
+            const bateDataFim = !dataFim || (dataReg && dataReg <= dataFim);
+
+            if (bateOSOuCliente && bateLoja && bateDataIni && bateDataFim) {
+                tr.style.display = "";
+                visiveis++;
+            } else {
+                tr.style.display = "none";
+            }
+        });
+
+        const contador = document.getElementById("contadorTaloesRecebidos");
+        if (contador) contador.innerText = formatarTextoContadorTaloes(visiveis);
+    }
+
+	    // ========================================================
+    // ENVIO, RECEBIMENTO E CÓPIA BRASLAB DOS TALÕES (PARTE 1/2)
+    // ========================================================
+    var listaTaloesRecebidosCache = [];
+
+    function capturarEstadoCompletoTalao() {
+        const camposTexto = {};
+        document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
+            if (el.id) camposTexto[el.id] = el.value;
+        });
+        const checkboxes = {};
+        document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
+            if (chk.id) checkboxes[chk.id] = chk.checked;
+        });
+        return {
+            camposTexto,
+            checkboxes,
+            pacoteBraslab: montarObjetoBraslabDoTalao()
+        };
+    }
+
+
+    async function enviarTalao() {
+        const osVal = (document.getElementById("talao_os_input")?.value || "").trim();
+        const lojaVal = (document.getElementById("talao_optica")?.value || document.getElementById("talao_cod")?.value || "").trim().toUpperCase();
+        const clienteVal = (document.getElementById("talao_nome_cliente_pedido")?.value || "").trim().toUpperCase();
+
+        if (!osVal) {
+            abrirModalAvisoSistema("Campo Obrigatório", "Preencha o campo 'Sua O.S.' antes de enviar o talão!", "aviso");
+            document.getElementById("talao_os_input")?.focus();
+            return;
+        }
+        if (!dbSupabase) {
+            abrirModalAvisoSistema("Sem Conexão", "Banco de dados desconectado.", "erro");
+            return;
+        }
+
+        const btn = document.getElementById("btnEnviarTalao");
+        if (btn) { btn.disabled = true; btn.innerText = "⏳ Enviando..."; }
+
+        try {
+            const payload = {
+                loja: lojaVal || "NÃO INFORMADA",
+                os: osVal,
+                cliente: clienteVal || "-",
+                cod_web: (document.getElementById("campoCodWebTalao")?.value || "").trim(),
+                produto: (document.getElementById("campoProdutoTalao")?.value || "").trim(),
+                data: document.getElementById("data-atual")?.value || obterDataBrasilia(),
+                criado_em: new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }).replace(",", ""),
+                status: "Pendente",
+                dados_json: capturarEstadoCompletoTalao()
+            };
+
+            const { error } = await dbSupabase.from("taloes_enviados").insert([payload]);
+            if (error) {
+                abrirModalAvisoSistema("Erro ao Enviar", "Não foi possível enviar o talão: " + error.message, "erro");
+            } else {
+                abrirModalAvisoSistema("Talão Enviado!", `O talão da OS ${osVal} foi enviado com sucesso para o laboratório!`, "sucesso");
+            }
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerText = "📤 Enviar Talão"; }
+        }
+    }
+
+	    // ========================================================
+    // LISTAGEM E AÇÕES DE TALÕES RECEBIDOS (PARTE 2/2)
+    // ========================================================
+    async function carregarTaloesRecebidos() {
+        if (!dbSupabase) return;
+        const tbody = document.getElementById("tabelaTaloesRecebidosBody");
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:15px; color:#0056b3; font-weight:bold;">⏳ Carregando talões recebidos...</td></tr>';
+
+        const { data, error } = await dbSupabase
+            .from("taloes_enviados")
+            .select("*")
+            .order("id", { ascending: false })
+            .limit(200);
+
+        if (error) {
+            if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#cc0000; padding:15px;">❌ Erro: ${error.message}</td></tr>`;
+            return;
+        }
+
+        listaTaloesRecebidosCache = data || [];
+        popularFiltroLojasTaloesRecebidos(listaTaloesRecebidosCache);
+        renderizarTabelaTaloesRecebidos(listaTaloesRecebidosCache);
+		filtrarTaloesRecebidos();
+    }
+
+    function renderizarTabelaTaloesRecebidos(lista) {
+        const tbody = document.getElementById("tabelaTaloesRecebidosBody");
+        const contador = document.getElementById("contadorTaloesRecebidos");
+        if (!tbody) return;
+
+        if (contador) contador.innerText = formatarTextoContadorTaloes(lista.length);
+        tbody.innerHTML = "";
+
+        if (lista.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #666; font-style: italic; padding: 20px;">Nenhum talão recebido encontrado.</td></tr>';
+            return;
+        }
+
+        lista.forEach(item => {
+            const tr = tbody.insertRow();
+            tr.setAttribute("data-os", item.os || "");
+            tr.setAttribute("data-loja", item.loja || "");
+            tr.setAttribute("data-data", item.data || "");
+
+            tr.insertCell(0).innerText = item.criado_em || item.data || "-";
+            tr.insertCell(1).innerText = item.loja || "-";
+            tr.insertCell(2).innerHTML = `<b>${item.os || "-"}</b>`;
+            tr.insertCell(3).innerText = item.cliente || "-";
+            tr.insertCell(4).innerText = item.cod_web ? `[${item.cod_web}] ${item.produto || ""}` : (item.produto || "-");
+
+            const tdStatus = tr.insertCell(5);
+            const ehCopiado = item.status === "Copiado";
+            tdStatus.innerHTML = `<span style="background:${ehCopiado ? '#d4edda' : '#fff3cd'}; color:${ehCopiado ? '#155724' : '#856404'}; padding:3px 8px; border-radius:10px; font-weight:bold; font-size:11px;">${item.status || 'Pendente'}</span>`;
+
+            const tdAcoes = tr.insertCell(6);
+            tdAcoes.style.whiteSpace = "nowrap";
+            tdAcoes.innerHTML = `
+                <button type="button" onclick="copiarRecebidoParaBraslab(${item.id})" style="background:#0056b3; color:#fff; padding:4px 8px; font-size:11px; border-radius:4px; margin-right:3px;" title="Copiar direto para colar no site da Braslab">📋 Braslab</button>
+                <button type="button" onclick="puxarParaTalaoPedidos(${item.id})" style="background:#28a745; color:#fff; padding:4px 8px; font-size:11px; border-radius:4px; margin-right:3px;" title="Abrir e preencher na aba Talão de Pedidos">📝 Abrir</button>
+                <button type="button" onclick="excluirTalaoRecebido(${item.id}, '${item.os}')" style="background:#cc0000; color:#fff; padding:4px 7px; font-size:11px; border-radius:4px;" title="Excluir">🗑️</button>
+            `;
+        });
+    }
+
+    async function copiarRecebidoParaBraslab(idRegistro) {
+        const item = listaTaloesRecebidosCache.find(x => x.id === idRegistro);
+        if (!item || !item.dados_json?.pacoteBraslab) {
+            abrirModalAvisoSistema("Erro", "Dados do talão não encontrados.", "erro");
+            return;
+        }
+
+        const aux = document.createElement("textarea");
+        aux.value = JSON.stringify(item.dados_json.pacoteBraslab);
+        document.body.appendChild(aux);
+        aux.select();
+        document.execCommand("copy");
+        document.body.removeChild(aux);
+
+        if (dbSupabase && item.status !== "Copiado") {
+            await dbSupabase.from("taloes_enviados").update({ status: "Copiado" }).eq("id", idRegistro);
+            item.status = "Copiado";
+            renderizarTabelaTaloesRecebidos(listaTaloesRecebidosCache);
+        }
+
+        abrirModalAvisoSistema("Pronto para Braslab!", `Talão da OS ${item.os} (${item.loja}) copiado! Vá na Braslab e clique em '⚡ Colar do Talão'.`, "sucesso");
+    }
+
+    function puxarParaTalaoPedidos(idRegistro) {
+        const item = listaTaloesRecebidosCache.find(x => x.id === idRegistro);
+        if (!item || !item.dados_json) return;
+
+        const { camposTexto = {}, checkboxes = {} } = item.dados_json;
+
+        document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
+            if (el.id) el.value = camposTexto[el.id] || "";
+        });
+        document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
+            if (chk.id) chk.checked = Boolean(checkboxes[chk.id]);
+        });
+
+        alternarAba("talao");
+        abrirModalAvisoSistema("Talão Carregado!", `Os dados da OS ${item.os} (${item.loja}) foram preenchidos no Talão de Pedidos.`, "sucesso");
+    }
+
+    async function excluirTalaoRecebido(idRegistro, osNum) {
+        if (!confirm(`⚠️ Deseja excluir o talão recebido da OS ${osNum}?`)) return;
+        const { error } = await dbSupabase.from("taloes_enviados").delete().eq("id", idRegistro);
+        if (!error) {
+            listaTaloesRecebidosCache = listaTaloesRecebidosCache.filter(x => x.id !== idRegistro);
+            renderizarTabelaTaloesRecebidos(listaTaloesRecebidosCache);
+        }
+    }
+
+	
+	    function montarObjetoBraslabDoTalao() {
+        const pegarVal = (id) => (document.getElementById(id)?.value || "").trim();
+        const pegarChk = (id) => Boolean(document.getElementById(id)?.checked);
+
+        let formaSelecionada = null;
+        document.querySelectorAll("#talao input[type='checkbox']:checked").forEach(chk => {
+            const textoVizinho = (chk.parentElement?.innerText || chk.closest("td, div, label")?.innerText || "").trim();
+            const num = parseInt(textoVizinho, 10);
+            if (num >= 13 && num <= 21) formaSelecionada = num;
+        });
+
+        let tipoArmacaoBraslab = "";
+        document.querySelectorAll("#talao input[type='checkbox']:checked").forEach(chk => {
+            const txt = (chk.parentElement?.innerText || chk.closest("td, div, label")?.innerText || "").toUpperCase();
+            if (txt.includes("ACETATO") || txt.includes("ZILO")) tipoArmacaoBraslab = "1";
+            else if (txt.includes("METAL")) tipoArmacaoBraslab = "2";
+            else if (txt.includes("NYLON")) tipoArmacaoBraslab = "3";
+            else if (txt.includes("FIO DE AÇO")) tipoArmacaoBraslab = "4";
+            else if (txt.includes("PARAFUSO") || txt.includes("BALGRIFF")) tipoArmacaoBraslab = "5";
+            else if (txt.includes("SEGURANÇA")) tipoArmacaoBraslab = "6";
+            else if (txt.includes("PINO")) tipoArmacaoBraslab = "8";
+            else if (txt.includes("OPTYL")) tipoArmacaoBraslab = "10";
+        });
+
+        const camposLonge = [
+            "longe_od_esf", "longe_od_cil", "longe_od_eixo", "longe_od_adi", "longe_od_dnp", "longe_od_alt",
+            "longe_oe_esf", "longe_oe_cil", "longe_oe_eixo", "longe_oe_adi", "longe_oe_dnp", "longe_oe_alt"
+        ];
+        const temDadosLonge = camposLonge.some(id => pegarVal(id) !== "");
+        const origemGrau = temDadosLonge ? "longe" : "perto";
+
+        return {
+            origem: "TALAO_OTICA_LIDER",
+            codParticipante: pegarVal("talao_cod"),
+            solicitante: pegarVal("talao_solicitante"),
+			os: pegarVal("talao_os_input"),
+            codWeb: pegarVal("campoCodWebTalao"),
+            comMontagem: pegarChk("chk_com_montagem"),
+            formaArmacao: formaSelecionada,
+            tipoArmacao: tipoArmacaoBraslab,
+            modeloArmacaoTexto: pegarVal("talao_modelo_armacao"),
+            condicoesAro: pegarVal("talao_condicoes_aro"),
+            od: {
+                esf: pegarVal(`${origemGrau}_od_esf`),
+                cil: pegarVal(`${origemGrau}_od_cil`),
+                eixo: pegarVal(`${origemGrau}_od_eixo`).replace("°", ""),
+                adi: pegarVal(`${origemGrau}_od_adi`),
+                dnp: pegarVal(`${origemGrau}_od_dnp`),
+                alt: pegarVal(`${origemGrau}_od_alt`)
+            },
+            oe: {
+                esf: pegarVal(`${origemGrau}_oe_esf`),
+                cil: pegarVal(`${origemGrau}_oe_cil`),
+                eixo: pegarVal(`${origemGrau}_oe_eixo`).replace("°", ""),
+                adi: pegarVal(`${origemGrau}_oe_adi`),
+                dnp: pegarVal(`${origemGrau}_oe_dnp`),
+                alt: pegarVal(`${origemGrau}_oe_alt`)
+            },
+            medidas: {
+                v: pegarVal("med_v"),
+                h: pegarVal("med_h"),
+                m: pegarVal("med_m"),
+                p: pegarVal("med_p")
+            },
+            cliente: pegarVal("talao_nome_cliente_pedido"),
+            medico: pegarVal("talao_medico"),
+            crm: pegarVal("talao_crm")
+        };
+    }
+	
+    function copiarTalaoParaBraslab() {
+        const pegarVal = (id) => (document.getElementById(id)?.value || "").trim();
+        const pegarChk = (id) => Boolean(document.getElementById(id)?.checked);
+
+        // Descobre qual forma (13 a 21) está marcada olhando os checkboxes visíveis no talão
+        let formaSelecionada = null;
+        document.querySelectorAll("#talao input[type='checkbox']:checked").forEach(chk => {
+            const textoVizinho = (chk.parentElement?.innerText || chk.closest("td, div, label")?.innerText || "").trim();
+            const num = parseInt(textoVizinho, 10);
+            if (num >= 13 && num <= 21) formaSelecionada = num;
+        });
+
+        // Descobre o tipo de armação marcado pelo texto vizinho
+        let tipoArmacaoBraslab = "";
+        document.querySelectorAll("#talao input[type='checkbox']:checked").forEach(chk => {
+            const txt = (chk.parentElement?.innerText || chk.closest("td, div, label")?.innerText || "").toUpperCase();
+            if (txt.includes("ACETATO") || txt.includes("ZILO")) tipoArmacaoBraslab = "1";
+            else if (txt.includes("METAL")) tipoArmacaoBraslab = "2";
+            else if (txt.includes("NYLON")) tipoArmacaoBraslab = "3";
+            else if (txt.includes("FIO DE AÇO")) tipoArmacaoBraslab = "4";
+            else if (txt.includes("PARAFUSO") || txt.includes("BALGRIFF")) tipoArmacaoBraslab = "5";
+            else if (txt.includes("SEGURANÇA")) tipoArmacaoBraslab = "6";
+            else if (txt.includes("PINO")) tipoArmacaoBraslab = "8";
+            else if (txt.includes("OPTYL")) tipoArmacaoBraslab = "10";
+        });
+
+        // Prioriza LONGE se houver qualquer campo preenchido; caso contrário, usa PERTO
+        const camposLonge = [
+            "longe_od_esf", "longe_od_cil", "longe_od_eixo", "longe_od_adi", "longe_od_dnp", "longe_od_alt",
+            "longe_oe_esf", "longe_oe_cil", "longe_oe_eixo", "longe_oe_adi", "longe_oe_dnp", "longe_oe_alt"
+        ];
+        const temDadosLonge = camposLonge.some(id => pegarVal(id) !== "");
+        const origemGrau = temDadosLonge ? "longe" : "perto";
+
+        const dados = {
+            origem: "TALAO_OTICA_LIDER",
+			codParticipante: pegarVal("talao_cod"),
+            solicitante: pegarVal("talao_solicitante"),
+            os: pegarVal("talao_os_input"),
+            codWeb: pegarVal("campoCodWebTalao"),
+            comMontagem: pegarChk("chk_com_montagem"),
+            formaArmacao: formaSelecionada,
+            tipoArmacao: tipoArmacaoBraslab,
+            modeloArmacaoTexto: pegarVal("talao_modelo_armacao"),
+            condicoesAro: pegarVal("talao_condicoes_aro"),
+            od: {
+                esf: pegarVal(`${origemGrau}_od_esf`),
+                cil: pegarVal(`${origemGrau}_od_cil`),
+                eixo: pegarVal(`${origemGrau}_od_eixo`).replace("°", ""),
+                adi: pegarVal(`${origemGrau}_od_adi`),
+                dnp: pegarVal(`${origemGrau}_od_dnp`),
+                alt: pegarVal(`${origemGrau}_od_alt`)
+            },
+            oe: {
+                esf: pegarVal(`${origemGrau}_oe_esf`),
+                cil: pegarVal(`${origemGrau}_oe_cil`),
+                eixo: pegarVal(`${origemGrau}_oe_eixo`).replace("°", ""),
+                adi: pegarVal(`${origemGrau}_oe_adi`),
+                dnp: pegarVal(`${origemGrau}_oe_dnp`),
+                alt: pegarVal(`${origemGrau}_oe_alt`)
+            },
+            medidas: {
+                v: pegarVal("med_v"),
+                h: pegarVal("med_h"),
+                m: pegarVal("med_m"),
+                p: pegarVal("med_p")
+            },
+            cliente: pegarVal("talao_nome_cliente_pedido"),
+            medico: pegarVal("talao_medico"),
+            crm: pegarVal("talao_crm")
+        };
+
+        const aux = document.createElement("textarea");
+        aux.value = JSON.stringify(dados);
+        document.body.appendChild(aux);
+        aux.select();
+        document.execCommand("copy");
+        document.body.removeChild(aux);
+
+        const tipoReceitaAviso = temDadosLonge ? "Longe" : "Perto";
+        if (typeof abrirModalAvisoSistema === "function") {
+            abrirModalAvisoSistema("Pronto para Braslab!", `Copiado (${tipoReceitaAviso})! Forma: ${formaSelecionada || "Nenhuma"} | Tipo: ${tipoArmacaoBraslab || "Nenhum"}`, "sucesso");
+        } else {
+            alert(`Copiado (${tipoReceitaAviso})! Forma: ${formaSelecionada || "Nenhuma"} | Tipo: ${tipoArmacaoBraslab || "Nenhum"}`);
+        }
+    }
+
+	
 </script>
 </body>
 </html>
