@@ -359,6 +359,9 @@
   #listaLojasCadastroModal td:last-child { text-align: right !important; padding-right: 15px !important; }
   #modalPesquisaFornecedoresCadastro th:last-child { text-align: right !important; padding-right: 25px !important; }
   #listaFornecedoresCadastroModal td:last-child { text-align: right !important; padding-right: 15px !important; }
+  #modalPesquisaServicosCadastro th:nth-child(1), #modalPesquisaServicosCadastro td:nth-child(1) { width: 110px !important; min-width: 110px !important; }
+  #modalPesquisaServicosCadastro th:nth-child(2), #modalPesquisaServicosCadastro td:nth-child(2) { width: auto !important; text-align: left !important; }
+  #modalPesquisaServicosCadastro th:nth-child(3), #modalPesquisaServicosCadastro td:nth-child(3) { width: 100px !important; min-width: 100px !important; text-align: right !important; padding-right: 20px !important; }
 
     /* ========================================================
        ESTILOS EXCLUSIVOS DA ABA CAPA MALOTE (ISOLADOS COM #malote)
@@ -414,6 +417,125 @@
         }
     }
 
+        /* MENU LATERAL FLUTUANTE DO TALÃO DE PEDIDOS */
+        .talao-sidebar-dock {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: stretch;
+            z-index: 9500;
+            font-family: Arial, sans-serif;
+            box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.16);
+            border-radius: 0 10px 10px 0;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-left: none;
+        }
+        .talao-sidebar-icons {
+            width: 52px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            gap: 8px;
+        }
+        .talao-dock-icon-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.15s;
+            padding: 0;
+        }
+        .talao-sidebar-icons {
+            width: 52px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 12px 0;
+            gap: 8px;
+        }
+        .talao-dock-icon-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.15s;
+            padding: 0;
+        }
+        .talao-dock-icon-btn:hover {
+            background: #e2e8f0;
+            transform: scale(1.06);
+        }
+        .talao-sidebar-panel {
+            width: 0 !important;
+            opacity: 0 !important;
+            padding: 12px 0 !important;
+            overflow: hidden !important;
+            transition: width 0.25s ease, opacity 0.2s ease, padding 0.25s ease !important;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .talao-sidebar-dock:hover .talao-sidebar-panel,
+        .talao-sidebar-dock.aberto .talao-sidebar-panel {
+            width: 215px !important;
+            opacity: 1 !important;
+            padding: 12px 14px !important;
+        }
+		
+        #menuLateralTalao button.talao-sidebar-link:hover,
+        #menuLateralTalao button.talao-dock-icon-btn:hover {
+            background-color: #cbd5e1 !important;
+            background: #cbd5e1 !important;
+            color: #003d80 !important;
+        }
+
+        .talao-sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 38px;
+            background: transparent;
+            border: none;
+            color: #007791;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 0 8px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        @media print {
+            .talao-sidebar-dock { display: none !important; }
+        }
 
     </style>
 </head>
@@ -811,6 +933,58 @@
                         </div>
                     </div>
                 </div>
+                <!-- LINHA 3: TRATAMENTOS (ANTIRREFLEXO) E COLORAÇÃO LADO A LADO -->
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; width: 100%;">
+
+                    <!-- PAINEL: TRATAMENTOS / ANTIRREFLEXO -->
+                    <div class="cadastro-card-geral" style="flex: 1; min-width: 380px;">
+                        <div class="cadastro-header-tit">
+                            ✨ Gerenciar Tratamentos / Antirreflexo
+                        </div>
+                        <div class="cadastro-corpo-campos">
+                            <div style="display: flex; gap: 8px; margin-bottom: 15px; align-items: flex-end;">
+                                <div style="display: flex; flex-direction: column; width: 95px;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓDIGO</label>
+                                    <input type="text" id="config_trat_codigo" placeholder="00171" style="text-align: center;" class="cadastro-input-clean">
+                                </div>
+                                <div style="display: flex; flex-direction: column; flex: 1;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">DESCRIÇÃO DO TRATAMENTO</label>
+                                    <input type="text" id="config_trat_desc" placeholder="Ex: TRAT. OPTIPLAS MAX+" style="text-transform: uppercase;" class="cadastro-input-clean">
+                                </div>
+                            </div>
+                            <div class="cadastro-btn-acao-container">
+                                <button type="button" id="btnSalvarTratCadastro" onclick="salvarServicoPeloCadastro('tratamento')" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Trat.</button>
+                                <button type="button" onclick="limparFormCadastroServico('tratamento')" class="btn-clear" style="height: 30px; padding: 0 15px; font-size: 12px;">Limpar</button>
+                                <button type="button" onclick="abrirModalServicosCadastro('tratamento')" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAINEL: COLORAÇÃO -->
+                    <div class="cadastro-card-geral" style="flex: 1; min-width: 380px;">
+                        <div class="cadastro-header-tit">
+                            🎨 Gerenciar Coloração
+                        </div>
+                        <div class="cadastro-corpo-campos">
+                            <div style="display: flex; gap: 8px; margin-bottom: 15px; align-items: flex-end;">
+                                <div style="display: flex; flex-direction: column; width: 95px;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓDIGO</label>
+                                    <input type="text" id="config_cor_codigo" placeholder="00200" style="text-align: center;" class="cadastro-input-clean">
+                                </div>
+                                <div style="display: flex; flex-direction: column; flex: 1;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">DESCRIÇÃO DA COLORAÇÃO</label>
+                                    <input type="text" id="config_cor_desc" placeholder="Ex: COLORACAO TOTAL RESINA 1.50" style="text-transform: uppercase;" class="cadastro-input-clean">
+                                </div>
+                            </div>
+                            <div class="cadastro-btn-acao-container">
+                                <button type="button" id="btnSalvarCorCadastro" onclick="salvarServicoPeloCadastro('coloracao')" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Cor</button>
+                                <button type="button" onclick="limparFormCadastroServico('coloracao')" class="btn-clear" style="height: 30px; padding: 0 15px; font-size: 12px;">Limpar</button>
+                                <button type="button" onclick="abrirModalServicosCadastro('coloracao')" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
             </div>
         </div>
@@ -1023,6 +1197,40 @@
 
     <!-- A partir daqui a estrutura do seu Talão passa a funcionar normalmente -->
     <div id="talao" class="tab-content">
+	
+	        <!-- MENU LATERAL FLUTUANTE DO TALÃO -->
+        <div id="menuLateralTalao" class="talao-sidebar-dock">
+            <div class="talao-sidebar-icons">
+                <button type="button" class="talao-dock-icon-btn" title="Upload Arquivo .VCA / .OMA" onclick="document.getElementById('inputArquivoVCATalao').click()">📂</button>
+                <button type="button" class="talao-dock-icon-btn" title="Enviar Talão para o Laboratório" onclick="document.querySelector('#talao .btn-print-top[style*=&quot;#28a745&quot;]')?.click()">📤</button>
+                <button type="button" class="talao-dock-icon-btn item-braslab-dock" title="Copiar para Braslab" onclick="copiarTalaoParaBraslab()">📋</button>
+                <button type="button" class="talao-dock-icon-btn" title="Imprimir Talão" onclick="imprimirTalaoComNome()">🖨️</button>
+                <button type="button" class="talao-dock-icon-btn" title="Limpar Arquivo .VCA" onclick="limparArquivoVCATalao()">🗑️</button>
+                <button type="button" class="talao-dock-icon-btn" title="Fixar / Recolher Menu" onclick="document.getElementById('menuLateralTalao').classList.toggle('aberto')">📌</button>
+            </div>
+            <div class="talao-sidebar-panel">
+                <button type="button" class="talao-sidebar-link" onclick="document.getElementById('inputArquivoVCATalao').click()">
+                    <span class="seta">&gt;</span> Upload (.vca / .oma)
+                </button>
+                <button type="button" class="talao-sidebar-link" onclick="document.querySelector('#talao .btn-print-top[style*=&quot;#28a745&quot;]')?.click()">
+                    <span class="seta">&gt;</span> Enviar Talão
+                </button>
+                <button type="button" class="talao-sidebar-link item-braslab-dock" onclick="copiarTalaoParaBraslab()">
+                    <span class="seta">&gt;</span> Copiar Braslab
+                </button>
+                <button type="button" class="talao-sidebar-link" onclick="imprimirTalaoComNome()">
+                    <span class="seta">&gt;</span> Imprimir Talão
+                </button>
+                <button type="button" class="talao-sidebar-link" onclick="limparArquivoVCATalao()">
+                    <span class="seta">&gt;</span> Limpar Arquivo
+                </button>
+                <div id="statusArquivoVCATalao" style="font-size: 11px; color: #28a745; font-weight: bold; margin-top: 2px; padding-left: 8px; display: none;"></div>
+            </div>
+
+            <input type="file" id="inputArquivoVCATalao" accept=".vca,.oma,.txt,.dat,.xml" style="display: none;" onchange="processarArquivoVCATalao(this)">
+        </div>
+
+	
         <div class="talao-container">
 
             <div class="header">
@@ -1041,7 +1249,7 @@
 
                         <div class="top-grid" style="grid-template-columns: 1fr 1.5fr 1.5fr 1fr;">
                 <div class="field-box">CÓD.:<input type="text" id="talao_cod" name="talao_cod"></div>
-                <div class="field-box">ÓPTICA:<input type="text" id="talao_optica" name="talao_optica"></div>
+                <div class="field-box">ÓPTICA:<input type="text" id="talao_optica" name="talao_optica" list="listaOpticasTalao" autocomplete="off" oninput="localStorage.setItem('ultimaLojaTalaoLider', this.value)"><datalist id="listaOpticasTalao"></datalist></div>
                 <div class="field-box">Solicitado por:<input type="text" id="talao_solicitante" name="talao_solicitante"></div>
                 <div class="field-box" style="background-color: #fff; border: 1px solid var(--talao-color);">
                     Sua O.S.:<input type="text" id="talao_os_input" name="talao_os_input" style="color: #000; font-weight: bold; text-align: center; font-size: 14px; border: none; margin: 0;">
@@ -1059,7 +1267,9 @@
                 <div class="checkbox-item"><input type="checkbox" id="chk_sem_montagem" name="chk_sem_montagem"> Sem Montagem</div>
                 <div class="checkbox-item"><input type="checkbox" id="chk_pronta" name="chk_pronta"> Pronta</div>
                 <div class="checkbox-item"><input type="checkbox" id="chk_surfacada" name="chk_surfacada"> Surfaçada</div>
+                <div class="checkbox-item"><input type="checkbox" id="chk_corte" name="chk_corte"> Corte</div>
             </div>
+
             <div class="top-grid" style="grid-template-columns: 90px 1fr !important;">
                 <div class="field-box">Cód. WEB:<input type="text" id="campoCodWebTalao" name="campoCodWebTalao" onkeydown="fazerBuscaAoApertarEnter(event, 'web', this.value)"></div>
                 <div class="field-box">
@@ -1071,14 +1281,27 @@
                 </div>
             </div>
 
-            <div class="top-grid" style="grid-template-columns: 2fr 2fr;">
-                <div class="field-box">Antireflexo:<input type="text" id="talao_antireflexo" name="talao_antireflexo"></div>
-                <div class="field-box">Coloração:<input type="text" id="talao_coloracao" name="talao_coloracao"></div>
+            <div class="top-grid" style="grid-template-columns: 3fr 90px;">
+                <div class="field-box">
+                    Antireflexo:
+                    <div class="input-with-button">
+                        <input type="text" id="talao_antireflexo" name="talao_antireflexo" onkeydown="buscarServicoTalaoAoEnter(event, 'tratamento', this.value)" placeholder="">
+                        <button type="button" class="btn-search-lupa" tabindex="-1" onclick="abrirModalServicosTalao('tratamento')" title="Pesquisar Tratamento">🔍</button>
+                    </div>
+                </div>               
+				<div class="field-box">Base:<input type="text" id="talao_base" name="talao_base"></div>
             </div>
-            <div class="top-grid" style="grid-template-columns: 2fr 2fr;">
+            <div class="top-grid" style="grid-template-columns: 3fr 180px;">
+                <div class="field-box">
+                    Coloração:
+                    <div class="input-with-button">
+                        <input type="text" id="talao_coloracao" name="talao_coloracao" onkeydown="buscarServicoTalaoAoEnter(event, 'coloracao', this.value)" placeholder="">
+                        <button type="button" class="btn-search-lupa" tabindex="-1" onclick="abrirModalServicosTalao('coloracao')" title="Pesquisar Coloração">🔍</button>
+                    </div>
+                </div>
                 <div class="field-box">Outros:<input type="text" id="talao_outros" name="talao_outros"></div>
-                <div class="field-box">Base:<input type="text" id="talao_base" name="talao_base"></div>
             </div>
+
 
 
             <div class="table-wrapper">
@@ -1354,6 +1577,30 @@
             </div>
         </div>
     </div>
+	
+	    <!-- 4. MODAL EXCLUSIVO PARA PESQUISA DE TRATAMENTOS E COLORAÇÃO NO CADASTRO -->
+    <div id="modalPesquisaServicosCadastro" class="modal-overlay" onclick="fecharModalAoClicarFora(event, 'modalPesquisaServicosCadastro')">
+        <div class="modal-box" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 id="tituloModalServicosCad">🔎 Gerenciar Tratamentos / Coloração</h3>
+                <button type="button" class="modal-close" onclick="fecharModalServicosCadastro()">&times;</button>
+            </div>
+            <input type="text" id="filtroPesquisaServicosCad" class="search-box" placeholder="Digite o código ou descrição para filtrar..." oninput="filtrarServicosCadastroModal()">
+            <div class="modal-table-wrapper">
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 22%; text-transform: uppercase;">Código</th>
+                            <th style="text-transform: uppercase;">Descrição</th>
+                            <th style="width: 20%; text-align: right; padding-right: 25px; text-transform: uppercase;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaServicosCadastroModal"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 
     <!-- MODAL PRÓPRIO DE AVISO E CONFIRMAÇÃO (ANTI-BLOQUEIO DE NAVEGADOR) -->
     <div id="modalAvisoSistema" class="modal-overlay" style="z-index: 999999;">
@@ -1553,6 +1800,158 @@
         { num: "40", nome: "MARAMBAIA" }, { num: "42", nome: "SALINAS" },
         { num: "48", nome: "SÃO FRANCISCO" }
     ];
+	
+	    // ========================================================
+    // BANCO EMBUTIDO DE TRATAMENTOS E COLORAÇÃO (BRASLAB)
+    // ========================================================
+    var bancoDadosTratamentosPadrao = [
+        { codigo: "00171", descricao: "TRAT. OPTIPLAS MAX+" },
+        { codigo: "00172", descricao: "TRAT. OPTIPLAS DUAL+" },
+        { codigo: "00017", descricao: "TRAT. A.R. C.O. FACE INTERNA" },
+        { codigo: "000857", descricao: "TRAT. CRIZAL SAPPHIRE HR UV FACE INTERNA" },
+        { codigo: "000878", descricao: "TRAT. OPTIPLAS BLUE ( RESIDUAL AZUL ) FACE INTERNA" },
+        { codigo: "00174", descricao: "TRAT. OPTIPLAS DUAL+ FACE INTERNA" },
+        { codigo: "00170", descricao: "TRAT. OPTIPLAS SHA" },
+        { codigo: "00741", descricao: "TRAT. A.R. HIPERCLEAN DUAL+" },
+        { codigo: "000848", descricao: "TRAT. CRIZAL SAPPHIRE HR" },
+        { codigo: "000849", descricao: "TRAT. CRIZAL ROCK" },
+        { codigo: "00731", descricao: "TRAT. CRIZAL PREVENCIA" },
+        { codigo: "00732", descricao: "TRAT. NO REFLEX" },
+        { codigo: "000879", descricao: "TRAT. A.R. HIPERCLEAN BLUE ( RESIDUAL AZUL ) FACE INTERNA" },
+        { codigo: "00740", descricao: "TRAT. OPTIFOG" },
+        { codigo: "00708", descricao: "TRAT. TRIO EASY CLEAN UV" },
+        { codigo: "000873", descricao: "TRAT. A.R. HIPERCLEAN BLUE ( RESIDUAL AZUL )" },
+        { codigo: "000874", descricao: "TRAT. OPTIPLAS BLUE ( RESIDUAL AZUL )" },
+        { codigo: "000885", descricao: "VERNIZ HC VARILUX" },
+        { codigo: "000886", descricao: "VERNIZ HC VARILUX POLICARBONATO" },
+        { codigo: "0099", descricao: "TRAT. A.R. HIPERCLEAN MAX+" },
+        { codigo: "0098", descricao: "TRAT. A.R. HIPERCLEAN SHA" },
+        { codigo: "00730", descricao: "TRAT. CRIZAL EASY PRO UV" },
+        { codigo: "00300", descricao: "TRAT. A.R. HIPERCLEAN DUAL + FACE INTERNA" },
+        { codigo: "000861", descricao: "VERNIZ TINTAVEL FACE INTERNA / EXTERNA" },
+        { codigo: "00735", descricao: "TRAT. A.R. C.O. CLEAN" },
+        { codigo: "00210", descricao: "TRAT. A.R. TERCEIROS" },
+        { codigo: "00214", descricao: "TRAT. ANTIRRISCO" },
+        { codigo: "000932", descricao: "TRAT. CRIZAL NATURAL LOOK" },
+        { codigo: "000933", descricao: "TRAT. CRIZAL NATURAL LOOK FACE INTERNA" }
+    ];
+
+    var bancoDadosColoracaoPadrao = [
+        { codigo: "000112", descricao: "COLORACAO VX DEGRADE RESINA (1.50) - PADRAO" },
+        { codigo: "000113", descricao: "COLORACAO VX DEGRADE POLI (1.59) - PADRAO" },
+        { codigo: "000116", descricao: "COLORACAO VX AMOSTRA POLI (1.59) - ESPECIAL" },
+        { codigo: "000115", descricao: "COLORACAO VX AMOSTRA RESINA (1.50) - ESPECIAL" },
+        { codigo: "000118", descricao: "COLORACAO VX TOTAL RESINA (1.50) - PADRAO" },
+        { codigo: "000119", descricao: "COLORACAO VX TOTAL POLI (1.59) - PADRAO" },
+        { codigo: "00051", descricao: "COLORACAO DEGRADE 1.59/1.60/1.67/1.74" },
+        { codigo: "00054", descricao: "COLORACAO AMOSTRA 1.59/1.60/1.67/1.74" },
+        { codigo: "00050", descricao: "COLORACAO DEGRADE RESINA 1.50" },
+        { codigo: "00053", descricao: "COLORACAO AMOSTRA RESINA 1.50" },
+        { codigo: "00200", descricao: "COLORACAO TOTAL RESINA 1.50" },
+        { codigo: "00205", descricao: "COLORACAO TOTAL 1.59/1.60/1.67/1.74" },
+        { codigo: "00203", descricao: "ESPELHAMENTO + COLORACAO + ANTIRRISCO" },
+        { codigo: "00212", descricao: "TRAT. NIGHT DRIVE" },
+        { codigo: "00215", descricao: "TRAT. U.V." },
+        { codigo: "00268", descricao: "TRAT. VIDEO FILTER" }
+    ];
+
+    var bancoDadosTratamentos = JSON.parse(localStorage.getItem("BDTratamentosLider")) || [...bancoDadosTratamentosPadrao];
+    var bancoDadosColoracao = JSON.parse(localStorage.getItem("BDColoracaoLider")) || [...bancoDadosColoracaoPadrao];
+    var tipoServicoModalTalaoAtual = "tratamento";
+
+    function buscarServicoTalaoAoEnter(event, tipo, valor) {
+        if (event.key === "Tab" && event.shiftKey) return;
+        if (event.key !== "Enter" && event.key !== "Tab") return;
+
+        valor = valor.trim();
+        if (!valor) return;
+
+        const lista = tipo === "tratamento" ? bancoDadosTratamentos : bancoDadosColoracao;
+        const campo = document.getElementById(tipo === "tratamento" ? "talao_antireflexo" : "talao_coloracao");
+
+        // Aceita digitar o código exato (ex: 00171) ou sem zeros à esquerda (ex: 171)
+        const encontrado = lista.find(item =>
+            item.codigo === valor ||
+            item.codigo.replace(/^0+/, "") === valor.replace(/^0+/, "")
+        );
+
+        if (encontrado && campo) {
+            event.preventDefault();
+            event.stopPropagation();
+            campo.value = encontrado.descricao;
+            campo.dataset.codigoServico = encontrado.codigo;
+
+
+            setTimeout(() => {
+                const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
+                const idx = formFields.indexOf(campo);
+                if (idx > -1 && idx < formFields.length - 1) formFields[idx + 1].focus();
+            }, 50);
+        }
+    }
+
+    function abrirModalServicosTalao(tipo) {
+        tipoServicoModalTalaoAtual = tipo;
+        const lista = tipo === "tratamento" ? bancoDadosTratamentos : bancoDadosColoracao;
+        const modal = document.getElementById("modalPesquisaTalao");
+        const titulo = modal.querySelector("h3");
+        const filtro = document.getElementById("filtroModalTalao");
+        const thead = modal.querySelector("thead");
+
+        if (titulo) titulo.innerText = tipo === "tratamento" ? "🔎 Localizar Tratamento / Antirreflexo" : "🔎 Localizar Coloração";
+        if (thead) thead.innerHTML = '<tr><th style="width: 25%;">Código</th><th>Descrição</th></tr>';
+
+        filtro.value = "";
+        filtro.oninput = function() {
+            const termo = this.value.toLowerCase().trim();
+            const filtrados = termo ? lista.filter(i => i.codigo.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo)) : lista;
+            renderizarListaServicosNoModalTalao(filtrados);
+        };
+
+        renderizarListaServicosNoModalTalao(lista);
+        modal.style.display = "flex";
+        setTimeout(() => filtro.focus(), 100);
+    }
+
+    function renderizarListaServicosNoModalTalao(dados) {
+        const tbody = document.getElementById("listaProdutosTalao");
+        tbody.innerHTML = "";
+
+        if (!dados || dados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="no-data-talao">Nenhum item encontrado.</td></tr>';
+            return;
+        }
+
+        const dadosOrdenados = [...dados].sort((a, b) => (parseInt(a.codigo, 10) || 0) - (parseInt(b.codigo, 10) || 0));
+        dadosOrdenados.forEach(item => {
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td style="padding-left:10px;">${item.codigo}</td><td style="padding-left:10px;">${item.descricao}</td>`;
+            tr.onclick = function() {
+                const campo = document.getElementById(tipoServicoModalTalaoAtual === "tratamento" ? "talao_antireflexo" : "talao_coloracao");
+            if (campo) { 
+			campo.value = item.descricao;
+            campo.dataset.codigoServico = item.codigo;
+            }
+
+                restaurarCabecalhoModalLentesTalao();
+                fecharModalTalao();
+            };
+            tbody.appendChild(tr);
+        });
+    }
+
+    function restaurarCabecalhoModalLentesTalao() {
+        const modal = document.getElementById("modalPesquisaTalao");
+        const titulo = modal.querySelector("h3");
+        const thead = modal.querySelector("thead");
+        const filtro = document.getElementById("filtroModalTalao");
+        if (titulo) titulo.innerText = "🔎 Localizar a Lente pelo Código";
+        if (thead) thead.innerHTML = '<tr><th style="width: 20%;">Cód. web</th><th style="width: 25%;">Código</th><th>Descrição da Lente</th></tr>';
+        if (filtro) filtro.oninput = filtrarProdutosTalao;
+    }
+
+	
     // Nova lista de fornecedores com BRASLAB por padrão
     var listaFornecedoresConfigurados = [
         { nome: "BRASLAB" }
@@ -1652,6 +2051,12 @@
                 document.getElementById("textoNomeLoja").innerText = opcaoTexto;
             }
             numeroLojaAtual = lojaSalva;
+        }
+
+        var lojaSalvaTalao = localStorage.getItem("ultimaLojaTalaoLider");
+        if (lojaSalvaTalao) {
+            var campoOpticaTalao = document.getElementById("talao_optica");
+            if (campoOpticaTalao) campoOpticaTalao.value = lojaSalvaTalao;
         }
 
         var ultimaAba = localStorage.getItem("abaAtivaPlanilha") || "planilha";
@@ -1808,6 +2213,16 @@
             if ([...selectTR.options].some(o => o.value === valorAntigoTR)) {
                 selectTR.value = valorAntigoTR;
             }
+        }
+		        // 6. Atualiza a lista de sugestões do campo ÓPTICA no Talão de Pedidos
+        var datalistTalao = document.getElementById("listaOpticasTalao");
+        if (datalistTalao) {
+            datalistTalao.innerHTML = "";
+            lojasParaExibir.forEach(l => {
+                var opt = document.createElement("option");
+                opt.value = l.num + " " + l.nome;
+                datalistTalao.appendChild(opt);
+            });
         }
 
 	}
@@ -2644,6 +3059,7 @@ if (document.getElementById("arquivoCSV")) {
         }
     }
     function abrirModalTalao() {
+		restaurarCabecalhoModalLentesTalao();
         document.getElementById("modalPesquisaTalao").style.display = "flex";
         document.getElementById("filtroModalTalao").value = ""; 
         renderizarTabelaTalao(bancoDadosProdutos);
@@ -3275,6 +3691,31 @@ async function gerarPDFouImprimir() {
             var campoProd = document.getElementById("campoProdutoTalao");
             if (valor === "") return;
 
+            // Suporte para dois códigos separados por hífen no Cód. WEB (ex: 9143-12030)
+            if (campoDisparador === "web" && valor.includes("-")) {
+                var partesWeb = valor.split("-").map(c => c.trim()).filter(c => c !== "");
+                if (partesWeb.length >= 2) {
+                    var prod1 = bancoDadosProdutos.find(p => String(p.cod_web).trim() === partesWeb[0]);
+                    var prod2 = bancoDadosProdutos.find(p => String(p.cod_web).trim() === partesWeb[1]);
+
+                    if (prod1) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        campoWeb.value = partesWeb[0] + "-" + partesWeb[1];
+                        campoProd.value = prod2
+                            ? prod1.descricao + " - ( " + prod1.codigo + " ) - ( " + prod2.codigo + " )"
+                            : prod1.descricao + " - ( " + prod1.codigo + " )";
+
+                        setTimeout(function() {
+                            const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
+                            const indexProduto = formFields.indexOf(campoProd);
+                            if (indexProduto > -1 && indexProduto < formFields.length - 1) formFields[indexProduto + 1].focus();
+                        }, 50);
+                        return;
+                    }
+                }
+            }
+
             if (campoDisparador === "produto" && valor.includes(" - ( ")) {
                 valor = valor.split(" - ( ")[1].replace(" )", "").trim();
             }
@@ -3295,6 +3736,7 @@ async function gerarPDFouImprimir() {
             }
         }
     }
+
 
     function renderizarTabelaTalao(dados) {
         var tbody = document.getElementById("listaProdutosTalao");
@@ -3785,6 +4227,155 @@ function renderizarTabelaCadastroLentes() {
         limparFormCadastroLojas();
         atualizarSelectsDeLojas();
         renderizarTabelaCadastroLojas();
+    }
+    // ========================================================
+    // GERENCIAMENTO DE TRATAMENTOS E COLORAÇÃO NA ABA CADASTRO
+    // ========================================================
+    var indexEdicaoTratamentoCad = null;
+    var indexEdicaoColoracaoCad = null;
+    var tipoModalServicoCadAtual = "tratamento";
+
+    function salvarServicoPeloCadastro(tipo) {
+        const isTrat = tipo === "tratamento";
+        const inputCod = document.getElementById(isTrat ? "config_trat_codigo" : "config_cor_codigo");
+        const inputDesc = document.getElementById(isTrat ? "config_trat_desc" : "config_cor_desc");
+        const lista = isTrat ? bancoDadosTratamentos : bancoDadosColoracao;
+        const chaveStorage = isTrat ? "BDTratamentosLider" : "BDColoracaoLider";
+        const idxEdicao = isTrat ? indexEdicaoTratamentoCad : indexEdicaoColoracaoCad;
+
+        const codigo = (inputCod?.value || "").trim();
+        const descricao = (inputDesc?.value || "").trim().toUpperCase();
+
+        if (!codigo || !descricao) {
+            alert("⚠️ Preencha o Código e a Descrição antes de salvar!");
+            return;
+        }
+
+        const duplicado = lista.find((item, idx) => item.codigo === codigo && idx !== idxEdicao);
+        if (duplicado) {
+            alert(`❌ Já existe um item cadastrado com o código "${codigo}" (${duplicado.descricao})!`);
+            return;
+        }
+
+        if (idxEdicao !== null) {
+            lista[idxEdicao] = { codigo, descricao };
+            alert("✏️ Cadastro alterado com sucesso!");
+        } else {
+            lista.push({ codigo, descricao });
+            alert("✅ Novo item cadastrado com sucesso!");
+        }
+
+        localStorage.setItem(chaveStorage, JSON.stringify(lista));
+        limparFormCadastroServico(tipo);
+    }
+
+    function limparFormCadastroServico(tipo) {
+        const isTrat = tipo === "tratamento";
+        const inputCod = document.getElementById(isTrat ? "config_trat_codigo" : "config_cor_codigo");
+        const inputDesc = document.getElementById(isTrat ? "config_trat_desc" : "config_cor_desc");
+        const btnSalvar = document.getElementById(isTrat ? "btnSalvarTratCadastro" : "btnSalvarCorCadastro");
+
+        if (inputCod) inputCod.value = "";
+        if (inputDesc) inputDesc.value = "";
+
+        if (isTrat) {
+            indexEdicaoTratamentoCad = null;
+            if (btnSalvar) btnSalvar.innerText = "＋ Adicionar Trat.";
+        } else {
+            indexEdicaoColoracaoCad = null;
+            if (btnSalvar) btnSalvar.innerText = "＋ Adicionar Cor";
+        }
+    }
+
+    function abrirModalServicosCadastro(tipo) {
+        tipoModalServicoCadAtual = tipo;
+        const isTrat = tipo === "tratamento";
+        const lista = isTrat ? bancoDadosTratamentos : bancoDadosColoracao;
+
+        document.getElementById("tituloModalServicosCad").innerText = isTrat
+            ? "🔎 Gerenciar Tratamentos / Antirreflexo"
+            : "🔎 Gerenciar Coloração";
+        document.getElementById("filtroPesquisaServicosCad").value = "";
+        renderizarTabelaServicosCadastroModal(lista);
+        document.getElementById("modalPesquisaServicosCadastro").style.display = "flex";
+        setTimeout(() => document.getElementById("filtroPesquisaServicosCad").focus(), 100);
+    }
+
+    function fecharModalServicosCadastro() {
+        document.getElementById("modalPesquisaServicosCadastro").style.display = "none";
+    }
+
+    function filtrarServicosCadastroModal() {
+        const termo = document.getElementById("filtroPesquisaServicosCad").value.toLowerCase().trim();
+        const lista = tipoModalServicoCadAtual === "tratamento" ? bancoDadosTratamentos : bancoDadosColoracao;
+        const filtrados = termo
+            ? lista.filter(i => i.codigo.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo))
+            : lista;
+        renderizarTabelaServicosCadastroModal(filtrados);
+    }
+
+    function renderizarTabelaServicosCadastroModal(dados) {
+        const tbody = document.getElementById("listaServicosCadastroModal");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        const isTrat = tipoModalServicoCadAtual === "tratamento";
+        const listaOriginal = isTrat ? bancoDadosTratamentos : bancoDadosColoracao;
+        const chaveStorage = isTrat ? "BDTratamentosLider" : "BDColoracaoLider";
+
+        if (!dados || dados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="no-data">Nenhum item encontrado.</td></tr>';
+            return;
+        }
+
+        const dadosOrdenados = [...dados].sort((a, b) => (parseInt(a.codigo, 10) || 0) - (parseInt(b.codigo, 10) || 0));
+        dadosOrdenados.forEach(item => {
+
+            const indexReal = listaOriginal.findIndex(x => x.codigo === item.codigo && x.descricao === item.descricao);
+            const tr = tbody.insertRow();
+            tr.insertCell(0).innerText = item.codigo;
+            tr.insertCell(1).innerText = item.descricao;
+
+            const tdAcoes = tr.insertCell(2);
+            tdAcoes.style.textAlign = "right";
+            tdAcoes.style.paddingRight = "25px";
+
+            const btnEdit = document.createElement("button");
+            btnEdit.innerHTML = "✏️";
+            btnEdit.type = "button";
+            btnEdit.className = "btn-modal-action btn-modal-edit";
+            btnEdit.onclick = function(e) {
+                e.stopPropagation();
+                if (isTrat) {
+                    indexEdicaoTratamentoCad = indexReal;
+                    document.getElementById("config_trat_codigo").value = item.codigo;
+                    document.getElementById("config_trat_desc").value = item.descricao;
+                    document.getElementById("btnSalvarTratCadastro").innerText = "✏️ Alterar Trat.";
+                } else {
+                    indexEdicaoColoracaoCad = indexReal;
+                    document.getElementById("config_cor_codigo").value = item.codigo;
+                    document.getElementById("config_cor_desc").value = item.descricao;
+                    document.getElementById("btnSalvarCorCadastro").innerText = "✏️ Alterar Cor";
+                }
+                fecharModalServicosCadastro();
+            };
+
+            const btnDel = document.createElement("button");
+            btnDel.innerHTML = "🗑️";
+            btnDel.type = "button";
+            btnDel.className = "btn-modal-action btn-modal-delete";
+            btnDel.onclick = function(e) {
+                e.stopPropagation();
+                if (confirm(`Deseja excluir permanentemente "${item.codigo} - ${item.descricao}"?`)) {
+                    listaOriginal.splice(indexReal, 1);
+                    localStorage.setItem(chaveStorage, JSON.stringify(listaOriginal));
+                    filtrarServicosCadastroModal();
+                }
+            };
+
+            tdAcoes.appendChild(btnEdit);
+            tdAcoes.appendChild(btnDel);
+        });
     }
 
 
@@ -4709,8 +5300,14 @@ function limparBancoDadosCadastro() {
         if (select) {
             document.getElementById("textoNomeLojaMalote").innerText = select.options[select.selectedIndex].text;
             localStorage.setItem("ultimaLojaCapaMaloteLider", valor);
-        }
+        }		
     }
+	   
+	function salvarLojaTalaoLocal(valor) {
+        localStorage.setItem("ultimaLojaTalaoLider", valor);
+    }
+
+	
     function atualizarStatusConexaoMalote(conectado) {
         var idsStatus = ["statusBancoMaloteAba", "statusConexaoConferenciaAba"];
         idsStatus.forEach(function(idEl) {
@@ -5788,8 +6385,8 @@ function limparBancoDadosCadastro() {
             tr.insertCell(4).innerText = item.cod_web ? `[${item.cod_web}] ${item.produto || ""}` : (item.produto || "-");
 
             const tdStatus = tr.insertCell(5);
-            const ehCopiado = item.status === "Copiado";
-            tdStatus.innerHTML = `<span style="background:${ehCopiado ? '#d4edda' : '#fff3cd'}; color:${ehCopiado ? '#155724' : '#856404'}; padding:3px 8px; border-radius:10px; font-weight:bold; font-size:11px;">${item.status || 'Pendente'}</span>`;
+            const ehVerde = item.status === "Copiado" || item.status === "Aberto";
+            tdStatus.innerHTML = `<span style="background:${ehVerde ? '#d4edda' : '#fff3cd'}; color:${ehVerde ? '#155724' : '#856404'}; padding:3px 8px; border-radius:10px; font-weight:bold; font-size:11px;">${item.status || 'Pendente'}</span>`;
 
             const tdAcoes = tr.insertCell(6);
             tdAcoes.style.whiteSpace = "nowrap";
@@ -5824,7 +6421,7 @@ function limparBancoDadosCadastro() {
         abrirModalAvisoSistema("Pronto para Braslab!", `Talão da OS ${item.os} (${item.loja}) copiado! Vá na Braslab e clique em '⚡ Colar do Talão'.`, "sucesso");
     }
 
-    function puxarParaTalaoPedidos(idRegistro) {
+    async function puxarParaTalaoPedidos(idRegistro) {
         const item = listaTaloesRecebidosCache.find(x => x.id === idRegistro);
         if (!item || !item.dados_json) return;
 
@@ -5837,9 +6434,17 @@ function limparBancoDadosCadastro() {
             if (chk.id) chk.checked = Boolean(checkboxes[chk.id]);
         });
 
+        if (dbSupabase && item.status !== "Aberto") {
+            await dbSupabase.from("taloes_enviados").update({ status: "Aberto" }).eq("id", idRegistro);
+            item.status = "Aberto";
+            renderizarTabelaTaloesRecebidos(listaTaloesRecebidosCache);
+            filtrarTaloesRecebidos();
+        }
+
         alternarAba("talao");
         abrirModalAvisoSistema("Talão Carregado!", `Os dados da OS ${item.os} (${item.loja}) foram preenchidos no Talão de Pedidos.`, "sucesso");
     }
+
 
     async function excluirTalaoRecebido(idRegistro, osNum) {
         if (!confirm(`⚠️ Deseja excluir o talão recebido da OS ${osNum}?`)) return;
@@ -5889,6 +6494,24 @@ function limparBancoDadosCadastro() {
 			os: pegarVal("talao_os_input"),
             codWeb: pegarVal("campoCodWebTalao"),
             comMontagem: pegarChk("chk_com_montagem"),
+            pronta: pegarChk("chk_pronta"),
+            surfacada: pegarChk("chk_surfacada"),
+            corte: pegarChk("chk_corte"),
+			            codTratamento: (() => {
+                const el = document.getElementById("talao_antireflexo");
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return "";
+                const achado = bancoDadosTratamentos.find(t => t.descricao.toUpperCase() === txt || t.codigo === txt || t.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
+                return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
+            })(),
+            codColoracao: (() => {
+                const el = document.getElementById("talao_coloracao");
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return "";
+                const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
+                return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
+            })(),
+
             formaArmacao: formaSelecionada,
             tipoArmacao: tipoArmacaoBraslab,
             modeloArmacaoTexto: pegarVal("talao_modelo_armacao"),
@@ -5913,8 +6536,13 @@ function limparBancoDadosCadastro() {
                 v: pegarVal("med_v"),
                 h: pegarVal("med_h"),
                 m: pegarVal("med_m"),
-                p: pegarVal("med_p")
+                p: pegarVal("med_p"),
+                dv: pegarVal("med_dv"),
+                ap: pegarVal("med_ap"),
+                af: pegarVal("med_af")
             },
+
+
             cliente: pegarVal("talao_nome_cliente_pedido"),
             medico: pegarVal("talao_medico"),
             crm: pegarVal("talao_crm")
@@ -5962,7 +6590,26 @@ function limparBancoDadosCadastro() {
             os: pegarVal("talao_os_input"),
             codWeb: pegarVal("campoCodWebTalao"),
             comMontagem: pegarChk("chk_com_montagem"),
+            pronta: pegarChk("chk_pronta"),
+            surfacada: pegarChk("chk_surfacada"),
+            corte: pegarChk("chk_corte"),
+		    codTratamento: (() => {
+                const el = document.getElementById("talao_antireflexo");
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return "";
+                const achado = bancoDadosTratamentos.find(t => t.descricao.toUpperCase() === txt || t.codigo === txt || t.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
+                return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
+            })(),
+            codColoracao: (() => {
+                const el = document.getElementById("talao_coloracao");
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return "";
+                const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
+                return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
+            })(),
+
             formaArmacao: formaSelecionada,
+            arquivoVCA: window.arquivoVCATalaoAtual || null,
             tipoArmacao: tipoArmacaoBraslab,
             modeloArmacaoTexto: pegarVal("talao_modelo_armacao"),
             condicoesAro: pegarVal("talao_condicoes_aro"),
@@ -5986,8 +6633,13 @@ function limparBancoDadosCadastro() {
                 v: pegarVal("med_v"),
                 h: pegarVal("med_h"),
                 m: pegarVal("med_m"),
-                p: pegarVal("med_p")
+                p: pegarVal("med_p"),
+                dv: pegarVal("med_dv"),
+                ap: pegarVal("med_ap"),
+                af: pegarVal("med_af")
             },
+
+
             cliente: pegarVal("talao_nome_cliente_pedido"),
             medico: pegarVal("talao_medico"),
             crm: pegarVal("talao_crm")
@@ -6001,14 +6653,84 @@ function limparBancoDadosCadastro() {
         document.body.removeChild(aux);
 
         const tipoReceitaAviso = temDadosLonge ? "Longe" : "Perto";
+        const infoFormaAviso = (window.arquivoVCATalaoAtual && window.arquivoVCATalaoAtual.nome)
+            ? `Arquivo VCA: ${window.arquivoVCATalaoAtual.nome}`
+            : `Forma: ${formaSelecionada || "Nenhuma"}`;
+
         if (typeof abrirModalAvisoSistema === "function") {
-            abrirModalAvisoSistema("Pronto para Braslab!", `Copiado (${tipoReceitaAviso})! Forma: ${formaSelecionada || "Nenhuma"} | Tipo: ${tipoArmacaoBraslab || "Nenhum"}`, "sucesso");
+            abrirModalAvisoSistema("Pronto para Braslab!", `Copiado (${tipoReceitaAviso})! ${infoFormaAviso} | Tipo: ${tipoArmacaoBraslab || "Nenhum"}`, "sucesso");
         } else {
-            alert(`Copiado (${tipoReceitaAviso})! Forma: ${formaSelecionada || "Nenhuma"} | Tipo: ${tipoArmacaoBraslab || "Nenhum"}`);
+            alert(`Copiado (${tipoReceitaAviso})! ${infoFormaAviso} | Tipo: ${tipoArmacaoBraslab || "Nenhum"}`);
         }
     }
 
-	
+
+	    function processarArquivoVCATalao(input) {
+        const arquivo = input.files && input.files[0];
+        if (!arquivo) return;
+
+        const leitor = new FileReader();
+        leitor.onload = function(e) {
+	    window.arquivoVCATalaoAtual = {
+            nome: arquivo.name,
+            conteudo: e.target.result || ""
+        };
+
+            const conteudo = e.target.result || "";
+            const extrairTagVCA = (chave) => {
+                const regex = new RegExp("^" + chave + "\\s*=\\s*([^;\\r\\n]+)", "im");
+                const match = conteudo.match(regex);
+                return match ? match[1].trim() : "";
+            };
+
+            const hbox = extrairTagVCA("HBOX");
+            const vbox = extrairTagVCA("VBOX");
+            const dbl = extrairTagVCA("DBL");
+            const fed = extrairTagVCA("FED");
+
+            const preencherMedida = (nomeCampo, valor) => {
+                if (!valor) return;
+                const campo = document.querySelector(`#talao input[name="${nomeCampo}"], #talao input[id*="${nomeCampo}"]`);
+                if (campo) campo.value = valor;
+            };
+
+            preencherMedida("medida_v", vbox);
+            preencherMedida("medida_h", hbox);
+            preencherMedida("medida_m", fed);
+            preencherMedida("medida_p", dbl);
+
+            const statusEl = document.getElementById("statusArquivoVCATalao");
+            if (statusEl) {
+                statusEl.innerText = "📎 " + arquivo.name;
+                statusEl.style.display = "block";
+            }
+
+            if (typeof abrirModalAvisoSistema === "function") {
+                abrirModalAvisoSistema(
+                    "Arquivo Carregado",
+                    "Arquivo '" + arquivo.name + "' importado com sucesso!" +
+                    (hbox || vbox || dbl ? "\n\nMedidas preenchidas automaticamente (V: " + (vbox || "-") + " | H: " + (hbox || "-") + " | P: " + (dbl || "-") + ")." : ""),
+                    "sucesso"
+                );
+            }
+            input.value = "";
+        };
+        leitor.readAsText(arquivo);
+    }
+
+    function limparArquivoVCATalao() {
+        window.arquivoVCATalaoAtual = null;
+
+        const inputVCA = document.getElementById("inputArquivoVCATalao");
+        if (inputVCA) inputVCA.value = "";
+
+        const statusEl = document.getElementById("statusArquivoVCATalao");
+        if (statusEl) {
+            statusEl.innerText = "";
+            statusEl.style.display = "none";
+        }
+    }
+
 </script>
 </body>
 </html>
