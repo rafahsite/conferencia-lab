@@ -60,7 +60,7 @@
 		
         .tab-content { display: none; width: 100%; animation: fadeIn 0.2s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .container-planilha { max-width: 1250px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 0 8px 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; width: 100%; box-sizing: border-box; }
         .header-print { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 25px; border-bottom: 2px solid #ccc; padding-bottom: 15px; width: 100%; }
         .logo-img { max-height: 45px; width: auto; display: block; }
@@ -421,8 +421,7 @@
         .talao-sidebar-dock {
             position: fixed;
             left: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 230px;
             display: flex;
             align-items: stretch;
             z-index: 9500;
@@ -434,6 +433,7 @@
             border: 1px solid #dee2e6;
             border-left: none;
         }
+
         .talao-sidebar-icons {
             width: 52px;
             background: #f8f9fa;
@@ -533,9 +533,37 @@
             transition: background 0.15s, color 0.15s;
         }
 
-        @media print {
-            .talao-sidebar-dock { display: none !important; }
+        /* BOTÃO FLUTUANTE LIMPAR TELA DO TALÃO (ACIMA DO MENU LATERAL) */
+        .btn-limpar-tela-talao-topo {
+            position: fixed;
+            left: 0;
+            top: 185px;
+            z-index: 9501;
+            background: #cc0000 !important;
+            color: #ffffff !important;
+            border: 1px solid #a30000;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            padding: 7px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.18);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
         }
+
+        .btn-limpar-tela-talao-topo:hover {
+            background: #990000 !important;
+            transform: translateX(2px);
+        }
+
+        @media print {
+            .talao-sidebar-dock, .btn-limpar-tela-talao-topo { display: none !important; }
+        }
+
 
     </style>
 </head>
@@ -1198,7 +1226,12 @@
     <!-- A partir daqui a estrutura do seu Talão passa a funcionar normalmente -->
     <div id="talao" class="tab-content">
 	
-	        <!-- MENU LATERAL FLUTUANTE DO TALÃO -->
+        <!-- BOTÃO LIMPAR TELA ACIMA DO MENU LATERAL -->
+        <button type="button" id="btnLimparTelaTalaoTopo" class="btn-limpar-tela-talao-topo" onclick="limparTelaTalaoCompleta()" title="Limpar todos os campos do Talão">
+            🧹 Limpar Talão
+        </button>
+
+        <!-- MENU LATERAL FLUTUANTE DO TALÃO -->
         <div id="menuLateralTalao" class="talao-sidebar-dock">
             <div class="talao-sidebar-icons">
                 <button type="button" class="talao-dock-icon-btn" title="Upload Arquivo .VCA / .OMA" onclick="document.getElementById('inputArquivoVCATalao').click()">📂</button>
@@ -1323,10 +1356,10 @@
 
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; margin-bottom: 4px; align-items: center;">
                     <div class="top-grid" style="grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 0;">
-                        <div class="field-box" style="font-size: 7.5px;">Vertical (V):<input type="text" id="med_v" name="med_v"></div>
-                        <div class="field-box" style="font-size: 7.5px;">Horizontal (H):<input type="text" id="med_h" name="med_h"></div>
-                        <div class="field-box" style="font-size: 7.5px;">Diagonal M. (M):<input type="text" id="med_m" name="med_m"></div>
-                        <div class="field-box" style="font-size: 7.5px;">Ponte (P):<input type="text" id="med_p" name="med_p"></div>
+                        <div class="field-box" style="font-size: 9px;">Vertical (V):<input type="text" id="med_v" name="med_v"></div>
+                        <div class="field-box" style="font-size: 9px;">Horizontal (H):<input type="text" id="med_h" name="med_h"></div>
+                        <div class="field-box" style="font-size: 9px;">Diagonal M. (M):<input type="text" id="med_m" name="med_m"></div>
+                        <div class="field-box" style="font-size: 9px;">Ponte (P):<input type="text" id="med_p" name="med_p"></div>
                     </div>
                     <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
                         <img src="formas/diagrama_oculos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Óculos">
@@ -1338,9 +1371,9 @@
                         <img src="formas/diagrama_angulos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Ângulos">
                     </div>
                     <div class="top-grid" style="grid-template-columns: 1fr 1.2fr 1.2fr; gap: 3px; margin-bottom: 0;">
-                        <div class="field-box" style="font-size: 7.5px;">Dist. Vértice (DV):<input type="text" id="med_dv" name="med_dv"></div>
-                        <div class="field-box" style="font-size: 7.5px;">Âng. Pantoscópico (AP):<input type="text" id="med_ap" name="med_ap"></div>
-                        <div class="field-box" style="font-size: 7.5px;">Âng. Frontal (AF):<input type="text" id="med_af" name="med_af"></div>
+                        <div class="field-box" style="font-size: 9px;">Dist. Vértice (DV):<input type="text" id="med_dv" name="med_dv"></div>
+                        <div class="field-box" style="font-size: 9px;">Âng. Pantoscópico (AP):<input type="text" id="med_ap" name="med_ap"></div>
+                        <div class="field-box" style="font-size: 9px;">Âng. Frontal (AF):<input type="text" id="med_af" name="med_af"></div>
                     </div>
                 </div>
 
@@ -1733,10 +1766,15 @@
         const btnBraslab = document.getElementById("btnCopiarBraslab");
         if (btnBraslab) btnBraslab.style.display = ehLoja ? "none" : "inline-flex";
 
+        // Oculta todo o menu lateral flutuante do Talão para lojas@oticalider.com
+        const menuLateral = document.getElementById("menuLateralTalao");
+        if (menuLateral) menuLateral.style.display = ehLoja ? "none" : "flex";
+
         if (ehLoja) {
             alternarAba("malote");
         }
     }
+
 
 
 
@@ -3846,6 +3884,35 @@ async function gerarPDFouImprimir() {
         setTimeout(() => {
             document.title = tituloOriginal;
         }, 1000);
+    }
+
+    function limparTelaTalaoCompleta() {
+        if (!confirm("🧹 Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?")) return;
+
+        // Salva a loja atual para não perder o padrão da máquina
+        const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
+
+        // Limpa todos os campos de texto e datas do talão
+        document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
+            el.value = "";
+            if (el.dataset && el.dataset.codigoServico) delete el.dataset.codigoServico;
+        });
+
+        // Desmarca todos os checkboxes (serviços, formas e tipos de armação)
+        document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
+            chk.checked = false;
+        });
+
+        // Restaura a data de hoje, a loja padrão e limpa o arquivo .VCA
+        const campoData = document.getElementById("data-atual");
+        if (campoData) campoData.value = obterDataBrasilia();
+
+        const campoOptica = document.getElementById("talao_optica");
+        if (campoOptica) campoOptica.value = lojaAtual;
+
+        if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
+
+        document.getElementById("talao_cod")?.focus();
     }
 
     // ========================================================
