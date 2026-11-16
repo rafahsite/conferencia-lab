@@ -560,9 +560,10 @@
             transform: translateX(2px);
         }
 
-        @media print {
-            .talao-sidebar-dock, .btn-limpar-tela-talao-topo { display: none !important; }
-        }
+    @media print {
+        .no-print, #dropdownOpticasTalaoCustom { display: none !important; }
+        .talao-sidebar-dock, .btn-limpar-tela-talao-topo { display: none !important; }
+    }
 
 
     </style>
@@ -1280,10 +1281,21 @@
 
             </div>
 
-                        <div class="top-grid" style="grid-template-columns: 1fr 1.5fr 1.5fr 1fr;">
+                        <div class="top-grid" style="grid-template-columns: 0.7fr 1.9fr 1.2fr 1fr;">
                 <div class="field-box">CÓD.:<input type="text" id="talao_cod" name="talao_cod"></div>
-                <div class="field-box">ÓPTICA:<input type="text" id="talao_optica" name="talao_optica" list="listaOpticasTalao" autocomplete="off" oninput="localStorage.setItem('ultimaLojaTalaoLider', this.value)"><datalist id="listaOpticasTalao"></datalist></div>
-                <div class="field-box">Solicitado por:<input type="text" id="talao_solicitante" name="talao_solicitante"></div>
+                <div class="field-box" style="position: relative;">
+                    ÓPTICA:
+                    <div style="display: flex; align-items: center; width: 100%;">
+                        <input type="text" id="talao_optica" name="talao_optica" autocomplete="off"
+                            oninput="filtrarDropdownOpticaTalao(this.value)"
+                            onfocus="abrirDropdownOpticaTalao()"
+                            onkeydown="navegarDropdownOpticaTalao(event)"
+                            style="flex: 1; padding-right: 18px;">
+                        <span class="no-print" onclick="alternarDropdownOpticaTalao(event)" style="cursor: pointer; font-size: 9px; color: #333; padding: 2px 4px; user-select: none;">▼</span>
+                    </div>
+                    <div id="dropdownOpticasTalaoCustom" style="display: none; position: absolute; top: 100%; left: 0; width: 220px; max-height: 280px; overflow-y: auto; background: #fff; border: 1px solid #ced4da; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99999;"></div>
+                </div>
+                <div class="field-box" >Solicitado por:<input type="text" id="talao_solicitante" name="talao_solicitante"></div>
                 <div class="field-box" style="background-color: #fff; border: 1px solid var(--talao-color);">
                     Sua O.S.:<input type="text" id="talao_os_input" name="talao_os_input" style="color: #000; font-weight: bold; text-align: center; font-size: 14px; border: none; margin: 0;">
                 </div>
@@ -2334,6 +2346,8 @@
         if (e.key === 'Enter') {
             if (document.getElementById("talao").classList.contains("active")) {
                 if (document.getElementById("modalPesquisaTalao").style.display === "flex") return;
+                const dropOptica = document.getElementById("dropdownOpticasTalaoCustom");
+                if (dropOptica && dropOptica.style.display === "block") return;
                 const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
                 const index = formFields.indexOf(e.target);
                 if (index > -1 && index < formFields.length - 1) {
@@ -3765,6 +3779,149 @@ async function gerarPDFouImprimir() {
             }
         });
     });
+
+    // ========================================================
+    // DROPDOWN PERSONALIZADO DO CAMPO ÓPTICA (ANTI-BUG CHROME)
+    // ========================================================
+    var indiceOpticaTalaoAtivo = -1;
+
+    function obterListaLojasTalao() {
+        return (listaLojasConfiguradas && listaLojasConfiguradas.length > 0)
+            ? [...listaLojasConfiguradas].sort((a, b) => parseInt(a.num, 10) - parseInt(b.num, 10))
+            : [];
+    }
+
+    function renderizarItensDropdownOptica(filtroTexto = "") {
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        if (!box) return;
+
+        const termo = filtroTexto.toLowerCase().trim();
+        const lojas = obterListaLojasTalao().filter(l => {
+            const completo = `${l.num} ${l.nome}`.toLowerCase();
+            return !termo || completo.includes(termo);
+        });
+
+        box.innerHTML = "";
+        indiceOpticaTalaoAtivo = -1;
+
+        if (lojas.length === 0) {
+            box.innerHTML = '<div style="padding: 8px 10px; font-size: 12px; color: #666;">Nenhuma loja encontrada</div>';
+            return;
+        }
+
+        lojas.forEach((l, idx) => {
+            const textoItem = `${l.num} ${l.nome}`;
+            const div = document.createElement("div");
+            div.className = "item-optica-talao";
+            div.innerText = textoItem;
+            div.style.cssText = "padding: 7px 12px; font-size: 12px; font-weight: bold; color: #222; cursor: pointer; border-bottom: 1px solid #f1f3f5; text-align: left;";
+            div.onmouseenter = () => destacarItemDropdownOptica(idx);
+            div.onmousedown = (e) => {
+                e.preventDefault();
+                selecionarOpticaDropdownTalao(textoItem);
+            };
+            box.appendChild(div);
+        });
+    }
+
+    function abrirDropdownOpticaTalao() {
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        if (!box) return;
+        renderizarItensDropdownOptica("");
+        box.style.display = "block";
+    }
+
+    function alternarDropdownOpticaTalao(e) {
+        if (e) e.stopPropagation();
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        const input = document.getElementById("talao_optica");
+        if (!box) return;
+
+        if (box.style.display === "block") {
+            box.style.display = "none";
+        } else {
+            if (input) input.focus();
+            abrirDropdownOpticaTalao();
+        }
+    }
+
+    function filtrarDropdownOpticaTalao(valor) {
+        localStorage.setItem("ultimaLojaTalaoLider", valor);
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        if (!box) return;
+        renderizarItensDropdownOptica(valor);
+        box.style.display = "block";
+    }
+
+    function destacarItemDropdownOptica(novoIndice) {
+        const itens = document.querySelectorAll("#dropdownOpticasTalaoCustom .item-optica-talao");
+        if (itens.length === 0) return;
+
+        itens.forEach(el => {
+            el.style.backgroundColor = "#fff";
+            el.style.color = "#222";
+        });
+
+        indiceOpticaTalaoAtivo = Math.max(0, Math.min(novoIndice, itens.length - 1));
+        const ativo = itens[indiceOpticaTalaoAtivo];
+        if (ativo) {
+            ativo.style.backgroundColor = "#0056b3";
+            ativo.style.color = "#fff";
+            ativo.scrollIntoView({ block: "nearest" });
+        }
+    }
+
+    function selecionarOpticaDropdownTalao(texto) {
+        const input = document.getElementById("talao_optica");
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        if (input) {
+            input.value = texto;
+            localStorage.setItem("ultimaLojaTalaoLider", texto);
+        }
+        if (box) box.style.display = "none";
+        indiceOpticaTalaoAtivo = -1;
+        document.getElementById("talao_solicitante")?.focus();
+    }
+
+    function navegarDropdownOpticaTalao(e) {
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        const itens = document.querySelectorAll("#dropdownOpticasTalaoCustom .item-optica-talao");
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!box || box.style.display !== "block") abrirDropdownOpticaTalao();
+            destacarItemDropdownOptica(indiceOpticaTalaoAtivo + 1);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (box && box.style.display === "block") {
+                destacarItemDropdownOptica(indiceOpticaTalaoAtivo - 1);
+            }
+        } else if (e.key === "Enter") {
+            if (box && box.style.display === "block") {
+                e.preventDefault();
+                e.stopPropagation();
+                if (indiceOpticaTalaoAtivo >= 0 && itens[indiceOpticaTalaoAtivo]) {
+                    selecionarOpticaDropdownTalao(itens[indiceOpticaTalaoAtivo].innerText);
+                } else if (itens.length === 1) {
+                    selecionarOpticaDropdownTalao(itens.innerText);
+                } else {
+                    box.style.display = "none";
+                    document.getElementById("talao_solicitante")?.focus();
+                }
+            }
+        } else if (e.key === "Escape" || e.key === "Tab") {
+            if (box) box.style.display = "none";
+        }
+    }
+
+    document.addEventListener("click", function(e) {
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        const campo = document.getElementById("talao_optica");
+        if (box && box.style.display === "block" && !box.contains(e.target) && e.target !== campo) {
+            box.style.display = "none";
+        }
+    });
+
 
     // ========================================================
     // EVENTOS DE BUSCA E CONTROLE DA LUPA (TALÃO)
