@@ -3717,6 +3717,55 @@ async function gerarPDFouImprimir() {
             if (!isNaN(numeroValido)) this.value = sinal + numeroValido.toFixed(2).replace('.', ',');
         });
     });
+	
+	    // ========================================================
+    // REGRA ÓPTICA AUTOMÁTICA: CALCULA GRAU DE PERTO PELA ADIÇÃO
+    // ========================================================
+    function calcularGrauPertoPorOlho(olho) {
+        const elEsfLonge = document.getElementById(`longe_${olho}_esf`);
+        const elCilLonge = document.getElementById(`longe_${olho}_cil`);
+        const elEixoLonge = document.getElementById(`longe_${olho}_eixo`);
+        const elAdiLonge = document.getElementById(`longe_${olho}_adi`);
+
+        const elEsfPerto = document.getElementById(`perto_${olho}_esf`);
+        const elCilPerto = document.getElementById(`perto_${olho}_cil`);
+        const elEixoPerto = document.getElementById(`perto_${olho}_eixo`);
+
+        if (!elAdiLonge || !elEsfPerto) return;
+
+        const txtAdi = elAdiLonge.value.trim().replace(',', '.');
+        if (txtAdi === "") {
+            elEsfPerto.value = "";
+            if (elCilPerto) elCilPerto.value = "";
+            if (elEixoPerto) elEixoPerto.value = "";
+            return;
+        }
+
+        const numAdi = parseFloat(txtAdi);
+        if (isNaN(numAdi)) return;
+
+        const txtEsfLonge = (elEsfLonge?.value || "").trim().replace(',', '.');
+        const numEsfLonge = txtEsfLonge !== "" && !isNaN(parseFloat(txtEsfLonge)) ? parseFloat(txtEsfLonge) : 0;
+
+        // Soma Esférico de Longe + Adição
+        const somaEsf = numEsfLonge + numAdi;
+        const sinal = somaEsf < 0 ? "-" : "+";
+        elEsfPerto.value = sinal + Math.abs(somaEsf).toFixed(2).replace('.', ',');
+
+        // Repete Cilíndrico e Eixo de Longe no campo de Perto, se houver
+        if (elCilPerto) elCilPerto.value = elCilLonge ? elCilLonge.value.trim() : "";
+        if (elEixoPerto) elEixoPerto.value = elEixoLonge ? elEixoLonge.value.trim() : "";
+    }
+
+    ["od", "oe"].forEach(olho => {
+        ["esf", "cil", "eixo", "adi"].forEach(campo => {
+            const input = document.getElementById(`longe_${olho}_${campo}`);
+            if (input) {
+                input.addEventListener("blur", () => calcularGrauPertoPorOlho(olho));
+            }
+        });
+    });
+
     // ========================================================
     // EVENTOS DE BUSCA E CONTROLE DA LUPA (TALÃO)
     // ========================================================
