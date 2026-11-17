@@ -200,11 +200,11 @@
         .field-box input[type="date"] { font-weight: normal !important; color: #000000; }
         .field-box input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(18%) sepia(83%) saturate(3946%) hue-rotate(346deg) brightness(80%) contrast(100%); opacity: 1 !important; cursor: pointer; }
         .checkbox-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-bottom: 2px; font-size: 9px; font-weight: bold; color: var(--talao-color); }
-        .checkbox-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 9px; font-weight: bold; color: var(--talao-color); }
+        .checkbox-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 9.5px; font-weight: bold; color: var(--talao-color); }
         .checkbox-item input { margin: 0; transform: scale(1.1); cursor: pointer; }
         .armacao-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 12px; margin-bottom: 4px; width: 100%; }
-        .armacao-grid .checkbox-item { font-size: 8.5px; color: var(--talao-color); }
-        .armacao-grid .checkbox-item input { transform: scale(1) !important; cursor: pointer; margin: 0; }
+        .armacao-grid .checkbox-item { font-size: 9.5px; color: var(--talao-color); }
+        .armacao-grid .checkbox-item input { transform: scale(1.1) !important; cursor: pointer; margin: 0; }
         .table-wrapper { width: 100%; overflow-x: visible; margin: 1px 0; border: 1px solid var(--talao-color); border-radius: 0px; box-sizing: border-box; }
         .table-grau { width: 100%; border-collapse: collapse; font-size: 8.5px; text-align: center; table-layout: fixed; }
         .table-grau th { background-color: var(--talao-color); color: white; padding: 2px 1px; font-weight: bold; font-size: 8.5px; border: 1px solid var(--talao-color); word-wrap: break-word; }
@@ -215,8 +215,8 @@
         .shapes-container { border: 1px solid var(--talao-color); background-color: #ffffff; border-radius: 4px; padding: 4px; margin-bottom: 2px; box-sizing: border-box; }
         .shapes-title { font-size: 8.5px; color: var(--talao-color); margin-bottom: 4px; font-weight: bold; }
         .shapes-grid { display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; gap: 6px; margin-bottom: 4px; }
-        .shape-item { display: flex; flex-direction: column; align-items: center; gap: 0px; font-size: 8.5px; font-weight: bold; color: var(--talao-color); }
-        .shape-item input { margin: 0; transform: scale(1); cursor: pointer; }
+        .shape-item { display: flex; flex-direction: column; align-items: center; gap: 0px; font-size: 9.5px; font-weight: bold; color: var(--talao-color); }
+        .shape-item input { margin: 0; transform: scale(1.1); cursor: pointer; }
         .lens-shape { width: 45px !important; height: 18px !important; object-fit: contain !important; background-color: transparent !important; border: none !important; border-radius: 0px !important; display: inline-block !important; vertical-align: middle !important; }
         .modal-pesquisa-talao { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
         .modal-conteudo-talao { background-color: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; border: 2px solid var(--talao-color); }
@@ -224,7 +224,7 @@
         .modal-fechar-talao:hover { color: var(--talao-color); }
         .search-box-talao { width: 100%; padding: 8px; font-size: 13px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; margin-bottom: 10px; margin-top: 8px; font-weight: bold; outline: none; }
         .search-box-talao:focus { border-color: var(--talao-color); }
-        .table-wrapper-talao { max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; background: white; border-radius: 4px; }
+        .table-wrapper-talao { max-height: 350px; overflow-y: auto; border: 1px solid #dee2e6; background: white; border-radius: 4px;  }
         .table-wrapper-talao table { width: 100%; border-collapse: collapse; }
         .table-wrapper-talao th, .table-wrapper-talao td { padding: 6px 8px; font-size: 11px; text-align: left; }
         .table-wrapper-talao th { background: var(--talao-color); color: white; position: sticky; top: 0; font-weight: bold; }
@@ -335,7 +335,7 @@
             #talao .field-box input { font-size: 11px !important; height: auto !important; margin-top: 0px !important; }
             #talao .shapes-container { padding: 2px !important; margin-bottom: 1px !important; }
             #talao .armacao-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 4px 12px !important; }
-            #talao .armacao-grid .checkbox-item { font-size: 8.5px !important; color: var(--talao-color) !important; }
+            #talao .armacao-grid .checkbox-item { font-size: 9.5px !important; color: var(--talao-color) !important; }
             #talao .btn-print-top { display: none !important; }
         }
 
@@ -362,6 +362,48 @@
   #modalPesquisaServicosCadastro th:nth-child(1), #modalPesquisaServicosCadastro td:nth-child(1) { width: 110px !important; min-width: 110px !important; }
   #modalPesquisaServicosCadastro th:nth-child(2), #modalPesquisaServicosCadastro td:nth-child(2) { width: auto !important; text-align: left !important; }
   #modalPesquisaServicosCadastro th:nth-child(3), #modalPesquisaServicosCadastro td:nth-child(3) { width: 100px !important; min-width: 100px !important; text-align: right !important; padding-right: 20px !important; }
+
+    /* SUB-ABAS INTERNAS DA CENTRAL DE CADASTROS */
+  .subtabs-cadastro-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid #e4e6eb;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+  }
+  .subtab-cad-btn {
+      background-color: #f0f2f5 !important;
+      color: #4b4b4b !important;
+      border: 1px solid #dee2e6 !important;
+      padding: 8px 16px !important;
+      font-size: 12px !important;
+      font-weight: bold !important;
+      border-radius: 6px !important;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+  }
+  .subtab-cad-btn:hover {
+      background-color: #e2e8f0 !important;
+      color: #1a202c !important;
+  }
+  .subtab-cad-btn.active {
+      background-color: #0056b3 !important;
+      color: #ffffff !important;
+      border-color: #0056b3 !important;
+      box-shadow: 0 2px 6px rgba(0, 86, 179, 0.25);
+  }
+  .subtab-cad-pane {
+      display: none;
+      animation: fadeIn 0.2s ease;
+  }
+  .subtab-cad-pane.active {
+      display: block;
+  }
+
 
     /* ========================================================
        ESTILOS EXCLUSIVOS DA ABA CAPA MALOTE (ISOLADOS COM #malote)
@@ -878,55 +920,59 @@
 				</div>
 				
             </div>
-				            <!-- SEÇÃO DE FORMULÁRIOS DE ENTRADA (Lentes e Lojas na Mesma Linha / Fornecedores Abaixo) -->
-            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; margin-bottom: 25px;">
-                
-                <!-- LINHA 1: LENTES E LOJAS LADO A LADO -->
-                <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; width: 100%;">
-                    
-                    <!-- PAINEL: CADASTRO DE LENTES (Ocupa o espaço flexível maior) -->
-                    <div class="cadastro-card-geral" style="width: 790px; min-width: 280px;">
-                        <div class="cadastro-header-tit">
-                            📦 Cadastrar Nova Lente / Código WEB
-                        </div>
+            <!-- BARRA DE SUB-ABAS INTERNAS DO CADASTRO -->
+            <div class="subtabs-cadastro-nav">
+                <button type="button" class="subtab-cad-btn active" onclick="alternarSubAbaCadastro('subcad_lentes', this)">📦 Lentes / Cód. WEB</button>
+                <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_lojas', this)">🏢 Filiais / Lojas</button>
+                <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_fornecedores', this)">🏭 Fornecedores</button>
+                <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_tratamentos', this)">✨ Tratamentos / Antirreflexo</button>
+                <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_coloracao', this)">🎨 Coloração</button>
+            </div>
+
+            <!-- CONTEÚDO DAS SUB-ABAS -->
+            <div style="width: 100%; margin-bottom: 15px;">
+
+                <!-- SUB-ABA 1: LENTES -->
+                <div id="subcad_lentes" class="subtab-cad-pane active">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 900px;">
+                        <div class="cadastro-header-tit">📦 Cadastrar Nova Lente / Código WEB</div>
                         <div class="cadastro-corpo-campos">
                             <div style="display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap;">
-                                <div style="display: flex; flex-direction: column; width: 80px;">
+                                <div style="display: flex; flex-direction: column; width: 90px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓD. WEB</label>
                                     <input type="text" id="config_cad_web" class="cadastro-input-clean">
                                 </div>
-                                <div style="display: flex; flex-direction: column; width: 140px;">
+                                <div style="display: flex; flex-direction: column; width: 150px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓD. PRODUTO</label>
                                     <input type="text" id="config_cad_produto" class="cadastro-input-clean">
                                 </div>
-								<div style="display: flex; flex-direction: column; flex: 1; min-width: 200px;">
+                                <div style="display: flex; flex-direction: column; flex: 1; min-width: 240px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">DESCRIÇÃO DA LENTE</label>
                                     <input type="text" id="config_cad_descricao" class="cadastro-input-clean" placeholder="Ex: HB VISION 1.56 BLUE LIGHT...">
                                 </div>
-                                <div style="display: flex; flex-direction: column; width: 150px;">
+                                <div style="display: flex; flex-direction: column; width: 170px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">FORNECEDOR</label>
                                     <select id="config_cad_fornecedor" class="cadastro-input-clean" style="height: 33px; font-weight: bold; cursor: pointer;">
                                         <option value="BRASLAB" selected>BRASLAB</option>
                                     </select>
                                 </div>
-
                             </div>
                             <div class="cadastro-btn-acao-container">
-                                <button type="button" id="btnSalvarLenteCadastro" class="btn-submit" style="height: 30px; padding: 0 20px; font-size: 12px;">Cadastrar Nova Lente</button>
-                                <button type="button" id="btnLimparLenteCadastro" class="btn-clear" style="height: 30px; padding: 0 15px; font-size: 12px;">Limpar</button>                          
-                                <button type="button" id="btnPesquisarLenteCadastro" class="btn-submit" onclick="abrirModalLentesCadastro()" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar Lente</button>
+                                <button type="button" id="btnSalvarLenteCadastro" class="btn-submit" style="height: 32px; padding: 0 20px; font-size: 12px;">Cadastrar Nova Lente</button>
+                                <button type="button" id="btnLimparLenteCadastro" class="btn-clear" style="height: 32px; padding: 0 15px; font-size: 12px;">Limpar</button>                          
+                                <button type="button" id="btnPesquisarLenteCadastro" class="btn-submit" onclick="abrirModalLentesCadastro()" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar Lente</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- PAINEL: FILIAIS / LOJAS (Largura contida ao lado da lente) -->
-                    <div style="width: 400px; min-width: 400px;" class="cadastro-card-geral">
-                        <div class="cadastro-header-tit">
-                            🏢 Gerenciar Filiais / Lojas
-                        </div>
+                <!-- SUB-ABA 2: FILIAIS / LOJAS -->
+                <div id="subcad_lojas" class="subtab-cad-pane">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 650px;">
+                        <div class="cadastro-header-tit">🏢 Gerenciar Filiais / Lojas</div>
                         <div class="cadastro-corpo-campos">
-                            <div style="display: flex; gap: 8px; margin-bottom: 15px; align-items: flex-end;">
-                                <div style="display: flex; flex-direction: column; width: 65px;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;">
+                                <div style="display: flex; flex-direction: column; width: 85px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">Nº LOJA</label>
                                     <input type="text" id="config_loja_num" maxlength="2" placeholder="02" style="text-align: center;" class="cadastro-input-clean">
                                 </div>
@@ -936,43 +982,38 @@
                                 </div>
                             </div>                       
                             <div class="cadastro-btn-acao-container">
-                                <button type="button" id="btnSalvarLojaCadastro" class="btn-submit" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Loja</button>
-                                <button type="button" id="btnLimparLojaCadastro" class="btn-clear" style="height: 30px; padding: 0 15px; font-size: 12px;">Limpar</button>                     
-                                <button type="button" id="btnPesquisarLojaCadastro" class="btn-submit" onclick="abrirModalLojasCadastro()" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar Loja</button>
+                                <button type="button" id="btnSalvarLojaCadastro" class="btn-submit" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Loja</button>
+                                <button type="button" id="btnLimparLojaCadastro" class="btn-clear" style="height: 32px; padding: 0 15px; font-size: 12px;">Limpar</button>                     
+                                <button type="button" id="btnPesquisarLojaCadastro" class="btn-submit" onclick="abrirModalLojasCadastro()" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar Loja</button>
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-                <!-- LINHA 2: FORNECEDORES SOZINHO EMBAIXO -->
-                <div class="cadastro-card-geral" style="width: 450px; min-width: 400px;">
-                    <div class="cadastro-header-tit">
-                        🏭 Gerenciar Fornecedores
-                    </div>
-                    <div class="cadastro-corpo-campos">
-                        <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
-                            <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">NOME DO FORNECEDOR</label>
-                            <input type="text" id="config_fornecedor_nome" placeholder="Ex: ESSILOR" style="text-transform: uppercase;" class="cadastro-input-clean">
-                        </div>                       
-                        <div class="cadastro-btn-acao-container">
-                            <button type="button" id="btnSalvarFornecedorCadastro" class="btn-submit" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Forn.</button>
-                            <button type="button" id="btnLimparFornecedorCadastro" class="btn-clear" style="height: 30px; padding: 0 15px; font-size: 12px;">Limpar</button>                     
-                            <button type="button" id="btnPesquisarFornecedorCadastro" class="btn-submit" onclick="abrirModalFornecedoresCadastro()" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar Fornecedor</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- LINHA 3: TRATAMENTOS (ANTIRREFLEXO) E COLORAÇÃO LADO A LADO -->
-                <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; width: 100%;">
-
-                    <!-- PAINEL: TRATAMENTOS / ANTIRREFLEXO -->
-                    <div class="cadastro-card-geral" style="flex: 1; min-width: 380px;">
-                        <div class="cadastro-header-tit">
-                            ✨ Gerenciar Tratamentos / Antirreflexo
-                        </div>
+                <!-- SUB-ABA 3: FORNECEDORES -->
+                <div id="subcad_fornecedores" class="subtab-cad-pane">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 650px;">
+                        <div class="cadastro-header-tit">🏭 Gerenciar Fornecedores</div>
                         <div class="cadastro-corpo-campos">
-                            <div style="display: flex; gap: 8px; margin-bottom: 15px; align-items: flex-end;">
-                                <div style="display: flex; flex-direction: column; width: 95px;">
+                            <div style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                                <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">NOME DO FORNECEDOR</label>
+                                <input type="text" id="config_fornecedor_nome" placeholder="Ex: ESSILOR" style="text-transform: uppercase;" class="cadastro-input-clean">
+                            </div>                       
+                            <div class="cadastro-btn-acao-container">
+                                <button type="button" id="btnSalvarFornecedorCadastro" class="btn-submit" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Forn.</button>
+                                <button type="button" id="btnLimparFornecedorCadastro" class="btn-clear" style="height: 32px; padding: 0 15px; font-size: 12px;">Limpar</button>                     
+                                <button type="button" id="btnPesquisarFornecedorCadastro" class="btn-submit" onclick="abrirModalFornecedoresCadastro()" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar Fornecedor</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-ABA 4: TRATAMENTOS / ANTIRREFLEXO -->
+                <div id="subcad_tratamentos" class="subtab-cad-pane">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 650px;">
+                        <div class="cadastro-header-tit">✨ Gerenciar Tratamentos / Antirreflexo</div>
+                        <div class="cadastro-corpo-campos">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;">
+                                <div style="display: flex; flex-direction: column; width: 105px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓDIGO</label>
                                     <input type="text" id="config_trat_codigo" placeholder="00171" style="text-align: center;" class="cadastro-input-clean">
                                 </div>
@@ -982,21 +1023,21 @@
                                 </div>
                             </div>
                             <div class="cadastro-btn-acao-container">
-                                <button type="button" id="btnSalvarTratCadastro" onclick="salvarServicoPeloCadastro('tratamento')" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Trat.</button>
-                                <button type="button" onclick="limparFormCadastroServico('tratamento')" class="btn-clear" style="height: 30px; padding: 0 15px; font-size: 12px;">Limpar</button>
-                                <button type="button" onclick="abrirModalServicosCadastro('tratamento')" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar</button>
+                                <button type="button" id="btnSalvarTratCadastro" onclick="salvarServicoPeloCadastro('tratamento')" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Trat.</button>
+                                <button type="button" onclick="limparFormCadastroServico('tratamento')" class="btn-clear" style="height: 32px; padding: 0 15px; font-size: 12px;">Limpar</button>
+                                <button type="button" onclick="abrirModalServicosCadastro('tratamento')" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- PAINEL: COLORAÇÃO -->
-                    <div class="cadastro-card-geral" style="flex: 1; min-width: 380px;">
-                        <div class="cadastro-header-tit">
-                            🎨 Gerenciar Coloração
-                        </div>
+                <!-- SUB-ABA 5: COLORAÇÃO -->
+                <div id="subcad_coloracao" class="subtab-cad-pane">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 650px;">
+                        <div class="cadastro-header-tit">🎨 Gerenciar Coloração</div>
                         <div class="cadastro-corpo-campos">
-                            <div style="display: flex; gap: 8px; margin-bottom: 15px; align-items: flex-end;">
-                                <div style="display: flex; flex-direction: column; width: 95px;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;">
+                                <div style="display: flex; flex-direction: column; width: 105px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓDIGO</label>
                                     <input type="text" id="config_cor_codigo" placeholder="00200" style="text-align: center;" class="cadastro-input-clean">
                                 </div>
@@ -1006,17 +1047,16 @@
                                 </div>
                             </div>
                             <div class="cadastro-btn-acao-container">
-                                <button type="button" id="btnSalvarCorCadastro" onclick="salvarServicoPeloCadastro('coloracao')" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Cor</button>
-                                <button type="button" onclick="limparFormCadastroServico('coloracao')" class="btn-clear" style="height: 30px; padding: 0 15px; font-size: 12px;">Limpar</button>
-                                <button type="button" onclick="abrirModalServicosCadastro('coloracao')" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 30px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar</button>
+                                <button type="button" id="btnSalvarCorCadastro" onclick="salvarServicoPeloCadastro('coloracao')" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Cor</button>
+                                <button type="button" onclick="limparFormCadastroServico('coloracao')" class="btn-clear" style="height: 32px; padding: 0 15px; font-size: 12px;">Limpar</button>
+                                <button type="button" onclick="abrirModalServicosCadastro('coloracao')" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar</button>
                             </div>
                         </div>
                     </div>
-
                 </div>
+			</div>
+         </div>
 
-            </div>
-        </div>
     </div> <!-- ESTA TAG FECHA A DIV ID="CADASTRO" CORRETAMENTE -->
 	
 	    <!-- ABA CAPA MALOTE (PARA AS LOJAS ENVIAREM AO LABORATÓRIO) -->
@@ -1407,8 +1447,8 @@
                     <div class="armacao-grid">
                         <div class="checkbox-item"><input type="checkbox" id="arm_acetato" name="arm_acetato"> Acetato</div>
                         <div class="checkbox-item"><input type="checkbox" id="arm_nylon" name="arm_nylon"> Nylon</div>
-                        <div class="checkbox-item"><input type="checkbox" id="arm_bal_pino" name="arm_bal_pino"> Balgriff (pino)</div>
-                        <div class="checkbox-item"><input type="checkbox" id="arm_bal_parafuso" name="arm_bal_parafuso"> Balgriff (parafuso)</div>
+                        <div class="checkbox-item"><input type="checkbox" id="arm_bal_pino" name="arm_bal_pino"> Balgriff</div>
+                        <div class="checkbox-item"><input type="checkbox" id="arm_bal_parafuso" name="arm_bal_parafuso"> Balgriff pino/tambor</div>
                         <div class="checkbox-item"><input type="checkbox" id="arm_metal" name="arm_metal"> Metal</div>
                         <div class="checkbox-item"><input type="checkbox" id="arm_fio_aco" name="arm_fio_aco"> Fio de Aço</div>
                         <div class="checkbox-item"><input type="checkbox" id="arm_seguranca" name="arm_seguranca"> Segurança</div>
@@ -1959,7 +1999,7 @@
         };
 
         renderizarListaServicosNoModalTalao(lista);
-        modal.style.display = "flex";
+        modal.style.display = "flex"; setTimeout(resetarRolagemModalTalao, 10);
         setTimeout(() => filtro.focus(), 100);
     }
 
@@ -1972,7 +2012,7 @@
             return;
         }
 
-        const dadosOrdenados = [...dados].sort((a, b) => (parseInt(a.codigo, 10) || 0) - (parseInt(b.codigo, 10) || 0));
+        const dadosOrdenados = [...dados].sort((a, b) => (a.descricao || "").localeCompare(b.descricao || "", 'pt-BR', { sensitivity: 'base' }));
         dadosOrdenados.forEach(item => {
 
             const tr = document.createElement("tr");
@@ -3100,19 +3140,27 @@ if (document.getElementById("arquivoCSV")) {
 
 
     // ADICIONE AS DUAS FUNÇÕES LOGO AQUI ABAIXO:
+    function resetarRolagemModalTalao() {
+        const wrapper = document.querySelector("#modalPesquisaTalao .table-wrapper-talao");
+        if (wrapper) wrapper.scrollTop = 0;
+    }
+
     function fecharModalTalao() {
+        resetarRolagemModalTalao();
         document.getElementById("modalPesquisaTalao").style.display = "none";
         indiceSelecionadoTalao = -1;
     }
 
     function fecharModalAoClicarFora(e, idModal) {
         if (e.target.id === idModal) {
+            if (idModal === "modalPesquisaTalao") resetarRolagemModalTalao();
             document.getElementById(idModal).style.display = "none";
         }
     }
+
     function abrirModalTalao() {
 		restaurarCabecalhoModalLentesTalao();
-        document.getElementById("modalPesquisaTalao").style.display = "flex";
+        document.getElementById("modalPesquisaTalao").style.display = "flex"; setTimeout(resetarRolagemModalTalao, 10);
         document.getElementById("filtroModalTalao").value = ""; 
         renderizarTabelaTalao(bancoDadosProdutos);
         setTimeout(function() { document.getElementById("filtroModalTalao").focus(); }, 100);
@@ -3689,20 +3737,39 @@ async function gerarPDFouImprimir() {
     containerDestino.appendChild(tabelaClone);
 }
 
+
     // ========================================================
-    // FORMATADORES AUTOMÁTICOS DE GRAU (TALÃO)
+    // FORMATADORES AUTOMÁTICOS DE GRAU E COR (NEGATIVO = VERMELHO)
     // ========================================================
+    function aplicarCorGrauTalao(input) {
+        if (!input) return;
+        const val = input.value.trim();
+        if (val.startsWith('-')) {
+            input.style.setProperty('color', '#cc0000', 'important');
+        } else {
+            input.style.setProperty('color', '#000000', 'important');
+        }
+    }
+
     document.querySelectorAll('.format-grau').forEach(input => {
+        input.addEventListener('input', function() {
+            aplicarCorGrauTalao(this);
+        });
         input.addEventListener('blur', function() {
             let valor = this.value.trim();
-            if (valor === "") return;
+            if (valor === "") {
+                aplicarCorGrauTalao(this);
+                return;
+            }
             valor = valor.replace('.', ',');
             let sinal = valor.startsWith('-') ? "-" : "+";
             if (valor.startsWith('+') || valor.startsWith('-')) valor = valor.substring(1);
             let numeroValido = parseFloat(valor.replace(',', '.'));
             if (!isNaN(numeroValido)) this.value = sinal + numeroValido.toFixed(2).replace('.', ',');
+            aplicarCorGrauTalao(this);
         });
     });
+
 
     document.querySelectorAll('.format-eixo').forEach(input => {
         input.addEventListener('blur', function() {
@@ -3768,6 +3835,9 @@ async function gerarPDFouImprimir() {
 
         // Repete Cilíndrico e Eixo de Longe no campo de Perto, se houver
         if (elCilPerto) elCilPerto.value = elCilLonge ? elCilLonge.value.trim() : "";
+		aplicarCorGrauTalao(elEsfPerto);
+        aplicarCorGrauTalao(elCilPerto);
+
         if (elEixoPerto) elEixoPerto.value = elEixoLonge ? elEixoLonge.value.trim() : "";
     }
 
@@ -4118,7 +4188,9 @@ async function gerarPDFouImprimir() {
 
         if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
 
+		document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
         document.getElementById("talao_cod")?.focus();
+		
     }
 
     // ========================================================
@@ -5111,8 +5183,6 @@ function exportarNovosProdutosCSV() {
     // ========================================================
     // RENDERIZAÇÃO E AÇÕES DOS MODAIS DE CADASTRO
     // ========================================================
-
-    // --- RENDERIZAR TABELA DE LENTES NO MODAL ---
 	
 function renderizarTabelaLentesCadastroModal(dados) {
     var tbody = document.getElementById("listaLentesCadastroModal");
@@ -5308,6 +5378,18 @@ function renderizarTabelaLojasCadastroModal(dados) {
         celulaAcoes.appendChild(btnDel);
     });
 }
+    // ========================================================
+    // ALTERNAR ENTRE AS OPÇÕES NA TELA CADASTRO
+    // ========================================================
+    function alternarSubAbaCadastro(idSubAba, botaoClicado) {
+        document.querySelectorAll("#cadastro .subtab-cad-pane").forEach(el => el.classList.remove("active"));
+        document.querySelectorAll("#cadastro .subtab-cad-btn").forEach(btn => btn.classList.remove("active"));
+
+        const alvo = document.getElementById(idSubAba);
+        if (alvo) alvo.classList.add("active");
+        if (botaoClicado) botaoClicado.classList.add("active");
+    }
+
 
 function imprimirCapaDiretaDoRelatorio() {
     var nomeConferente = document.getElementById("conferenteInput").value.trim();
@@ -6716,7 +6798,9 @@ function limparBancoDadosCadastro() {
 
         alternarAba("talao");
         abrirModalAvisoSistema("Talão Carregado!", `Os dados da OS ${item.os} (${item.loja}) foram preenchidos no Talão de Pedidos.`, "sucesso");
-    }
+		document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
+
+	}
 
 
     async function excluirTalaoRecebido(idRegistro, osNum) {
@@ -6784,6 +6868,8 @@ function limparBancoDadosCadastro() {
                 const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
                 return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
             })(),
+            base: pegarVal("talao_base"),
+
 
             formaArmacao: formaSelecionada,
             tipoArmacao: tipoArmacaoBraslab,
@@ -6795,6 +6881,7 @@ function limparBancoDadosCadastro() {
                 eixo: pegarVal(`${origemGrau}_od_eixo`).replace("°", ""),
                 adi: pegarVal(`${origemGrau}_od_adi`),
                 dnp: pegarVal(`${origemGrau}_od_dnp`),
+                dnpPerto: pegarVal("perto_od_dnp"),
                 alt: pegarVal(`${origemGrau}_od_alt`)
             },
             oe: {
@@ -6803,8 +6890,10 @@ function limparBancoDadosCadastro() {
                 eixo: pegarVal(`${origemGrau}_oe_eixo`).replace("°", ""),
                 adi: pegarVal(`${origemGrau}_oe_adi`),
                 dnp: pegarVal(`${origemGrau}_oe_dnp`),
+                dnpPerto: pegarVal("perto_oe_dnp"),
                 alt: pegarVal(`${origemGrau}_oe_alt`)
             },
+
             medidas: {
                 v: pegarVal("med_v"),
                 h: pegarVal("med_h"),
@@ -6880,6 +6969,8 @@ function limparBancoDadosCadastro() {
                 const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
                 return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
             })(),
+            base: pegarVal("talao_base"),
+
 
             formaArmacao: formaSelecionada,
             arquivoVCA: window.arquivoVCATalaoAtual || null,
@@ -6892,6 +6983,7 @@ function limparBancoDadosCadastro() {
                 eixo: pegarVal(`${origemGrau}_od_eixo`).replace("°", ""),
                 adi: pegarVal(`${origemGrau}_od_adi`),
                 dnp: pegarVal(`${origemGrau}_od_dnp`),
+                dnpPerto: pegarVal("perto_od_dnp"),
                 alt: pegarVal(`${origemGrau}_od_alt`)
             },
             oe: {
@@ -6900,8 +6992,10 @@ function limparBancoDadosCadastro() {
                 eixo: pegarVal(`${origemGrau}_oe_eixo`).replace("°", ""),
                 adi: pegarVal(`${origemGrau}_oe_adi`),
                 dnp: pegarVal(`${origemGrau}_oe_dnp`),
+                dnpPerto: pegarVal("perto_oe_dnp"),
                 alt: pegarVal(`${origemGrau}_oe_alt`)
             },
+
             medidas: {
                 v: pegarVal("med_v"),
                 h: pegarVal("med_h"),
