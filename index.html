@@ -359,9 +359,10 @@
   #listaLojasCadastroModal td:last-child { text-align: right !important; padding-right: 15px !important; }
   #modalPesquisaFornecedoresCadastro th:last-child { text-align: right !important; padding-right: 25px !important; }
   #listaFornecedoresCadastroModal td:last-child { text-align: right !important; padding-right: 15px !important; }
-  #modalPesquisaServicosCadastro th:nth-child(1), #modalPesquisaServicosCadastro td:nth-child(1) { width: 110px !important; min-width: 110px !important; }
+  #modalPesquisaServicosCadastro th:nth-child(1), #modalPesquisaServicosCadastro td:nth-child(1) { width: 105px !important; min-width: 105px !important; }
   #modalPesquisaServicosCadastro th:nth-child(2), #modalPesquisaServicosCadastro td:nth-child(2) { width: auto !important; text-align: left !important; }
-  #modalPesquisaServicosCadastro th:nth-child(3), #modalPesquisaServicosCadastro td:nth-child(3) { width: 100px !important; min-width: 100px !important; text-align: right !important; padding-right: 20px !important; }
+  #modalPesquisaServicosCadastro th:nth-child(3), #modalPesquisaServicosCadastro td:nth-child(3) { width: 120px !important; min-width: 120px !important; text-align: left !important; }
+  #modalPesquisaServicosCadastro th:nth-child(4), #modalPesquisaServicosCadastro td:nth-child(4) { width: 95px !important; min-width: 95px !important; text-align: right !important; padding-right: 20px !important; }
 
     /* SUB-ABAS INTERNAS DA CENTRAL DE CADASTROS */
   .subtabs-cadastro-nav {
@@ -927,6 +928,7 @@
                 <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_fornecedores', this)">🏭 Fornecedores</button>
                 <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_tratamentos', this)">✨ Tratamentos / Antirreflexo</button>
                 <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_coloracao', this)">🎨 Coloração</button>
+                <button type="button" class="subtab-cad-btn" onclick="alternarSubAbaCadastro('subcad_servicos_montagem', this)">🛠️ Serviços / Montagem</button>
             </div>
 
             <!-- CONTEÚDO DAS SUB-ABAS -->
@@ -1009,17 +1011,23 @@
 
                 <!-- SUB-ABA 4: TRATAMENTOS / ANTIRREFLEXO -->
                 <div id="subcad_tratamentos" class="subtab-cad-pane">
-                    <div class="cadastro-card-geral" style="width: 100%; max-width: 650px;">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 850px;">
                         <div class="cadastro-header-tit">✨ Gerenciar Tratamentos / Antirreflexo</div>
                         <div class="cadastro-corpo-campos">
-                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end; flex-wrap: wrap;">
                                 <div style="display: flex; flex-direction: column; width: 105px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓDIGO</label>
                                     <input type="text" id="config_trat_codigo" placeholder="00171" style="text-align: center;" class="cadastro-input-clean">
                                 </div>
-                                <div style="display: flex; flex-direction: column; flex: 1;">
+                                <div style="display: flex; flex-direction: column; flex: 1; min-width: 240px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">DESCRIÇÃO DO TRATAMENTO</label>
                                     <input type="text" id="config_trat_desc" placeholder="Ex: TRAT. OPTIPLAS MAX+" style="text-transform: uppercase;" class="cadastro-input-clean">
+                                </div>
+                                <div style="display: flex; flex-direction: column; width: 170px;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">FORNECEDOR</label>
+                                    <select id="config_trat_fornecedor" class="cadastro-input-clean" style="height: 33px; font-weight: bold; cursor: pointer;">
+                                        <option value="BRASLAB" selected>BRASLAB</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="cadastro-btn-acao-container">
@@ -1031,19 +1039,26 @@
                     </div>
                 </div>
 
+
                 <!-- SUB-ABA 5: COLORAÇÃO -->
                 <div id="subcad_coloracao" class="subtab-cad-pane">
-                    <div class="cadastro-card-geral" style="width: 100%; max-width: 650px;">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 850px;">
                         <div class="cadastro-header-tit">🎨 Gerenciar Coloração</div>
                         <div class="cadastro-corpo-campos">
-                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end; flex-wrap: wrap;">
                                 <div style="display: flex; flex-direction: column; width: 105px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓDIGO</label>
                                     <input type="text" id="config_cor_codigo" placeholder="00200" style="text-align: center;" class="cadastro-input-clean">
                                 </div>
-                                <div style="display: flex; flex-direction: column; flex: 1;">
+                                <div style="display: flex; flex-direction: column; flex: 1; min-width: 240px;">
                                     <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">DESCRIÇÃO DA COLORAÇÃO</label>
                                     <input type="text" id="config_cor_desc" placeholder="Ex: COLORACAO TOTAL RESINA 1.50" style="text-transform: uppercase;" class="cadastro-input-clean">
+                                </div>
+                                <div style="display: flex; flex-direction: column; width: 170px;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">FORNECEDOR</label>
+                                    <select id="config_cor_fornecedor" class="cadastro-input-clean" style="height: 33px; font-weight: bold; cursor: pointer;">
+                                        <option value="BRASLAB" selected>BRASLAB</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="cadastro-btn-acao-container">
@@ -1054,6 +1069,38 @@
                         </div>
                     </div>
                 </div>
+
+				
+                <!-- SUB-ABA 6: SERVIÇOS / MONTAGEM -->
+                <div id="subcad_servicos_montagem" class="subtab-cad-pane">
+                    <div class="cadastro-card-geral" style="width: 100%; max-width: 850px;">
+                        <div class="cadastro-header-tit">🛠️ Gerenciar Serviços / Montagem</div>
+                        <div class="cadastro-corpo-campos">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end; flex-wrap: wrap;">
+                                <div style="display: flex; flex-direction: column; width: 105px;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">CÓDIGO</label>
+                                    <input type="text" id="config_mont_codigo" placeholder="100" style="text-align: center;" class="cadastro-input-clean">
+                                </div>
+                                <div style="display: flex; flex-direction: column; flex: 1; min-width: 240px;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">DESCRIÇÃO DO SERVIÇO / MONTAGEM</label>
+                                    <input type="text" id="config_mont_desc" placeholder="Ex: MONTAGEM ARO/FIO-NYLON" style="text-transform: uppercase;" class="cadastro-input-clean">
+                                </div>
+                                <div style="display: flex; flex-direction: column; width: 170px;">
+                                    <label style="font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #495057;">FORNECEDOR</label>
+                                    <select id="config_mont_fornecedor" class="cadastro-input-clean" style="height: 33px; font-weight: bold; cursor: pointer;">
+                                        <option value="BRASLAB" selected>BRASLAB</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="cadastro-btn-acao-container">
+                                <button type="button" id="btnSalvarMontCadastro" onclick="salvarServicoPeloCadastro('montagem')" onmouseover="this.style.setProperty('background-color', '#276f49', 'important')" onmouseout="this.style.setProperty('background-color', '#38a169', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #38a169 !important;">＋ Adicionar Serv.</button>
+                                <button type="button" onclick="limparFormCadastroServico('montagem')" class="btn-clear" style="height: 32px; padding: 0 15px; font-size: 12px;">Limpar</button>
+                                <button type="button" onclick="abrirModalServicosCadastro('montagem')" onmouseover="this.style.setProperty('background-color', '#236b69', 'important')" onmouseout="this.style.setProperty('background-color', '#319795', 'important')" style="height: 32px; padding: 0 15px; font-size: 12px; background-color: #319795 !important;">🔍 Pesquisar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 			</div>
          </div>
 
@@ -1384,10 +1431,15 @@
                         <button type="button" class="btn-search-lupa" tabindex="-1" onclick="abrirModalServicosTalao('coloracao')" title="Pesquisar Coloração">🔍</button>
                     </div>
                 </div>
-                <div class="field-box">Outros:<input type="text" id="talao_outros" name="talao_outros"></div>
+                <div class="field-box">
+                    Outros / Montagem
+                    <div class="input-with-button">
+                        <input type="text" id="talao_outros" name="talao_outros" onkeydown="buscarServicoTalaoAoEnter(event, 'montagem', this.value)" placeholder="">
+                        <button type="button" class="btn-search-lupa" tabindex="-1" onclick="abrirModalServicosTalao('montagem')" title="Pesquisar Serviço / Montagem">🔍</button>
+                    </div>
+                </div>
+
             </div>
-
-
 
             <div class="table-wrapper">
                 <table class="table-grau">
@@ -1663,21 +1715,22 @@
         </div>
     </div>
 	
-	    <!-- 4. MODAL EXCLUSIVO PARA PESQUISA DE TRATAMENTOS E COLORAÇÃO NO CADASTRO -->
+    <!-- 4. MODAL EXCLUSIVO PARA PESQUISA DE TRATAMENTOS E COLORAÇÃO NO CADASTRO -->
     <div id="modalPesquisaServicosCadastro" class="modal-overlay" onclick="fecharModalAoClicarFora(event, 'modalPesquisaServicosCadastro')">
-        <div class="modal-box" style="max-width: 650px;">
+        <div class="modal-box" style="max-width: 750px;">
             <div class="modal-header">
                 <h3 id="tituloModalServicosCad">🔎 Gerenciar Tratamentos / Coloração</h3>
                 <button type="button" class="modal-close" onclick="fecharModalServicosCadastro()">&times;</button>
             </div>
-            <input type="text" id="filtroPesquisaServicosCad" class="search-box" placeholder="Digite o código ou descrição para filtrar..." oninput="filtrarServicosCadastroModal()">
+            <input type="text" id="filtroPesquisaServicosCad" class="search-box" placeholder="Digite o código, descrição ou fornecedor para filtrar..." oninput="filtrarServicosCadastroModal()">
             <div class="modal-table-wrapper">
                 <table class="modal-table">
                     <thead>
                         <tr>
-                            <th style="width: 22%; text-transform: uppercase;">Código</th>
+                            <th style="width: 16%; text-transform: uppercase;">Código</th>
                             <th style="text-transform: uppercase;">Descrição</th>
-                            <th style="width: 20%; text-align: right; padding-right: 25px; text-transform: uppercase;">Ações</th>
+                            <th style="width: 20%; text-transform: uppercase;">Fornecedor</th>
+                            <th style="width: 16%; text-align: right; padding-right: 25px; text-transform: uppercase;">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="listaServicosCadastroModal"></tbody>
@@ -1685,6 +1738,7 @@
             </div>
         </div>
     </div>
+
 
 
     <!-- MODAL PRÓPRIO DE AVISO E CONFIRMAÇÃO (ANTI-BLOQUEIO DE NAVEGADOR) -->
@@ -1866,6 +1920,27 @@
             atualizarLayoutHistorico(historicoProducao.length);
             if (document.getElementById("rep_data_inicio").value) filtrarHistoricoProducao();
         }
+		        // 5. Carrega Serviços Adicionais (Tratamentos, Coloração e Montagem)
+        const { data: servicosNuvem } = await dbSupabase.from("servicos_adicionais").select("*");
+        if (servicosNuvem && servicosNuvem.length > 0) {
+            const tratNuvem = servicosNuvem.filter(s => s.tipo === "tratamento");
+            const corNuvem = servicosNuvem.filter(s => s.tipo === "coloracao");
+            const montNuvem = servicosNuvem.filter(s => s.tipo === "montagem");
+
+            if (tratNuvem.length > 0) {
+                bancoDadosTratamentos = tratNuvem;
+                localStorage.setItem("BDTratamentosLider", JSON.stringify(bancoDadosTratamentos));
+            }
+            if (corNuvem.length > 0) {
+                bancoDadosColoracao = corNuvem;
+                localStorage.setItem("BDColoracaoLider", JSON.stringify(bancoDadosColoracao));
+            }
+            if (montNuvem.length > 0) {
+                bancoDadosServicosMontagem = montNuvem;
+                localStorage.setItem("BDServicosMontagemLider", JSON.stringify(bancoDadosServicosMontagem));
+            }
+        }
+
 		
         if (typeof carregarTaloesRecebidos === "function") await carregarTaloesRecebidos();
         atualizarStatusConexaoMalote(true);
@@ -1947,48 +2022,126 @@
 
     var bancoDadosTratamentos = JSON.parse(localStorage.getItem("BDTratamentosLider")) || [...bancoDadosTratamentosPadrao];
     var bancoDadosColoracao = JSON.parse(localStorage.getItem("BDColoracaoLider")) || [...bancoDadosColoracaoPadrao];
+    var bancoDadosServicosMontagem = JSON.parse(localStorage.getItem("BDServicosMontagemLider")) || [];
     var tipoServicoModalTalaoAtual = "tratamento";
+	var fornecedorAtualTalao = "";
 
+
+
+    function obterListaServicoFiltradaPorFornecedor(tipo) {
+        const base = tipo === "tratamento"
+            ? bancoDadosTratamentos
+            : (tipo === "coloracao" ? bancoDadosColoracao : bancoDadosServicosMontagem);
+
+        if (!fornecedorAtualTalao) return base;
+        return base.filter(item => (item.fornecedor || "BRASLAB").toUpperCase() === fornecedorAtualTalao);
+    }
+	
+	
     function buscarServicoTalaoAoEnter(event, tipo, valor) {
-        if (event.key === "Tab" && event.shiftKey) return;
-        if (event.key !== "Enter" && event.key !== "Tab") return;
+    if (event.key === "Tab" && event.shiftKey) return;
+    if (event.key !== "Enter" && event.key !== "Tab") return;
 
-        valor = valor.trim();
-        if (!valor) return;
+    valor = valor.trim();
+    if (!valor) return;
 
-        const lista = tipo === "tratamento" ? bancoDadosTratamentos : bancoDadosColoracao;
-        const campo = document.getElementById(tipo === "tratamento" ? "talao_antireflexo" : "talao_coloracao");
+    const lista = obterListaServicoFiltradaPorFornecedor(tipo);
+    const campo = document.getElementById(
+        tipo === "tratamento" ? "talao_antireflexo" : (tipo === "coloracao" ? "talao_coloracao" : "talao_outros")
+    );
 
-        // Aceita digitar o código exato (ex: 00171) ou sem zeros à esquerda (ex: 171)
-        const encontrado = lista.find(item =>
-            item.codigo === valor ||
-            item.codigo.replace(/^0+/, "") === valor.replace(/^0+/, "")
-        );
+    const encontrado = lista.find(item =>
+        item.codigo === valor ||
+        item.codigo.replace(/^0+/, "") === valor.replace(/^0+/, "")
+    );
 
-        if (encontrado && campo) {
-            event.preventDefault();
-            event.stopPropagation();
-            campo.value = encontrado.descricao;
-            campo.dataset.codigoServico = encontrado.codigo;
+    if (encontrado && campo) {
+        event.preventDefault();
+        event.stopPropagation();
+        campo.value = encontrado.descricao;
+        campo.dataset.codigoServico = encontrado.codigo;
 
-
-            setTimeout(() => {
-                const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
-                const idx = formFields.indexOf(campo);
-                if (idx > -1 && idx < formFields.length - 1) formFields[idx + 1].focus();
+        setTimeout(() => {
+            const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
+            const idx = formFields.indexOf(campo);
+            if (idx > -1 && idx < formFields.length - 1) formFields[idx + 1].focus();
             }, 50);
         }
     }
 
+
+    function fazerBuscaAoApertarEnter(event, campoDisparador, valor) {
+        if (event.key === "Tab" && event.shiftKey) return;
+
+        if (event.key === "Enter" || event.key === "Tab") {
+            valor = valor.trim();
+            var campoWeb = document.getElementById("campoCodWebTalao");
+            var campoProd = document.getElementById("campoProdutoTalao");
+            if (valor === "") return;
+
+            // Suporte para dois códigos separados por hífen no Cód. WEB (ex: 9143-12030)
+            if (campoDisparador === "web" && valor.includes("-")) {
+                var partesWeb = valor.split("-").map(c => c.trim()).filter(c => c !== "");
+                if (partesWeb.length >= 2) {
+                    var prod1 = bancoDadosProdutos.find(p => String(p.cod_web).trim() === partesWeb[0]);
+                    var prod2 = bancoDadosProdutos.find(p => String(p.cod_web).trim() === partesWeb[1]);
+
+                    if (prod1) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        fornecedorAtualTalao = (prod1.fornecedor || "BRASLAB").toUpperCase();
+                        campoWeb.value = partesWeb[0] + "-" + partesWeb[1];
+                        campoProd.value = prod2
+                            ? prod1.descricao + " - ( " + prod1.codigo + " ) - ( " + prod2.codigo + " )"
+                            : prod1.descricao + " - ( " + prod1.codigo + " )";
+
+                        setTimeout(function() {
+                            const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
+                            const indexProduto = formFields.indexOf(campoProd);
+                            if (indexProduto > -1 && indexProduto < formFields.length - 1) formFields[indexProduto + 1].focus();
+                        }, 50);
+                        return;
+                    }
+                }
+            }
+
+            if (campoDisparador === "produto" && valor.includes(" - ( ")) {
+                valor = valor.split(" - ( ")[1].replace(" )", "").trim();
+            }
+
+            var encontrado = bancoDadosProdutos.find(p => campoDisparador === "web" ? String(p.cod_web).trim() === valor : String(p.codigo).trim() === valor);
+
+            if (encontrado) {
+                event.preventDefault(); 
+                event.stopPropagation();
+                fornecedorAtualTalao = (encontrado.fornecedor || "BRASLAB").toUpperCase();
+                campoWeb.value = encontrado.cod_web || "";
+                campoProd.value = encontrado.descricao + " - ( " + encontrado.codigo + " )";
+                
+                setTimeout(function() {
+                    const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
+                    const indexProduto = formFields.indexOf(campoProd);
+                    if (indexProduto > -1 && indexProduto < formFields.length - 1) formFields[indexProduto + 1].focus(); 
+                }, 50);
+            }
+        }
+    }
+
+
     function abrirModalServicosTalao(tipo) {
         tipoServicoModalTalaoAtual = tipo;
-        const lista = tipo === "tratamento" ? bancoDadosTratamentos : bancoDadosColoracao;
+        const lista = obterListaServicoFiltradaPorFornecedor(tipo);
         const modal = document.getElementById("modalPesquisaTalao");
         const titulo = modal.querySelector("h3");
         const filtro = document.getElementById("filtroModalTalao");
         const thead = modal.querySelector("thead");
 
-        if (titulo) titulo.innerText = tipo === "tratamento" ? "🔎 Localizar Tratamento / Antirreflexo" : "🔎 Localizar Coloração";
+        const sufixoForn = fornecedorAtualTalao ? ` (${fornecedorAtualTalao})` : "";
+        if (titulo) {
+            titulo.innerText = tipo === "tratamento"
+                ? `🔎 Localizar Tratamento / Antirreflexo${sufixoForn}`
+                : (tipo === "coloracao" ? `🔎 Localizar Coloração${sufixoForn}` : `🔎 Localizar Serviço / Montagem${sufixoForn}`);
+        }
         if (thead) thead.innerHTML = '<tr><th style="width: 25%;">Código</th><th>Descrição</th></tr>';
 
         filtro.value = "";
@@ -1999,7 +2152,57 @@
         };
 
         renderizarListaServicosNoModalTalao(lista);
-        modal.style.display = "flex"; setTimeout(resetarRolagemModalTalao, 10);
+        modal.style.display = "flex";
+        setTimeout(resetarRolagemModalTalao, 10);
+        setTimeout(() => filtro.focus(), 100);
+    }
+
+
+    function abrirModalServicosTalao(tipo) {
+        tipoServicoModalTalaoAtual = tipo;
+        const lista = obterListaServicoFiltradaPorFornecedor(tipo);
+        const modal = document.getElementById("modalPesquisaTalao");
+        const titulo = modal.querySelector("h3");
+        const filtro = document.getElementById("filtroModalTalao");
+        const thead = modal.querySelector("thead");
+
+        // Remove rodapé de confirmação anterior se existir
+        const rodapeAntigo = document.getElementById("rodapeMultiServicosTalao");
+        if (rodapeAntigo) rodapeAntigo.remove();
+
+        const sufixoForn = fornecedorAtualTalao ? ` (${fornecedorAtualTalao})` : "";
+        if (titulo) {
+            titulo.innerText = tipo === "tratamento"
+                ? `🔎 Localizar Tratamento / Antirreflexo${sufixoForn}`
+                : (tipo === "coloracao" ? `🔎 Localizar Coloração${sufixoForn}` : `🔎 Selecionar Serviços / Montagem${sufixoForn}`);
+        }
+
+        if (tipo === "montagem") {
+            if (thead) thead.innerHTML = '<tr><th style="width: 10%; text-align: center;">Sel.</th><th style="width: 22%;">Código</th><th>Descrição</th></tr>';
+
+            // Cria barra de confirmação na base do modal para múltipla escolha
+            const rodape = document.createElement("div");
+            rodape.id = "rodapeMultiServicosTalao";
+            rodape.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #dee2e6;";
+            rodape.innerHTML = `
+                <button type="button" onclick="limparSelecaoMultiServicosTalao()" style="background: #6c757d; color: #fff; border: none; padding: 6px 12px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer;">Limpar Seleção</button>
+                <button type="button" onclick="confirmarMultiServicosTalao()" style="background: #28a745; color: #fff; border: none; padding: 6px 16px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer;">✅ Confirmar Serviços</button>
+            `;
+            modal.querySelector(".modal-conteudo-talao").appendChild(rodape);
+        } else {
+            if (thead) thead.innerHTML = '<tr><th style="width: 25%;">Código</th><th>Descrição</th></tr>';
+        }
+
+        filtro.value = "";
+        filtro.oninput = function() {
+            const termo = this.value.toLowerCase().trim();
+            const filtrados = termo ? lista.filter(i => i.codigo.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo)) : lista;
+            renderizarListaServicosNoModalTalao(filtrados);
+        };
+
+        renderizarListaServicosNoModalTalao(lista);
+        modal.style.display = "flex";
+        setTimeout(resetarRolagemModalTalao, 10);
         setTimeout(() => filtro.focus(), 100);
     }
 
@@ -2007,29 +2210,74 @@
         const tbody = document.getElementById("listaProdutosTalao");
         tbody.innerHTML = "";
 
+        const ehMulti = tipoServicoModalTalaoAtual === "montagem";
+        const cols = ehMulti ? 3 : 2;
+
         if (!dados || dados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2" class="no-data-talao">Nenhum item encontrado.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="${cols}" class="no-data-talao">Nenhum item encontrado.</td></tr>`;
             return;
         }
 
+        const campoOutros = document.getElementById("talao_outros");
+        const codigosJaSelecionados = ehMulti && campoOutros?.dataset?.codigosServicos
+            ? campoOutros.dataset.codigosServicos.split(",").map(c => c.trim()).filter(Boolean)
+            : [];
+
         const dadosOrdenados = [...dados].sort((a, b) => (a.descricao || "").localeCompare(b.descricao || "", 'pt-BR', { sensitivity: 'base' }));
         dadosOrdenados.forEach(item => {
-
             const tr = document.createElement("tr");
-            tr.innerHTML = `<td style="padding-left:10px;">${item.codigo}</td><td style="padding-left:10px;">${item.descricao}</td>`;
-            tr.onclick = function() {
-                const campo = document.getElementById(tipoServicoModalTalaoAtual === "tratamento" ? "talao_antireflexo" : "talao_coloracao");
-            if (campo) { 
-			campo.value = item.descricao;
-            campo.dataset.codigoServico = item.codigo;
-            }
 
-                restaurarCabecalhoModalLentesTalao();
-                fecharModalTalao();
-            };
+            if (ehMulti) {
+                const marcado = codigosJaSelecionados.includes(item.codigo);
+                tr.innerHTML = `
+                    <td style="text-align: center;"><input type="checkbox" class="chk-multi-servico-talao" value="${item.codigo}" data-desc="${item.descricao}" ${marcado ? "checked" : ""} style="transform: scale(1.15); cursor: pointer;"></td>
+                    <td style="padding-left:10px;">${item.codigo}</td>
+                    <td style="padding-left:10px;">${item.descricao}</td>
+                `;
+                tr.onclick = function(e) {
+                    if (e.target.tagName !== "INPUT") {
+                        const chk = tr.querySelector("input[type='checkbox']");
+                        if (chk) chk.checked = !chk.checked;
+                    }
+                };
+            } else {
+                tr.innerHTML = `<td style="padding-left:10px;">${item.codigo}</td><td style="padding-left:10px;">${item.descricao}</td>`;
+                tr.onclick = function() {
+                    const campo = document.getElementById(tipoServicoModalTalaoAtual === "tratamento" ? "talao_antireflexo" : "talao_coloracao");
+                    if (campo) {
+                        campo.value = item.descricao;
+                        campo.dataset.codigoServico = item.codigo;
+                    }
+                    restaurarCabecalhoModalLentesTalao();
+                    fecharModalTalao();
+                };
+            }
             tbody.appendChild(tr);
         });
     }
+
+    function confirmarMultiServicosTalao() {
+        const marcados = Array.from(document.querySelectorAll(".chk-multi-servico-talao:checked"));
+        const campoOutros = document.getElementById("talao_outros");
+        if (campoOutros) {
+            campoOutros.value = marcados.map(c => c.dataset.desc).join(" + ");
+            campoOutros.dataset.codigosServicos = marcados.map(c => c.value).join(",");
+            campoOutros.dataset.codigoServico = marcados[0]?.value || "";
+        }
+        restaurarCabecalhoModalLentesTalao();
+        fecharModalTalao();
+    }
+
+    function limparSelecaoMultiServicosTalao() {
+        document.querySelectorAll(".chk-multi-servico-talao").forEach(c => c.checked = false);
+        const campoOutros = document.getElementById("talao_outros");
+        if (campoOutros) {
+            campoOutros.value = "";
+            delete campoOutros.dataset.codigosServicos;
+            delete campoOutros.dataset.codigoServico;
+        }
+    }
+
 
     function restaurarCabecalhoModalLentesTalao() {
         const modal = document.getElementById("modalPesquisaTalao");
@@ -2174,25 +2422,27 @@
 
     // Função para atualizar as caixas de fornecedores dinamicamente
     function atualizarSelectsDeFornecedores() {
-        var selectCadastro = document.getElementById("config_cad_fornecedor");
+        var idsSelectsCadastro = ["config_cad_fornecedor", "config_trat_fornecedor", "config_cor_fornecedor", "config_mont_fornecedor"];
         var selectRelatorio = document.getElementById("rep_filtro_fornecedor");
         
         var fornecedoresPadrao = [{ nome: "BRASLAB" }];
         var fornecedoresParaExibir = (listaFornecedoresConfigurados && listaFornecedoresConfigurados.length > 0) ? listaFornecedoresConfigurados : fornecedoresPadrao;
 
-        if (selectCadastro) {
-            var valorAntigo = selectCadastro.value;
-            selectCadastro.innerHTML = "";
+        idsSelectsCadastro.forEach(function(idSel) {
+            var sel = document.getElementById(idSel);
+            if (!sel) return;
+            var valorAntigo = sel.value;
+            sel.innerHTML = "";
             fornecedoresParaExibir.forEach(f => {
                 var opt = new Option(f.nome, f.nome);
-                selectCadastro.add(opt);
+                sel.add(opt);
             });
-            if ([...selectCadastro.options].some(o => o.value === valorAntigo)) {
-                selectCadastro.value = valorAntigo;
+            if ([...sel.options].some(o => o.value === valorAntigo)) {
+                sel.value = valorAntigo;
             } else {
-                selectCadastro.value = "BRASLAB";
+                sel.value = "BRASLAB";
             }
-        }
+        });
 
         if (selectRelatorio) {
             var valorAntigoRel = selectRelatorio.value;
@@ -2204,6 +2454,7 @@
             selectRelatorio.value = valorAntigoRel || "TODOS";
         }
     }
+
 
     function atualizarStatusCadastro(qtd) {
         const statusCad = document.getElementById("statusBancoCadastro");
@@ -3011,11 +3262,12 @@ if (document.getElementById("arquivoCSV")) {
                 if (linhaLimpa.includes("--- SEÇÃO LOJAS ---")) {
                     secaoAtual = "lojas";
                     continue;
-                } else if (linhaLimpa.includes("--- SEÇÃO LENTES ---")) {
+                }
+                if (linhaLimpa.includes("--- SEÇÃO LENTES")) {
                     secaoAtual = "lentes";
                     continue;
                 }
-                
+             
                 var colunas = linhaLimpa.split(",");
                 
                 // Captura as Lojas
@@ -3033,9 +3285,11 @@ if (document.getElementById("arquivoCSV")) {
                     bancoDadosProdutos.push({
                         cod_web: colunas[0].trim(),
                         codigo: colunas[1].trim(),
-                        descricao: colunas[2].trim().replace(/^"|"$/g, '')
+                        descricao: colunas[2].trim().replace(/^"|"$/g, ''),
+                        fornecedor: colunas[3] ? colunas[3].trim().toUpperCase().replace(/^"|"$/g, '') : "BRASLAB"
                     });
                 }
+
             }
 
             // Grava os bancos atualizados no navegador
@@ -3992,66 +4246,6 @@ async function gerarPDFouImprimir() {
         }
     });
 
-
-    // ========================================================
-    // EVENTOS DE BUSCA E CONTROLE DA LUPA (TALÃO)
-    // ========================================================
-    function fazerBuscaAoApertarEnter(event, campoDisparador, valor) {
-        if (event.key === "Tab" && event.shiftKey) return;
-
-        if (event.key === "Enter" || event.key === "Tab") {
-            valor = valor.trim();
-            var campoWeb = document.getElementById("campoCodWebTalao");
-            var campoProd = document.getElementById("campoProdutoTalao");
-            if (valor === "") return;
-
-            // Suporte para dois códigos separados por hífen no Cód. WEB (ex: 9143-12030)
-            if (campoDisparador === "web" && valor.includes("-")) {
-                var partesWeb = valor.split("-").map(c => c.trim()).filter(c => c !== "");
-                if (partesWeb.length >= 2) {
-                    var prod1 = bancoDadosProdutos.find(p => String(p.cod_web).trim() === partesWeb[0]);
-                    var prod2 = bancoDadosProdutos.find(p => String(p.cod_web).trim() === partesWeb[1]);
-
-                    if (prod1) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        campoWeb.value = partesWeb[0] + "-" + partesWeb[1];
-                        campoProd.value = prod2
-                            ? prod1.descricao + " - ( " + prod1.codigo + " ) - ( " + prod2.codigo + " )"
-                            : prod1.descricao + " - ( " + prod1.codigo + " )";
-
-                        setTimeout(function() {
-                            const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
-                            const indexProduto = formFields.indexOf(campoProd);
-                            if (indexProduto > -1 && indexProduto < formFields.length - 1) formFields[indexProduto + 1].focus();
-                        }, 50);
-                        return;
-                    }
-                }
-            }
-
-            if (campoDisparador === "produto" && valor.includes(" - ( ")) {
-                valor = valor.split(" - ( ")[1].replace(" )", "").trim();
-            }
-
-            var encontrado = bancoDadosProdutos.find(p => campoDisparador === "web" ? String(p.cod_web).trim() === valor : String(p.codigo).trim() === valor);
-
-            if (encontrado) {
-                event.preventDefault(); 
-                event.stopPropagation();
-                campoWeb.value = encontrado.cod_web || "";
-                campoProd.value = encontrado.descricao + " - ( " + encontrado.codigo + " )";
-                
-                setTimeout(function() {
-                    const formFields = Array.from(document.querySelectorAll('.talao-container input[type="text"], .talao-container input[type="date"]'));
-                    const indexProduto = formFields.indexOf(campoProd);
-                    if (indexProduto > -1 && indexProduto < formFields.length - 1) formFields[indexProduto + 1].focus(); 
-                }, 50);
-            }
-        }
-    }
-
-
     function renderizarTabelaTalao(dados) {
         var tbody = document.getElementById("listaProdutosTalao");
         tbody.innerHTML = "";
@@ -4097,10 +4291,13 @@ async function gerarPDFouImprimir() {
     }
 
     function selecionarLenteEspecifica(descricao, codigo, codWeb) {
+        const lenteObj = bancoDadosProdutos.find(p => String(p.codigo).trim() === String(codigo).trim() && String(p.cod_web || "").trim() === String(codWeb).trim());
+        fornecedorAtualTalao = (lenteObj?.fornecedor || "BRASLAB").toUpperCase();
         document.getElementById("campoCodWebTalao").value = codWeb;
         document.getElementById("campoProdutoTalao").value = descricao + " - ( " + codigo + " )";
         fecharModalTalao();
     }
+
 
     function filtrarProdutosTalao() {
         var termo = document.getElementById("filtroModalTalao").value.toLowerCase().trim();
@@ -4165,6 +4362,8 @@ async function gerarPDFouImprimir() {
     function limparTelaTalaoCompleta() {
         if (!confirm("🧹 Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?")) return;
 
+        fornecedorAtualTalao = "";
+
         // Salva a loja atual para não perder o padrão da máquina
         const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
 
@@ -4188,10 +4387,10 @@ async function gerarPDFouImprimir() {
 
         if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
 
-		document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
+        document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
         document.getElementById("talao_cod")?.focus();
-		
     }
+
 
     // ========================================================
     // MOTOR DE GERENCIAMENTO DE CADASTROS - PARTE 1: EVENTOS
@@ -4242,16 +4441,21 @@ function processarArquivoCSVCadastro(files) {
         bancoDadosProdutos = []; 
         listaLojasConfiguradas = [];
         listaFornecedoresConfigurados = [];
-        
+        var novosTratamentos = [];
+        var novasColoracoes = [];
+        var novosServicosMontagem = [];
         var secaoAtual = ""; 
 
         for (var i = 0; i < linhas.length; i++) {
             var linhaLimpa = linhas[i].trim();
             if (linhaLimpa === "") continue;
             
-            if (linhaLimpa.includes("--- SEÇÃO FORNECEDORES ---")) { secaoAtual = "fornecedores"; continue; }
-            if (linhaLimpa.includes("--- SEÇÃO LOJAS ---")) { secaoAtual = "lojas"; continue; }
-            if (linhaLimpa.includes("--- SEÇÃO LENTES ---")) { secaoAtual = "lentes"; continue; }
+            if (linhaLimpa.includes("SEÇÃO FORNECEDORES")) { secaoAtual = "fornecedores"; continue; }
+            if (linhaLimpa.includes("SEÇÃO LOJAS")) { secaoAtual = "lojas"; continue; }
+            if (linhaLimpa.includes("SEÇÃO TRATAMENTOS")) { secaoAtual = "tratamentos"; continue; }
+            if (linhaLimpa.includes("SEÇÃO COLORAÇÃO")) { secaoAtual = "coloracao"; continue; }
+            if (linhaLimpa.includes("SEÇÃO SERVIÇOS MONTAGEM")) { secaoAtual = "montagem"; continue; }
+            if (linhaLimpa.includes("SEÇÃO LENTES")) { secaoAtual = "lentes"; continue; }
 
             var colunas = linhaLimpa.split(",").map(function(item) {
                 return item.trim().replace(/^"|"$/g, '');
@@ -4265,9 +4469,33 @@ function processarArquivoCSVCadastro(files) {
                 if (colunas[0].toLowerCase() === "numero") continue;
                 listaLojasConfiguradas.push({ num: colunas[0].padStart(2, '0'), nome: colunas[1].toUpperCase() });
             }
-            else if (secaoAtual === "lentes" && colunas.length >= 4) {
+            else if (secaoAtual === "tratamentos" && colunas.length >= 2) {
+                if (colunas[0].toLowerCase() === "codigo") continue;
+                novosTratamentos.push({
+                    codigo: colunas[0],
+                    descricao: colunas[1].toUpperCase(),
+                    fornecedor: colunas[2] ? colunas[2].toUpperCase() : "BRASLAB"
+                });
+            }
+            else if (secaoAtual === "coloracao" && colunas.length >= 2) {
+                if (colunas[0].toLowerCase() === "codigo") continue;
+                novasColoracoes.push({
+                    codigo: colunas[0],
+                    descricao: colunas[1].toUpperCase(),
+                    fornecedor: colunas[2] ? colunas[2].toUpperCase() : "BRASLAB"
+                });
+            }
+            else if (secaoAtual === "montagem" && colunas.length >= 2) {
+                if (colunas[0].toLowerCase() === "codigo") continue;
+                novosServicosMontagem.push({
+                    codigo: colunas[0],
+                    descricao: colunas[1].toUpperCase(),
+                    fornecedor: colunas[2] ? colunas[2].toUpperCase() : "BRASLAB"
+                });
+            }
+			
+			else if (secaoAtual === "lentes" && colunas.length >= 4) {
                 if (colunas[0].toLowerCase() === "web") continue;
-                // CORREÇÃO AQUI: Mapeia o índice 2 como Descrição e o índice 3 como Fornecedor
                 bancoDadosProdutos.push({
                     cod_web: colunas[0],
                     codigo: colunas[1],
@@ -4275,6 +4503,7 @@ function processarArquivoCSVCadastro(files) {
                     fornecedor: colunas[3].toUpperCase()
                 });
             }
+
             else if (secaoAtual === "lentes" && colunas.length === 3) {
                 if (colunas[0].toLowerCase() === "web") continue;
                 bancoDadosProdutos.push({
@@ -4286,9 +4515,23 @@ function processarArquivoCSVCadastro(files) {
             }
         }
 
+        if (novosTratamentos.length > 0) {
+            bancoDadosTratamentos = novosTratamentos;
+            localStorage.setItem("BDTratamentosLider", JSON.stringify(bancoDadosTratamentos));
+        }
+        if (novasColoracoes.length > 0) {
+            bancoDadosColoracao = novasColoracoes;
+            localStorage.setItem("BDColoracaoLider", JSON.stringify(bancoDadosColoracao));
+        }
+        if (novosServicosMontagem.length > 0) {
+            bancoDadosServicosMontagem = novosServicosMontagem;
+            localStorage.setItem("BDServicosMontagemLider", JSON.stringify(bancoDadosServicosMontagem));
+        }
+
         if (listaFornecedoresConfigurados.length === 0) {
             listaFornecedoresConfigurados.push({ nome: "BRASLAB" });
         }
+
 		
 		
         localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
@@ -4313,6 +4556,17 @@ function processarArquivoCSVCadastro(files) {
                 }));
                 await dbSupabase.from("lentes").insert(lentesParaNuvem);
             }
+            const todosServicosParaNuvem = [
+                ...bancoDadosTratamentos.map(t => ({ tipo: "tratamento", codigo: t.codigo, descricao: t.descricao, fornecedor: t.fornecedor || "BRASLAB" })),
+                ...bancoDadosColoracao.map(c => ({ tipo: "coloracao", codigo: c.codigo, descricao: c.descricao, fornecedor: c.fornecedor || "BRASLAB" })),
+                ...bancoDadosServicosMontagem.map(m => ({ tipo: "montagem", codigo: m.codigo, descricao: m.descricao, fornecedor: m.fornecedor || "BRASLAB" }))
+            ];
+
+            if (todosServicosParaNuvem.length > 0) {
+                await dbSupabase.from("servicos_adicionais").delete().neq("id", 0);
+                await dbSupabase.from("servicos_adicionais").insert(todosServicosParaNuvem);
+            }
+
             alert("☁️ Lentes, lojas e fornecedores enviados para a nuvem com sucesso!");
         })();
 
@@ -4573,75 +4827,128 @@ function renderizarTabelaCadastroLentes() {
         atualizarSelectsDeLojas();
         renderizarTabelaCadastroLojas();
     }
+
     // ========================================================
-    // GERENCIAMENTO DE TRATAMENTOS E COLORAÇÃO NA ABA CADASTRO
+    // GERENCIAMENTO DE TRATAMENTOS, COLORAÇÃO E MONTAGEM NO CADASTRO
     // ========================================================
     var indexEdicaoTratamentoCad = null;
     var indexEdicaoColoracaoCad = null;
+    var indexEdicaoMontagemCad = null;
     var tipoModalServicoCadAtual = "tratamento";
 
-    function salvarServicoPeloCadastro(tipo) {
-        const isTrat = tipo === "tratamento";
-        const inputCod = document.getElementById(isTrat ? "config_trat_codigo" : "config_cor_codigo");
-        const inputDesc = document.getElementById(isTrat ? "config_trat_desc" : "config_cor_desc");
-        const lista = isTrat ? bancoDadosTratamentos : bancoDadosColoracao;
-        const chaveStorage = isTrat ? "BDTratamentosLider" : "BDColoracaoLider";
-        const idxEdicao = isTrat ? indexEdicaoTratamentoCad : indexEdicaoColoracaoCad;
+    function obterConfigServicoCadastro(tipo) {
+        if (tipo === "tratamento") {
+            return {
+                inputCod: document.getElementById("config_trat_codigo"),
+                inputDesc: document.getElementById("config_trat_desc"),
+                inputForn: document.getElementById("config_trat_fornecedor"),
+                btnSalvar: document.getElementById("btnSalvarTratCadastro"),
+                lista: bancoDadosTratamentos,
+                chaveStorage: "BDTratamentosLider",
+                textoAdd: "＋ Adicionar Trat.",
+                textoAlt: "✏️ Alterar Trat.",
+                tituloModal: "🔎 Gerenciar Tratamentos / Antirreflexo",
+                getIdx: () => indexEdicaoTratamentoCad,
+                setIdx: (v) => { indexEdicaoTratamentoCad = v; }
+            };
+        } else if (tipo === "coloracao") {
+            return {
+                inputCod: document.getElementById("config_cor_codigo"),
+                inputDesc: document.getElementById("config_cor_desc"),
+                inputForn: document.getElementById("config_cor_fornecedor"),
+                btnSalvar: document.getElementById("btnSalvarCorCadastro"),
+                lista: bancoDadosColoracao,
+                chaveStorage: "BDColoracaoLider",
+                textoAdd: "＋ Adicionar Cor",
+                textoAlt: "✏️ Alterar Cor",
+                tituloModal: "🔎 Gerenciar Coloração",
+                getIdx: () => indexEdicaoColoracaoCad,
+                setIdx: (v) => { indexEdicaoColoracaoCad = v; }
+            };
+        } else {
+            return {
+                inputCod: document.getElementById("config_mont_codigo"),
+                inputDesc: document.getElementById("config_mont_desc"),
+                inputForn: document.getElementById("config_mont_fornecedor"),
+                btnSalvar: document.getElementById("btnSalvarMontCadastro"),
+                lista: bancoDadosServicosMontagem,
+                chaveStorage: "BDServicosMontagemLider",
+                textoAdd: "＋ Adicionar Serv.",
+                textoAlt: "✏️ Alterar Serv.",
+                tituloModal: "🔎 Gerenciar Serviços / Montagem",
+                getIdx: () => indexEdicaoMontagemCad,
+                setIdx: (v) => { indexEdicaoMontagemCad = v; }
+            };
+        }
+    }
 
-        const codigo = (inputCod?.value || "").trim();
-        const descricao = (inputDesc?.value || "").trim().toUpperCase();
+    function salvarServicoPeloCadastro(tipo) {
+        const cfg = obterConfigServicoCadastro(tipo);
+        const idxEdicao = cfg.getIdx();
+        const codigo = (cfg.inputCod?.value || "").trim();
+        const descricao = (cfg.inputDesc?.value || "").trim().toUpperCase();
+        const fornecedor = (cfg.inputForn?.value || "BRASLAB").trim().toUpperCase();
 
         if (!codigo || !descricao) {
             alert("⚠️ Preencha o Código e a Descrição antes de salvar!");
             return;
         }
 
-        const duplicado = lista.find((item, idx) => item.codigo === codigo && idx !== idxEdicao);
+        // Permite o mesmo código se for de fornecedor diferente, bloqueia apenas se repetir código + fornecedor
+        const duplicado = cfg.lista.find((item, idx) =>
+            item.codigo === codigo &&
+            (item.fornecedor || "BRASLAB").toUpperCase() === fornecedor &&
+            idx !== idxEdicao
+        );
         if (duplicado) {
-            alert(`❌ Já existe um item cadastrado com o código "${codigo}" (${duplicado.descricao})!`);
+            alert(`❌ Já existe um item cadastrado para ${fornecedor} com o código "${codigo}" (${duplicado.descricao})!`);
             return;
         }
 
+        let idNuvemServico = null;
         if (idxEdicao !== null) {
-            lista[idxEdicao] = { codigo, descricao };
+            idNuvemServico = cfg.lista[idxEdicao].id || null;
+            cfg.lista[idxEdicao] = { id: idNuvemServico, codigo, descricao, fornecedor };
             alert("✏️ Cadastro alterado com sucesso!");
         } else {
-            lista.push({ codigo, descricao });
+            cfg.lista.push({ codigo, descricao, fornecedor });
             alert("✅ Novo item cadastrado com sucesso!");
         }
 
-        localStorage.setItem(chaveStorage, JSON.stringify(lista));
+        localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
+
+        if (dbSupabase) {
+            (async function() {
+                const itemSalvo = idxEdicao !== null ? cfg.lista[idxEdicao] : cfg.lista[cfg.lista.length - 1];
+                if (idNuvemServico) {
+                    await dbSupabase.from("servicos_adicionais").update({ codigo, descricao, fornecedor }).eq("id", idNuvemServico);
+                } else {
+                    const { data } = await dbSupabase.from("servicos_adicionais").insert([{ tipo, codigo, descricao, fornecedor }]).select();
+                    if (data && data.length > 0 && itemSalvo) {
+                        itemSalvo.id = data.id;
+                        localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
+                    }
+                }
+            })();
+        }
+
         limparFormCadastroServico(tipo);
     }
 
     function limparFormCadastroServico(tipo) {
-        const isTrat = tipo === "tratamento";
-        const inputCod = document.getElementById(isTrat ? "config_trat_codigo" : "config_cor_codigo");
-        const inputDesc = document.getElementById(isTrat ? "config_trat_desc" : "config_cor_desc");
-        const btnSalvar = document.getElementById(isTrat ? "btnSalvarTratCadastro" : "btnSalvarCorCadastro");
-
-        if (inputCod) inputCod.value = "";
-        if (inputDesc) inputDesc.value = "";
-
-        if (isTrat) {
-            indexEdicaoTratamentoCad = null;
-            if (btnSalvar) btnSalvar.innerText = "＋ Adicionar Trat.";
-        } else {
-            indexEdicaoColoracaoCad = null;
-            if (btnSalvar) btnSalvar.innerText = "＋ Adicionar Cor";
-        }
+        const cfg = obterConfigServicoCadastro(tipo);
+        if (cfg.inputCod) cfg.inputCod.value = "";
+        if (cfg.inputDesc) cfg.inputDesc.value = "";
+        cfg.setIdx(null);
+        if (cfg.btnSalvar) cfg.btnSalvar.innerText = cfg.textoAdd;
     }
 
     function abrirModalServicosCadastro(tipo) {
         tipoModalServicoCadAtual = tipo;
-        const isTrat = tipo === "tratamento";
-        const lista = isTrat ? bancoDadosTratamentos : bancoDadosColoracao;
-
-        document.getElementById("tituloModalServicosCad").innerText = isTrat
-            ? "🔎 Gerenciar Tratamentos / Antirreflexo"
-            : "🔎 Gerenciar Coloração";
+        const cfg = obterConfigServicoCadastro(tipo);
+        document.getElementById("tituloModalServicosCad").innerText = cfg.tituloModal;
         document.getElementById("filtroPesquisaServicosCad").value = "";
-        renderizarTabelaServicosCadastroModal(lista);
+        renderizarTabelaServicosCadastroModal(cfg.lista);
         document.getElementById("modalPesquisaServicosCadastro").style.display = "flex";
         setTimeout(() => document.getElementById("filtroPesquisaServicosCad").focus(), 100);
     }
@@ -4652,10 +4959,14 @@ function renderizarTabelaCadastroLentes() {
 
     function filtrarServicosCadastroModal() {
         const termo = document.getElementById("filtroPesquisaServicosCad").value.toLowerCase().trim();
-        const lista = tipoModalServicoCadAtual === "tratamento" ? bancoDadosTratamentos : bancoDadosColoracao;
+        const cfg = obterConfigServicoCadastro(tipoModalServicoCadAtual);
         const filtrados = termo
-            ? lista.filter(i => i.codigo.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo))
-            : lista;
+            ? cfg.lista.filter(i =>
+                i.codigo.toLowerCase().includes(termo) ||
+                i.descricao.toLowerCase().includes(termo) ||
+                (i.fornecedor || "BRASLAB").toLowerCase().includes(termo)
+            )
+            : cfg.lista;
         renderizarTabelaServicosCadastroModal(filtrados);
     }
 
@@ -4664,24 +4975,28 @@ function renderizarTabelaCadastroLentes() {
         if (!tbody) return;
         tbody.innerHTML = "";
 
-        const isTrat = tipoModalServicoCadAtual === "tratamento";
-        const listaOriginal = isTrat ? bancoDadosTratamentos : bancoDadosColoracao;
-        const chaveStorage = isTrat ? "BDTratamentosLider" : "BDColoracaoLider";
+        const cfg = obterConfigServicoCadastro(tipoModalServicoCadAtual);
 
         if (!dados || dados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="no-data">Nenhum item encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="no-data">Nenhum item encontrado.</td></tr>';
             return;
         }
 
         const dadosOrdenados = [...dados].sort((a, b) => (parseInt(a.codigo, 10) || 0) - (parseInt(b.codigo, 10) || 0));
         dadosOrdenados.forEach(item => {
+            const fornItem = (item.fornecedor || "BRASLAB").toUpperCase();
+            const indexReal = cfg.lista.findIndex(x =>
+                x.codigo === item.codigo &&
+                x.descricao === item.descricao &&
+                (x.fornecedor || "BRASLAB").toUpperCase() === fornItem
+            );
 
-            const indexReal = listaOriginal.findIndex(x => x.codigo === item.codigo && x.descricao === item.descricao);
             const tr = tbody.insertRow();
             tr.insertCell(0).innerText = item.codigo;
             tr.insertCell(1).innerText = item.descricao;
+            tr.insertCell(2).innerText = fornItem;
 
-            const tdAcoes = tr.insertCell(2);
+            const tdAcoes = tr.insertCell(3);
             tdAcoes.style.textAlign = "right";
             tdAcoes.style.paddingRight = "25px";
 
@@ -4691,17 +5006,11 @@ function renderizarTabelaCadastroLentes() {
             btnEdit.className = "btn-modal-action btn-modal-edit";
             btnEdit.onclick = function(e) {
                 e.stopPropagation();
-                if (isTrat) {
-                    indexEdicaoTratamentoCad = indexReal;
-                    document.getElementById("config_trat_codigo").value = item.codigo;
-                    document.getElementById("config_trat_desc").value = item.descricao;
-                    document.getElementById("btnSalvarTratCadastro").innerText = "✏️ Alterar Trat.";
-                } else {
-                    indexEdicaoColoracaoCad = indexReal;
-                    document.getElementById("config_cor_codigo").value = item.codigo;
-                    document.getElementById("config_cor_desc").value = item.descricao;
-                    document.getElementById("btnSalvarCorCadastro").innerText = "✏️ Alterar Cor";
-                }
+                cfg.setIdx(indexReal);
+                if (cfg.inputCod) cfg.inputCod.value = item.codigo;
+                if (cfg.inputDesc) cfg.inputDesc.value = item.descricao;
+                if (cfg.inputForn) cfg.inputForn.value = fornItem;
+                if (cfg.btnSalvar) cfg.btnSalvar.innerText = cfg.textoAlt;
                 fecharModalServicosCadastro();
             };
 
@@ -4711,9 +5020,21 @@ function renderizarTabelaCadastroLentes() {
             btnDel.className = "btn-modal-action btn-modal-delete";
             btnDel.onclick = function(e) {
                 e.stopPropagation();
-                if (confirm(`Deseja excluir permanentemente "${item.codigo} - ${item.descricao}"?`)) {
-                    listaOriginal.splice(indexReal, 1);
-                    localStorage.setItem(chaveStorage, JSON.stringify(listaOriginal));
+                if (confirm(`Deseja excluir permanentemente "${item.codigo} - ${item.descricao} (${fornItem})"?`)) {
+                    cfg.lista.splice(indexReal, 1);
+                    localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
+                    if (dbSupabase) {
+                        (async function() {
+                            if (item.id) {
+                                await dbSupabase.from("servicos_adicionais").delete().eq("id", item.id);
+                            } else {
+                                await dbSupabase.from("servicos_adicionais").delete()
+                                    .eq("tipo", tipoModalServicoCadAtual)
+                                    .eq("codigo", item.codigo)
+                                    .eq("fornecedor", fornItem);
+                            }
+                        })();
+                    }
                     filtrarServicosCadastroModal();
                 }
             };
@@ -4722,6 +5043,7 @@ function renderizarTabelaCadastroLentes() {
             tdAcoes.appendChild(btnDel);
         });
     }
+
 
 
 function renderizarTabelaCadastroLojas() {
@@ -5097,19 +5419,45 @@ function exportarNovosProdutosCSV() {
         csvConteudo += num + "," + nome + "\n";
     });
     
-    // 3. Grava as LENTES na nova ordem correta: web,codigo,descricao,fornecedor
-    csvConteudo += "--- SEÇÃO LENTES ---\nweb,codigo,descricao,fornecedor\n";
-    var lentesOrdenadas = [...bancoDadosProdutos].sort((a, b) => parseFloat(a.codigo) - parseFloat(b.codigo));
-    lentesOrdenadas.forEach(function(p) {
-        var web = p.cod_web || "";
-        var cod = p.codigo || "";
-        var forn = p.fornecedor || "BRASLAB"; 
-        var desc = p.descricao || "";
-        if (desc.includes(",")) desc = '"' + desc + '"';
-        if (forn.includes(",")) forn = '"' + forn + '"';
-        // Invertido fisicamente aqui para salvar a descrição antes do fornecedor
-        csvConteudo += web + "," + cod + "," + desc + "," + forn + "\n";
+    // 2.5. Grava os TRATAMENTOS
+    csvConteudo += "--- SEÇÃO TRATAMENTOS ---\ncodigo,descricao,fornecedor\n";
+    bancoDadosTratamentos.forEach(function(t) {
+        var desc = (t.descricao || "").includes(",") ? '"' + t.descricao + '"' : (t.descricao || "");
+        csvConteudo += (t.codigo || "") + "," + desc + "," + (t.fornecedor || "BRASLAB") + "\n";
     });
+
+    // 2.6. Grava a COLORAÇÃO
+    csvConteudo += "--- SEÇÃO COLORAÇÃO ---\ncodigo,descricao,fornecedor\n";
+    bancoDadosColoracao.forEach(function(c) {
+        var desc = (c.descricao || "").includes(",") ? '"' + c.descricao + '"' : (c.descricao || "");
+        csvConteudo += (c.codigo || "") + "," + desc + "," + (c.fornecedor || "BRASLAB") + "\n";
+    });
+
+    // 2.7. Grava os SERVIÇOS MONTAGEM
+    csvConteudo += "--- SEÇÃO SERVIÇOS MONTAGEM ---\ncodigo,descricao,fornecedor\n";
+    bancoDadosServicosMontagem.forEach(function(m) {
+        var desc = (m.descricao || "").includes(",") ? '"' + m.descricao + '"' : (m.descricao || "");
+        csvConteudo += (m.codigo || "") + "," + desc + "," + (m.fornecedor || "BRASLAB") + "\n";
+    });
+
+
+	// 3. Grava as LENTES separadas por seção de fornecedor
+	var lentesOrdenadas = [...bancoDadosProdutos].sort((a, b) => parseFloat(a.codigo) - parseFloat(b.codigo));
+	var fornecedoresLentes = [...new Set(lentesOrdenadas.map(p => (p.fornecedor || "BRASLAB").toUpperCase()))];
+	
+	fornecedoresLentes.forEach(function(fornAtual) {
+		csvConteudo += "--- SEÇÃO LENTES " + fornAtual + " ---\nweb,codigo,descricao,fornecedor\n";
+		lentesOrdenadas.filter(p => (p.fornecedor || "BRASLAB").toUpperCase() === fornAtual).forEach(function(p) {
+			var web = p.cod_web || "";
+			var cod = p.codigo || "";
+			var forn = p.fornecedor || "BRASLAB";
+			var desc = p.descricao || "";
+			if (desc.includes(",")) desc = '"' + desc + '"';
+			if (forn.includes(",")) forn = '"' + forn + '"';
+			csvConteudo += web + "," + cod + "," + desc + "," + forn + "\n";
+		});
+	});
+
 
     var blob = new Blob([csvConteudo], { type: 'text/csv;charset=utf-8;' });
     var link = document.createElement("a");
@@ -6868,9 +7216,20 @@ function limparBancoDadosCadastro() {
                 const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
                 return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
             })(),
+            codigosServicosMontagem: (() => {
+                const el = document.getElementById("talao_outros");
+                if (el?.dataset?.codigosServicos) {
+                    return el.dataset.codigosServicos.split(",").map(c => c.trim()).filter(Boolean);
+                }
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return [];
+                return txt.split("+").map(parte => {
+                    const p = parte.trim();
+                    const achado = bancoDadosServicosMontagem.find(m => m.descricao.toUpperCase() === p || m.codigo === p || m.codigo.replace(/^0+/, "") === p.replace(/^0+/, ""));
+                    return achado ? achado.codigo : p;
+                }).filter(Boolean);
+            })(),
             base: pegarVal("talao_base"),
-
-
             formaArmacao: formaSelecionada,
             tipoArmacao: tipoArmacaoBraslab,
             modeloArmacaoTexto: pegarVal("talao_modelo_armacao"),
@@ -6969,9 +7328,21 @@ function limparBancoDadosCadastro() {
                 const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
                 return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
             })(),
+            codigosServicosMontagem: (() => {
+                const el = document.getElementById("talao_outros");
+                if (el?.dataset?.codigosServicos) {
+                    return el.dataset.codigosServicos.split(",").map(c => c.trim()).filter(Boolean);
+                }
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return [];
+                return txt.split("+").map(parte => {
+                    const p = parte.trim();
+                    const achado = bancoDadosServicosMontagem.find(m => m.descricao.toUpperCase() === p || m.codigo === p || m.codigo.replace(/^0+/, "") === p.replace(/^0+/, ""));
+                    return achado ? achado.codigo : p;
+                }).filter(Boolean);
+            })(),
+
             base: pegarVal("talao_base"),
-
-
             formaArmacao: formaSelecionada,
             arquivoVCA: window.arquivoVCATalaoAtual || null,
             tipoArmacao: tipoArmacaoBraslab,
