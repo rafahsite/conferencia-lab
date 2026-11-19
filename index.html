@@ -1382,7 +1382,7 @@
                     </div>
                     <div id="dropdownOpticasTalaoCustom" style="display: none; position: absolute; top: 100%; left: 0; width: 220px; max-height: 280px; overflow-y: auto; background: #fff; border: 1px solid #ced4da; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99999;"></div>
                 </div>
-                <div class="field-box" >Solicitado por:<input type="text" id="talao_solicitante" name="talao_solicitante"></div>
+                <div class="field-box">Solicitado por:<input type="text" id="talao_solicitante" name="talao_solicitante" oninput="localStorage.setItem('ultimoSolicitanteTalaoLider', this.value)"></div>
                 <div class="field-box" style="background-color: #fff; border: 1px solid var(--talao-color);">
                     Sua O.S.:<input type="text" id="talao_os_input" name="talao_os_input" onblur="aplicarPrefixoLojaNaOSTalao()" style="color: #000; font-weight: bold; text-align: center; font-size: 14px; border: none; margin: 0;">
                 </div>
@@ -2376,6 +2376,13 @@
             var campoOpticaTalao = document.getElementById("talao_optica");
             if (campoOpticaTalao) campoOpticaTalao.value = lojaSalvaTalao;
         }
+
+        var solicitanteSalvoTalao = localStorage.getItem("ultimoSolicitanteTalaoLider");
+        if (solicitanteSalvoTalao) {
+            var campoSolicitanteTalao = document.getElementById("talao_solicitante");
+            if (campoSolicitanteTalao) campoSolicitanteTalao.value = solicitanteSalvoTalao;
+        }
+
 
         var ultimaAba = localStorage.getItem("abaAtivaPlanilha") || "planilha";
         alternarAba(ultimaAba);
@@ -4316,8 +4323,10 @@ async function gerarPDFouImprimir() {
 
         fornecedorAtualTalao = "";
 
-        // Salva a loja atual para não perder o padrão da máquina
+        // Salva a loja atual e o solicitante para não perder o padrão da máquina
         const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
+        const solicitanteAtual = document.getElementById("talao_solicitante")?.value || localStorage.getItem("ultimoSolicitanteTalaoLider") || "";
+
 
         // Limpa todos os campos de texto, datas e os códigos selecionados nos modais
         document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
@@ -4339,6 +4348,9 @@ async function gerarPDFouImprimir() {
 
         const campoOptica = document.getElementById("talao_optica");
         if (campoOptica) campoOptica.value = lojaAtual;
+		const campoSolicitante = document.getElementById("talao_solicitante");
+        if (campoSolicitante) campoSolicitante.value = solicitanteAtual;
+
 
         if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
 
