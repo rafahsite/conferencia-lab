@@ -136,7 +136,7 @@
         .modal-table-wrapper { overflow-y: auto; border: 1px solid #dee2e6; background: white; border-radius: 4px; flex: 1; }
         .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; margin-top: 0; }
         .modal-table th, .modal-table td { padding: 10px; border-bottom: 1px solid #dee2e6; border: none; text-align: left; }
-        .modal-table th { background: #0056b3; color: white; position: sticky; top: 0; text-transform: uppercase; }
+        .modal-table th { background: #0056b3; color: white; position: sticky; top: 0; text-transform: uppercase; z-index: 2; }
         .modal-table tbody tr:hover { background-color: #f1f3f5; }
         .no-data { padding: 20px; text-align: center; color: #666; font-style: italic; }
         [id*="modal"] th:nth-child(1), [id*="modal"] td:nth-child(1) { width: 100px !important; min-width: 100px !important; }
@@ -227,7 +227,7 @@
         .table-wrapper-talao { max-height: 350px; overflow-y: auto; border: 1px solid #dee2e6; background: white; border-radius: 4px;  }
         .table-wrapper-talao table { width: 100%; border-collapse: collapse; }
         .table-wrapper-talao th, .table-wrapper-talao td { padding: 6px 8px; font-size: 11px; text-align: left; }
-        .table-wrapper-talao th { background: var(--talao-color); color: white; position: sticky; top: 0; font-weight: bold; }
+        .table-wrapper-talao th { background: var(--talao-color); color: white; position: sticky; top: 0; font-weight: bold; z-index: 2; }
         .table-wrapper-talao tr { border-bottom: 1px solid #dee2e6; }
         .table-wrapper-talao tr:hover { background-color: #fdf2f3; cursor: pointer; }
         .no-data-talao { padding: 15px; text-align: center; color: #666; font-style: italic; font-size: 11px; }
@@ -2127,37 +2127,6 @@
         }
     }
 
-
-    function abrirModalServicosTalao(tipo) {
-        tipoServicoModalTalaoAtual = tipo;
-        const lista = obterListaServicoFiltradaPorFornecedor(tipo);
-        const modal = document.getElementById("modalPesquisaTalao");
-        const titulo = modal.querySelector("h3");
-        const filtro = document.getElementById("filtroModalTalao");
-        const thead = modal.querySelector("thead");
-
-        const sufixoForn = fornecedorAtualTalao ? ` (${fornecedorAtualTalao})` : "";
-        if (titulo) {
-            titulo.innerText = tipo === "tratamento"
-                ? `🔎 Localizar Tratamento / Antirreflexo${sufixoForn}`
-                : (tipo === "coloracao" ? `🔎 Localizar Coloração${sufixoForn}` : `🔎 Localizar Serviço / Montagem${sufixoForn}`);
-        }
-        if (thead) thead.innerHTML = '<tr><th style="width: 25%;">Código</th><th>Descrição</th></tr>';
-
-        filtro.value = "";
-        filtro.oninput = function() {
-            const termo = this.value.toLowerCase().trim();
-            const filtrados = termo ? lista.filter(i => i.codigo.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo)) : lista;
-            renderizarListaServicosNoModalTalao(filtrados);
-        };
-
-        renderizarListaServicosNoModalTalao(lista);
-        modal.style.display = "flex";
-        setTimeout(resetarRolagemModalTalao, 10);
-        setTimeout(() => filtro.focus(), 100);
-    }
-
-
     function abrirModalServicosTalao(tipo) {
         tipoServicoModalTalaoAtual = tipo;
         const lista = obterListaServicoFiltradaPorFornecedor(tipo);
@@ -2174,19 +2143,21 @@
         if (titulo) {
             titulo.innerText = tipo === "tratamento"
                 ? `🔎 Localizar Tratamento / Antirreflexo${sufixoForn}`
-                : (tipo === "coloracao" ? `🔎 Localizar Coloração${sufixoForn}` : `🔎 Selecionar Serviços / Montagem${sufixoForn}`);
+                : (tipo === "coloracao" ? `🔎 Selecionar Coloração${sufixoForn}` : `🔎 Selecionar Serviços / Montagem${sufixoForn}`);
         }
 
-        if (tipo === "montagem") {
-            if (thead) thead.innerHTML = '<tr><th style="width: 10%; text-align: center;">Sel.</th><th style="width: 22%;">Código</th><th>Descrição</th></tr>';
+        const ehMulti = (tipo === "montagem" || tipo === "coloracao");
 
-            // Cria barra de confirmação na base do modal para múltipla escolha
+        if (ehMulti) {
+            if (thead) thead.innerHTML = '<tr><th style="width: 10%; text-align: center;">Selecionar</th><th style="width: 22%;">Código</th><th>Descrição</th></tr>';
+
+            const textoBotaoConfirmar = tipo === "coloracao" ? "✅ Confirmar Coloração" : "✅ Confirmar Serviços";
             const rodape = document.createElement("div");
             rodape.id = "rodapeMultiServicosTalao";
             rodape.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #dee2e6;";
             rodape.innerHTML = `
                 <button type="button" onclick="limparSelecaoMultiServicosTalao()" style="background: #6c757d; color: #fff; border: none; padding: 6px 12px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer;">Limpar Seleção</button>
-                <button type="button" onclick="confirmarMultiServicosTalao()" style="background: #28a745; color: #fff; border: none; padding: 6px 16px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer;">✅ Confirmar Serviços</button>
+                <button type="button" onclick="confirmarMultiServicosTalao()" style="background: #28a745; color: #fff; border: none; padding: 6px 16px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer;">${textoBotaoConfirmar}</button>
             `;
             modal.querySelector(".modal-conteudo-talao").appendChild(rodape);
         } else {
@@ -2210,7 +2181,7 @@
         const tbody = document.getElementById("listaProdutosTalao");
         tbody.innerHTML = "";
 
-        const ehMulti = tipoServicoModalTalaoAtual === "montagem";
+        const ehMulti = (tipoServicoModalTalaoAtual === "montagem" || tipoServicoModalTalaoAtual === "coloracao");
         const cols = ehMulti ? 3 : 2;
 
         if (!dados || dados.length === 0) {
@@ -2218,9 +2189,10 @@
             return;
         }
 
-        const campoOutros = document.getElementById("talao_outros");
-        const codigosJaSelecionados = ehMulti && campoOutros?.dataset?.codigosServicos
-            ? campoOutros.dataset.codigosServicos.split(",").map(c => c.trim()).filter(Boolean)
+        const idCampoAlvo = tipoServicoModalTalaoAtual === "coloracao" ? "talao_coloracao" : "talao_outros";
+        const campoAlvo = document.getElementById(idCampoAlvo);
+        const codigosJaSelecionados = ehMulti && campoAlvo?.dataset?.codigosServicos
+            ? campoAlvo.dataset.codigosServicos.split(",").map(c => c.trim()).filter(Boolean)
             : [];
 
         const dadosOrdenados = [...dados].sort((a, b) => (a.descricao || "").localeCompare(b.descricao || "", 'pt-BR', { sensitivity: 'base' }));
@@ -2243,7 +2215,7 @@
             } else {
                 tr.innerHTML = `<td style="padding-left:10px;">${item.codigo}</td><td style="padding-left:10px;">${item.descricao}</td>`;
                 tr.onclick = function() {
-                    const campo = document.getElementById(tipoServicoModalTalaoAtual === "tratamento" ? "talao_antireflexo" : "talao_coloracao");
+                    const campo = document.getElementById("talao_antireflexo");
                     if (campo) {
                         campo.value = item.descricao;
                         campo.dataset.codigoServico = item.codigo;
@@ -2258,11 +2230,13 @@
 
     function confirmarMultiServicosTalao() {
         const marcados = Array.from(document.querySelectorAll(".chk-multi-servico-talao:checked"));
-        const campoOutros = document.getElementById("talao_outros");
-        if (campoOutros) {
-            campoOutros.value = marcados.map(c => c.dataset.desc).join(" + ");
-            campoOutros.dataset.codigosServicos = marcados.map(c => c.value).join(",");
-            campoOutros.dataset.codigoServico = marcados[0]?.value || "";
+        const idCampoAlvo = tipoServicoModalTalaoAtual === "coloracao" ? "talao_coloracao" : "talao_outros";
+        const campoAlvo = document.getElementById(idCampoAlvo);
+
+        if (campoAlvo) {
+            campoAlvo.value = marcados.map(c => c.dataset.desc).join(" + ");
+            campoAlvo.dataset.codigosServicos = marcados.map(c => c.value).join(",");
+            campoAlvo.dataset.codigoServico = marcados[0]?.value || "";
         }
         restaurarCabecalhoModalLentesTalao();
         fecharModalTalao();
@@ -2270,16 +2244,21 @@
 
     function limparSelecaoMultiServicosTalao() {
         document.querySelectorAll(".chk-multi-servico-talao").forEach(c => c.checked = false);
-        const campoOutros = document.getElementById("talao_outros");
-        if (campoOutros) {
-            campoOutros.value = "";
-            delete campoOutros.dataset.codigosServicos;
-            delete campoOutros.dataset.codigoServico;
+        const idCampoAlvo = tipoServicoModalTalaoAtual === "coloracao" ? "talao_coloracao" : "talao_outros";
+        const campoAlvo = document.getElementById(idCampoAlvo);
+
+        if (campoAlvo) {
+            campoAlvo.value = "";
+            delete campoAlvo.dataset.codigosServicos;
+            delete campoAlvo.dataset.codigoServico;
         }
     }
 
 
+
     function restaurarCabecalhoModalLentesTalao() {
+		const rodapeAntigo = document.getElementById("rodapeMultiServicosTalao");
+		if (rodapeAntigo) rodapeAntigo.remove();
         const modal = document.getElementById("modalPesquisaTalao");
         const titulo = modal.querySelector("h3");
         const thead = modal.querySelector("thead");
@@ -4367,10 +4346,13 @@ async function gerarPDFouImprimir() {
         // Salva a loja atual para não perder o padrão da máquina
         const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
 
-        // Limpa todos os campos de texto e datas do talão
+        // Limpa todos os campos de texto, datas e os códigos selecionados nos modais
         document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
             el.value = "";
-            if (el.dataset && el.dataset.codigoServico) delete el.dataset.codigoServico;
+            if (el.dataset) {
+                delete el.dataset.codigoServico;
+                delete el.dataset.codigosServicos;
+            }
         });
 
         // Desmarca todos os checkboxes (serviços, formas e tipos de armação)
@@ -4390,6 +4372,20 @@ async function gerarPDFouImprimir() {
         document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
         document.getElementById("talao_cod")?.focus();
     }
+
+    // Limpa os códigos guardados do modal se o usuário apagar o campo manualmente
+    ["talao_antireflexo", "talao_coloracao", "talao_outros"].forEach(id => {
+        const campo = document.getElementById(id);
+        if (campo) {
+            campo.addEventListener("input", function() {
+                if (this.value.trim() === "") {
+                    delete this.dataset.codigoServico;
+                    delete this.dataset.codigosServicos;
+                }
+            });
+        }
+    });
+
 
 
     // ========================================================
@@ -7128,14 +7124,38 @@ function limparBancoDadosCadastro() {
         const item = listaTaloesRecebidosCache.find(x => x.id === idRegistro);
         if (!item || !item.dados_json) return;
 
-        const { camposTexto = {}, checkboxes = {} } = item.dados_json;
+        const { camposTexto = {}, checkboxes = {}, pacoteBraslab = {} } = item.dados_json;
 
         document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
-            if (el.id) el.value = camposTexto[el.id] || "";
+            if (el.id) {
+                el.value = camposTexto[el.id] || "";
+                if (el.dataset) {
+                    delete el.dataset.codigoServico;
+                    delete el.dataset.codigosServicos;
+                }
+            }
         });
         document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
             if (chk.id) chk.checked = Boolean(checkboxes[chk.id]);
         });
+
+        // Restaura os códigos selecionados nos modais de Antireflexo, Coloração e Outros/Montagem
+        const elTrat = document.getElementById("talao_antireflexo");
+        if (elTrat && pacoteBraslab.codTratamento) {
+            elTrat.dataset.codigoServico = pacoteBraslab.codTratamento;
+        }
+
+        const elCor = document.getElementById("talao_coloracao");
+        if (elCor && Array.isArray(pacoteBraslab.codigosColoracao) && pacoteBraslab.codigosColoracao.length > 0) {
+            elCor.dataset.codigosServicos = pacoteBraslab.codigosColoracao.join(",");
+            elCor.dataset.codigoServico = pacoteBraslab.codigosColoracao[0];
+        }
+
+        const elOutros = document.getElementById("talao_outros");
+        if (elOutros && Array.isArray(pacoteBraslab.codigosServicosMontagem) && pacoteBraslab.codigosServicosMontagem.length > 0) {
+            elOutros.dataset.codigosServicos = pacoteBraslab.codigosServicosMontagem.join(",");
+            elOutros.dataset.codigoServico = pacoteBraslab.codigosServicosMontagem[0];
+        }
 
         if (dbSupabase && item.status !== "Aberto") {
             await dbSupabase.from("taloes_enviados").update({ status: "Aberto" }).eq("id", idRegistro);
@@ -7146,9 +7166,9 @@ function limparBancoDadosCadastro() {
 
         alternarAba("talao");
         abrirModalAvisoSistema("Talão Carregado!", `Os dados da OS ${item.os} (${item.loja}) foram preenchidos no Talão de Pedidos.`, "sucesso");
-		document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
+        document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
+    }
 
-	}
 
 
     async function excluirTalaoRecebido(idRegistro, osNum) {
@@ -7216,6 +7236,21 @@ function limparBancoDadosCadastro() {
                 const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
                 return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
             })(),
+            // ADICIONE ESTE BLOCO LOGO ABAIXO DO codColoracao (NAS DUAS FUNÇÕES):
+            codigosColoracao: (() => {
+                const el = document.getElementById("talao_coloracao");
+                if (el?.dataset?.codigosServicos) {
+                    return el.dataset.codigosServicos.split(",").map(c => c.trim()).filter(Boolean);
+                }
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return [];
+                return txt.split("+").map(parte => {
+                    const p = parte.trim();
+                    const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === p || c.codigo === p || c.codigo.replace(/^0+/, "") === p.replace(/^0+/, ""));
+                    return achado ? achado.codigo : p;
+                }).filter(Boolean);
+            })(),
+
             codigosServicosMontagem: (() => {
                 const el = document.getElementById("talao_outros");
                 if (el?.dataset?.codigosServicos) {
@@ -7328,6 +7363,21 @@ function limparBancoDadosCadastro() {
                 const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === txt || c.codigo === txt || c.codigo.replace(/^0+/, "") === txt.replace(/^0+/, ""));
                 return achado ? achado.codigo : (el?.dataset?.codigoServico || "");
             })(),
+            // ADICIONE ESTE BLOCO LOGO ABAIXO DO codColoracao (NAS DUAS FUNÇÕES):
+            codigosColoracao: (() => {
+                const el = document.getElementById("talao_coloracao");
+                if (el?.dataset?.codigosServicos) {
+                    return el.dataset.codigosServicos.split(",").map(c => c.trim()).filter(Boolean);
+                }
+                const txt = (el?.value || "").trim().toUpperCase();
+                if (!txt) return [];
+                return txt.split("+").map(parte => {
+                    const p = parte.trim();
+                    const achado = bancoDadosColoracao.find(c => c.descricao.toUpperCase() === p || c.codigo === p || c.codigo.replace(/^0+/, "") === p.replace(/^0+/, ""));
+                    return achado ? achado.codigo : p;
+                }).filter(Boolean);
+            })(),
+
             codigosServicosMontagem: (() => {
                 const el = document.getElementById("talao_outros");
                 if (el?.dataset?.codigosServicos) {
