@@ -1312,7 +1312,7 @@
     </div>
 
     <!-- A partir daqui a estrutura do seu Talão passa a funcionar normalmente -->
-    <div id="talao" class="tab-content">
+    <div id="talao" class="tab-content" >
 	
         <!-- BOTÃO LIMPAR TELA ACIMA DO MENU LATERAL -->
         <button type="button" id="btnLimparTelaTalaoTopo" class="btn-limpar-tela-talao-topo" onclick="limparTelaTalaoCompleta()" title="Limpar todos os campos do Talão">
@@ -1384,8 +1384,9 @@
                 </div>
                 <div class="field-box" >Solicitado por:<input type="text" id="talao_solicitante" name="talao_solicitante"></div>
                 <div class="field-box" style="background-color: #fff; border: 1px solid var(--talao-color);">
-                    Sua O.S.:<input type="text" id="talao_os_input" name="talao_os_input" style="color: #000; font-weight: bold; text-align: center; font-size: 14px; border: none; margin: 0;">
+                    Sua O.S.:<input type="text" id="talao_os_input" name="talao_os_input" onblur="aplicarPrefixoLojaNaOSTalao()" style="color: #000; font-weight: bold; text-align: center; font-size: 14px; border: none; margin: 0;">
                 </div>
+
             </div>
 
             <div class="top-grid" style="grid-template-columns: 1fr 1fr 1fr;">
@@ -4183,39 +4184,11 @@ async function gerarPDFouImprimir() {
         }
         if (box) box.style.display = "none";
         indiceOpticaTalaoAtivo = -1;
+        aplicarPrefixoLojaNaOSTalao();
         document.getElementById("talao_solicitante")?.focus();
     }
 
-    function navegarDropdownOpticaTalao(e) {
-        const box = document.getElementById("dropdownOpticasTalaoCustom");
-        const itens = document.querySelectorAll("#dropdownOpticasTalaoCustom .item-optica-talao");
 
-        if (e.key === "ArrowDown") {
-            e.preventDefault();
-            if (!box || box.style.display !== "block") abrirDropdownOpticaTalao();
-            destacarItemDropdownOptica(indiceOpticaTalaoAtivo + 1);
-        } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            if (box && box.style.display === "block") {
-                destacarItemDropdownOptica(indiceOpticaTalaoAtivo - 1);
-            }
-        } else if (e.key === "Enter") {
-            if (box && box.style.display === "block") {
-                e.preventDefault();
-                e.stopPropagation();
-                if (indiceOpticaTalaoAtivo >= 0 && itens[indiceOpticaTalaoAtivo]) {
-                    selecionarOpticaDropdownTalao(itens[indiceOpticaTalaoAtivo].innerText);
-                } else if (itens.length === 1) {
-                    selecionarOpticaDropdownTalao(itens.innerText);
-                } else {
-                    box.style.display = "none";
-                    document.getElementById("talao_solicitante")?.focus();
-                }
-            }
-        } else if (e.key === "Escape" || e.key === "Tab") {
-            if (box) box.style.display = "none";
-        }
-    }
 
     document.addEventListener("click", function(e) {
         const box = document.getElementById("dropdownOpticasTalaoCustom");
@@ -7165,8 +7138,10 @@ function limparBancoDadosCadastro() {
         }
 
         alternarAba("talao");
+        aplicarPrefixoLojaNaOSTalao();
         abrirModalAvisoSistema("Talão Carregado!", `Os dados da OS ${item.os} (${item.loja}) foram preenchidos no Talão de Pedidos.`, "sucesso");
         document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
+
     }
 
 
@@ -7518,6 +7493,110 @@ function limparBancoDadosCadastro() {
             statusEl.style.display = "none";
         }
     }
+
+    function navegarDropdownOpticaTalao(e) {
+        const box = document.getElementById("dropdownOpticasTalaoCustom");
+        const itens = document.querySelectorAll("#dropdownOpticasTalaoCustom .item-optica-talao");
+        const valorDigitado = (e.target?.value || "").trim().toLowerCase();
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!box || box.style.display !== "block") abrirDropdownOpticaTalao();
+            destacarItemDropdownOptica(indiceOpticaTalaoAtivo + 1);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (box && box.style.display === "block") {
+                destacarItemDropdownOptica(indiceOpticaTalaoAtivo - 1);
+            }
+        } else if (e.key === "Enter" || (e.key === "Tab" && !e.shiftKey)) {
+            if (box && box.style.display === "block") {
+                // 1. Se já navegou com setas, seleciona o item destacado
+                if (indiceOpticaTalaoAtivo >= 0 && itens[indiceOpticaTalaoAtivo]) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    selecionarOpticaDropdownTalao(itens[indiceOpticaTalaoAtivo].innerText);
+                    return;
+                }
+
+                // 2. Se houver apenas 1 loja filtrada (ex: digitou "02"), seleciona ela direto
+                if (itens.length === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    selecionarOpticaDropdownTalao(itens[0].innerText);
+                    return;
+                }
+
+                // 3. Se digitou o número exato de uma loja (ex: "2" ou "02"), seleciona a loja correspondente
+                if (valorDigitado) {
+                    const numBuscado = valorDigitado.padStart(2, "0");
+                    const itemExato = Array.from(itens).find(el => el.innerText.trim().startsWith(numBuscado + " "));
+                    if (itemExato) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        selecionarOpticaDropdownTalao(itemExato.innerText);
+                        return;
+                    }
+                }
+
+                // 4. Caso contrário, fecha o dropdown e avança para "Solicitado por:"
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    box.style.display = "none";
+                    aplicarPrefixoLojaNaOSTalao();
+                    document.getElementById("talao_solicitante")?.focus();
+                } else {
+                    box.style.display = "none";
+                    aplicarPrefixoLojaNaOSTalao();
+                }
+            }
+        } else if (e.key === "Escape") {
+            if (box) box.style.display = "none";
+        }
+    }
+
+    // ========================================================
+    // PREFIXO AUTOMÁTICO DA LOJA NO CAMPO "SUA O.S." (TALÃO)
+    // ========================================================
+    function gerarPrefixoLojaTalao(textoOptica) {
+        const limpo = String(textoOptica || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase()
+            .replace(/^\d+\s*[-–]?\s*/, "")
+            .trim();
+
+        if (!limpo) return "";
+
+        if (limpo === "MARABA") return "MARA";
+        if (limpo === "CASTANHEIRA") return "CAST";
+
+        const palavras = limpo.split(/\s+/).filter(Boolean);
+        if (palavras.length >= 2) {
+            return palavras.map(p => p[0]).join("");
+        } else {
+            return palavras[0].substring(0, 3);
+        }
+    }
+
+    function aplicarPrefixoLojaNaOSTalao() {
+        const inputOptica = document.getElementById("talao_optica");
+        const inputOS = document.getElementById("talao_os_input");
+        if (!inputOptica || !inputOS) return;
+
+        const osAtual = inputOS.value.trim().toUpperCase();
+        if (!osAtual) return;
+
+        const prefixoNovo = gerarPrefixoLojaTalao(inputOptica.value);
+        if (!prefixoNovo) return;
+
+        const numeroPuro = osAtual.replace(/^[A-Z]+\s*/, "");
+        if (!numeroPuro) return;
+
+        inputOS.value = prefixoNovo + numeroPuro;
+    }
+
+
 
 </script>
 </body>
