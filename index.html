@@ -1855,10 +1855,15 @@
     }
 
     async function sairDoSistemaSupabase() {
-        if (confirm("Deseja sair do sistema?")) {
-            await dbSupabase.auth.signOut();
-            location.reload();
-        }
+        abrirModalConfirmacaoMalote(
+            "Deseja sair do sistema?",
+            async function() {
+                await dbSupabase.auth.signOut();
+                location.reload();
+            },
+            "Sair do Sistema",
+            "🚪"
+        );
     }
 	
     function aplicarPermissoesUsuario(emailUsuario) {
@@ -2686,14 +2691,15 @@ function atualizarLayoutHistorico(quantidade) {
         }
     }
 }
+
 function filtrarHistoricoProducao() {
     var lojaSelecionada = document.getElementById("rep_select_loja").value;
-    var fornecedorSelecionado = document.getElementById("rep_filtro_fornecedor").value; // Captura o Fornecedor selecionado
+    var fornecedorSelecionado = document.getElementById("rep_filtro_fornecedor").value;
     var dataInicio = document.getElementById("rep_data_inicio").value;
     var dataFim = document.getElementById("rep_data_fim").value;
 
     if (!dataInicio || !dataFim) {
-        alert("⚠️ Por favor, selecione o intervalo de Data Inicial e Data Final!");
+        abrirModalAvisoSistema("Atenção", "Por favor, selecione o intervalo de Data Inicial e Data Final!", "aviso");
         return;
     }
 
@@ -2701,7 +2707,6 @@ function filtrarHistoricoProducao() {
         var atendeData = (item.data >= dataInicio && item.data <= dataFim);
         var atendeLoja = (lojaSelecionada === "TODAS" || String(item.loja).padStart(2, '0') === String(lojaSelecionada).padStart(2, '0'));
         
-        // Verifica se o item atende ao fornecedor selecionado (olhando a propriedade .fornecedor salva no registro)
         var itemFornecedor = (item.fornecedor || "BRASLAB").toUpperCase().trim();
         var atendeFornecedor = (fornecedorSelecionado === "TODOS" || itemFornecedor === fornecedorSelecionado.toUpperCase().trim());
         
@@ -2918,20 +2923,17 @@ function executarBuscaGlobalRelatorio(termo) {
     document.getElementById("rep_total_pedidos_financeiro").innerText = "R$ " + totalFinanceiroAcumulado.toFixed(2).replace(".", ",");
 }
 
-
-
 function imprimirFiltroRelatorio() {
     var dataInicio = document.getElementById("rep_data_inicio").value;
     var dataFim = document.getElementById("rep_data_fim").value;
 
     if (!dataInicio || !dataFim) {
-        alert("⚠️ Por favor, filtre os dados antes de imprimir!");
+        abrirModalAvisoSistema("Atenção", "Por favor, filtre os dados antes de imprimir!", "aviso");
         return;
     }
 
     var novaJanela = window.open('', '_blank');
     
-    // Captura os dados atualizados dos cards superiores de forma segura
     var cards = document.querySelectorAll("#relatorios div[style*='flex: 1; min-width: 180px'], #relatorios div[style*='flex: 1; min-width: 150px']");
     var lojaTexto = cards[0] ? cards[0].querySelector("div:nth-child(2)").innerText : "—";
     var totalOS = cards[1] ? cards[1].querySelector("div:nth-child(2)").innerText : "0";
@@ -2940,7 +2942,6 @@ function imprimirFiltroRelatorio() {
     var dInicioForm = dataInicio.split("-").reverse().join("/");
     var dFimForm = dataFim.split("-").reverse().join("/");
 
-    // CORREÇÃO CRÍTICA: Busca a tabela exata de listagem de serviços dentro da div de relatórios
     var tabelaOriginal = document.querySelector("#relatorios .table-container table");
     if (!tabelaOriginal) {
         tabelaOriginal = document.querySelector("#relatorios table");
@@ -2972,11 +2973,9 @@ function imprimirFiltroRelatorio() {
                 .header-print { border-bottom: 2px solid #ccc; padding-bottom: 8px; margin-bottom: 15px; }
                 .titulo { font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; color: #333; }
                 .subtitulo { font-size: 11px; color: #666; margin-top: 4px; font-weight: bold; }
-                
                 .resumo-container { display: flex; gap: 100px;text-align: center; margin-bottom: 15px; background: #f8f9fa; padding: 8px 15px; border-radius: 4px; border: 1px solid #ddd; justify-content: flex-start; flex-wrap: wrap; }
                 .resumo-card { font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase; min-width: 140px; }
                 .resumo-card span { display: block; font-size: 13px; color: #000; margin-top: 2px; font-weight: bold; text-transform: none;text-align: center; }
-                
                 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
                 th { border: 1px solid #000; padding: 5px; text-align: center; background-color: #f2f2f2 !important; font-weight: bold; text-transform: uppercase; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                 td { border: 1px solid #000; padding: 4px; text-align: center; }
@@ -2986,19 +2985,16 @@ function imprimirFiltroRelatorio() {
         </head>
         <body>
             <div class="painel-acoes"><button class="btn-imprimir-guia" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button></div>
-            
             <div class="header-print">
                 <div class="titulo">ÓTICA LÍDER — LABORATÓRIO</div>
                 <div class="subtitulo">RELATÓRIO GERENCIAL DE PRODUÇÃO EMITIDO NO PERÍODO DE ${dInicioForm} ATÉ ${dFimForm}</div>
             </div>
-
             <div class="resumo-container">
                 <div class="resumo-card">LOJA FILTRADA: <span> ${lojaTexto}</span></div>
                 <div class="resumo-card">FORNECEDOR FILTRADO: <span> ${fornecedorTexto}</span></div>
                 <div class="resumo-card">TOTAL DE PEDIDOS: <span> ${totalOS}</span></div>
                 <div class="resumo-card">TOTAL DOS PEDIDOS: <span> ${totalFinanceiro}</span></div>
             </div>
-
             <h3 style="font-size: 11px; margin-bottom: 5px; text-transform: uppercase;">📋 Detalhes dos Serviços Prestados no Período</h3>
             <div id="tabelaDestino"></div>
         </body>
@@ -3016,21 +3012,32 @@ function imprimirFiltroRelatorio() {
 }
 
 
+
 // NOVA POSIÇÃO CORRETA: Função de limpeza totalmente livre e independente
 function limparTodoHistoricoLocal() {
-    if (confirm("⚠️ ATENÇÃO!\nVocê tem certeza que deseja apagar DEFINITIVAMENTE todo o histórico de produção salvo neste computador?")) {
-        historicoProducao = [];
-        localStorage.removeItem("HistoricoProducaoLider");
-        atualizarLayoutHistorico(0);
-        filtrarHistoricoProducao();
-        alert("🗑️ Histórico local totalmente limpo!");
-    }
+    abrirModalConfirmacaoConferencia(
+        "Você tem certeza que deseja apagar DEFINITIVAMENTE todo o histórico de produção salvo neste computador?",
+        function() {
+            historicoProducao = [];
+            localStorage.removeItem("HistoricoProducaoLider");
+            atualizarLayoutHistorico(0);
+            if (document.getElementById("rep_data_inicio").value && document.getElementById("rep_data_fim").value) {
+                filtrarHistoricoProducao();
+            }
+            abrirModalAvisoSistema("Histórico Limpo", "O histórico local de relatórios foi totalmente apagado!", "sucesso");
+        },
+        null,
+        "Limpar Histórico Local",
+        "🗑️",
+        "#cc0000"
+    );
 }
+
 
 // Exporta o histórico para .CSV usando o formato DD-MM-AAAA
 function exportarHistoricoProducaoCSV() {
     if (historicoProducao.length === 0) {
-        alert("⚠️ Não há registros no histórico para exportar!");
+        abrirModalAvisoSistema("Atenção", "Não há registros no histórico para exportar!", "aviso");
         return;
     }
     
@@ -3067,26 +3074,20 @@ function exportarHistoricoProducaoCSV() {
         csvConteudo += os + "," + loja + "," + web + "," + prod + "," + desc + "," + cliente + "," + qtd + "," + valor + "," + nf + "," + dataBR + "," + conf + "," + forn + "\n";
     });
 
-    // CAPTURA A DATA ATUAL DA MÁQUINA FORMATADA COM HÍFEN (DD-MM-AAAA)
-    var dataFiltroObj = new Date();
-    var dia = String(dataFiltroObj.getDate()).padStart(2, '0');
-    var mes = String(dataFiltroObj.getMonth() + 1).padStart(2, '0');
-    var ano = dataFiltroObj.getFullYear();
-    var dataNomeArquivo = dia + "-" + mes + "-" + ano;
-
     var blob = new Blob([csvConteudo], { type: 'text/csv;charset=utf-8;' });
     var link = document.createElement("a");
     var url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    
-    // Define o nome exato solicitado: "Relatorio DD-MM-YYYY.csv"
     link.setAttribute("download", "Relatório " + obterDataBrasilia().split("-").reverse().join("-") + ".csv");
     
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    abrirModalAvisoSistema("Exportação Concluída", "O arquivo CSV dos relatórios foi gerado e baixado com sucesso!", "sucesso");
 }
+
 
 
 	
@@ -3132,11 +3133,9 @@ function processarArquivoHistoricoCSV(arquivo) {
                     }
                 }
 
-                // CRÍTICO: Captura o código do produto puramente no índice 3 (Ex: 1515)
                 var codigoProdutoCSV = colunas[3] ? colunas[3].trim() : "";
-                var fornecedorEncontrado = "BRASLAB"; // Padrão caso não ache correspondência
+                var fornecedorEncontrado = "BRASLAB";
 
-                // Faz a varredura inteligente no banco de lentes para descobrir o fornecedor real
                 if (bancoDadosProdutos && bancoDadosProdutos.length > 0 && codigoProdutoCSV !== "") {
                     var correspondencia = bancoDadosProdutos.find(p => String(p.codigo).trim() === String(codigoProdutoCSV));
                     if (correspondencia && correspondencia.fornecedor) {
@@ -3156,7 +3155,7 @@ function processarArquivoHistoricoCSV(arquivo) {
                     nf: colunas[8], 
                     data: dataFormatadaInterna,
                     conferente: colunas[10],
-                    fornecedor: fornecedorEncontrado // Injeta o fornecedor real descoberto no cruzamento
+                    fornecedor: fornecedorEncontrado
                 };
 
                 var jaExiste = historicoProducao.some(h => 
@@ -3175,8 +3174,9 @@ function processarArquivoHistoricoCSV(arquivo) {
         }
         
         localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
-		
-        // Envia APENAS os relatórios novos importados para a tabela 'relatorios' no Supabase
+        if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
+        if (document.getElementById("rep_data_inicio").value) filtrarHistoricoProducao();
+
         (async function() {
             if (novosRegistroscont > 0) {
                 const apenasNovos = historicoProducao.slice(-novosRegistroscont).map(r => ({
@@ -3195,24 +3195,19 @@ function processarArquivoHistoricoCSV(arquivo) {
                 }));
                 const { error } = await dbSupabase.from("relatorios").insert(apenasNovos);
                 if (!error) {
-                    alert("☁️ " + novosRegistroscont + " novos relatórios salvos na nuvem sem duplicar!");
+                    abrirModalAvisoSistema("Importação Concluída", novosRegistroscont + " novos relatórios importados e salvos na nuvem sem duplicar!", "sucesso");
                 } else {
-                    alert("⚠️ Erro ao enviar relatórios para a nuvem: " + error.message);
+                    abrirModalAvisoSistema("Erro na Nuvem", "Importado localmente, mas ocorreu um erro ao enviar para a nuvem: " + error.message, "erro");
                 }
             } else {
-                alert("ℹ️ Todos os relatórios deste arquivo já estavam no sistema. Nada foi duplicado!");
+                abrirModalAvisoSistema("Nada a Importar", "Todos os relatórios deste arquivo já estavam no sistema. Nada foi duplicado!", "aviso");
             }
         })();
-
-
-        if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
-        
-        alert("🎉 Histórico importado e cruzado com o banco de dados! " + novosRegistroscont + " novos registros sincronizados.");
-        if (document.getElementById("rep_data_inicio").value) filtrarHistoricoProducao();
     };
     
     leitor.readAsText(arquivo, "UTF-8");
 }
+
 
 function atualizarLojaSelecionada(textoCompleto) {
     var select = document.getElementById("selectLoja");
@@ -3502,13 +3497,13 @@ if (document.getElementById("arquivoCSV")) {
         var desc = document.getElementById("cad_descricao").value.trim();
 
         if (web === "" || prod === "" || desc === "") {
-            alert("Todos os campos são obrigatórios!");
+            abrirModalAvisoSistema("Campos Obrigatórios", "Todos os campos são obrigatórios!", "aviso");
             return;
         }
 
         var produtoExistente = bancoDadosProdutos.find((item, idx) => item.cod_web === web && idx !== indexSendoEditado);
         if (produtoExistente) {
-            alert("⚠️ Atenção! O CÓD. WEB '" + web + "' já está cadastrado!");
+            abrirModalAvisoSistema("Código Duplicado", "O CÓD. WEB '" + web + "' já está cadastrado!", "erro");
             return;
         }
 
@@ -3516,10 +3511,10 @@ if (document.getElementById("arquivoCSV")) {
             bancoDadosProdutos[indexSendoEditado].cod_web = web;
             bancoDadosProdutos[indexSendoEditado].codigo = prod;
             bancoDadosProdutos[indexSendoEditado].descricao = desc;
-            alert("Produto alterado com sucesso!");
+            abrirModalAvisoSistema("Alterado", "Produto alterado com sucesso!", "sucesso");
         } else {
             bancoDadosProdutos.push({ cod_web: web, codigo: prod, descricao: desc });
-            alert("Novo produto cadastrado com sucesso!");
+            abrirModalAvisoSistema("Cadastrado", "Novo produto cadastrado com sucesso!", "sucesso");
         }
 
         localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
@@ -3532,25 +3527,33 @@ if (document.getElementById("arquivoCSV")) {
 
     function excluirProdutoDoBanco(index) {
         var p = bancoDadosProdutos[index];
-        if (confirm("Deseja excluir permanentemente o produto: " + p.descricao + "?")) {
-            bancoDadosProdutos.splice(index, 1); 
-            localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
-            
-            if (bancoDadosProdutos.length > 0) {
-                activarLayoutBancoCarregado(bancoDadosProdutos.length);
-                atualizarStatusTalao(bancoDadosProdutos.length);
-            } else {
-                const statusMalote = document.getElementById("statusBancoMalote");
-                if (statusMalote) { statusMalote.innerText = "⚠️ Sem CSV"; statusMalote.style.color = "#856404"; }
-                const statusTalao = document.getElementById("statusBancoTalao");
-                if (statusTalao) { statusTalao.innerText = "⚠️ Sem CSV"; statusTalao.style.color = "#856404"; }
-                localStorage.removeItem("BDotica");
-            }
+        abrirModalConfirmacaoConferencia(
+            "Deseja excluir permanentemente o produto: " + p.descricao + "?",
+            function() {
+                bancoDadosProdutos.splice(index, 1); 
+                localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
+                
+                if (bancoDadosProdutos.length > 0) {
+                    activarLayoutBancoCarregado(bancoDadosProdutos.length);
+                    atualizarStatusTalao(bancoDadosProdutos.length);
+                } else {
+                    const statusMalote = document.getElementById("statusBancoMalote");
+                    if (statusMalote) { statusMalote.innerText = "⚠️ Sem CSV"; statusMalote.style.color = "#856404"; }
+                    const statusTalao = document.getElementById("statusBancoTalao");
+                    if (statusTalao) { statusTalao.innerText = "⚠️ Sem CSV"; statusTalao.style.color = "#856404"; }
+                    localStorage.removeItem("BDotica");
+                }
 
-            filtrarProdutosModal();
-            if (typeof renderizarTabelaTalao === "function") renderizarTabelaTalao(bancoDadosProdutos);
-        }
+                filtrarProdutosModal();
+                if (typeof renderizarTabelaTalao === "function") renderizarTabelaTalao(bancoDadosProdutos);
+            },
+            null,
+            "Excluir Produto",
+            "🗑️",
+            "#cc0000"
+        );
     }
+
 
     function filtrarProdutosModal() {
         var termo = document.getElementById("filtroPesquisa").value.toLowerCase().trim();
@@ -3774,11 +3777,10 @@ if (document.getElementById("arquivoCSV")) {
         );
     }
 
-
 async function gerarPDFouImprimir() {
     var nomeConferente = document.getElementById("conferenteInput").value.trim();
     if (nomeConferente === "") {
-        alert("⚠️ Atenção! Por favor, preencha o NOME DO CONFERENTE antes de Salvar em PDF ou imprimir!");
+        abrirModalAvisoSistema("Conferente Obrigatório", "Por favor, preencha o NOME DO CONFERENTE antes de Salvar em PDF ou imprimir!", "aviso");
         document.getElementById("conferenteInput").focus();
         return;
     }
@@ -3855,11 +3857,10 @@ async function gerarPDFouImprimir() {
 
         localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
 
-        // Grava o lote inteiro na nuvem ANTES de abrir a janela de impressão
         if (loteParaNuvem.length > 0 && dbSupabase) {
             const { data, error } = await dbSupabase.from("relatorios").insert(loteParaNuvem).select();
             if (error) {
-                alert("⚠️ Aviso: Não foi possível salvar na nuvem (" + error.message + ").");
+                abrirModalAvisoSistema("Erro na Nuvem", "Não foi possível salvar na nuvem (" + error.message + ").", "erro");
             } else if (data && data.length > 0) {
                 data.forEach(function(itemNuvem) {
                     var itemLocal = historicoProducao.find(h =>
@@ -3878,16 +3879,11 @@ async function gerarPDFouImprimir() {
         if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
         if (typeof filtrarHistoricoProducao === "function") filtrarHistoricoProducao();
     }
-
-
     var novaJanela = window.open('', '_blank');
-    
-    // Captura o texto da loja atual selecionada na planilha idêntico ao relatório
     var selectPlanilha = document.getElementById("selectLoja");
     var textoLoja = selectPlanilha.options[selectPlanilha.selectedIndex].text;
 
     var tabelaClone = document.getElementById("tabelaDados").cloneNode(true);
-    
     var thAcoes = tabelaClone.querySelector('.col-actions');
     if (thAcoes) thAcoes.remove();
        
@@ -3912,9 +3908,8 @@ async function gerarPDFouImprimir() {
         }
     });
 
-    // Lógica Automática inteligente para ler o fornecedor do primeiro item da tabela
-	var primeiraLinhaTabela = document.querySelector("#corpoTabela tr");
-	var fornecedorLivreConferencia = primeiraLinhaTabela ? (primeiraLinhaTabela.dataset.fornecedorItem || "BRASLAB") : "BRASLAB";
+    var primeiraLinhaTabela = document.querySelector("#corpoTabela tr");
+    var fornecedorLivreConferencia = primeiraLinhaTabela ? (primeiraLinhaTabela.dataset.fornecedorItem || "BRASLAB") : "BRASLAB";
 
     novaJanela.document.write(`
         <!DOCTYPE html>
@@ -3926,7 +3921,6 @@ async function gerarPDFouImprimir() {
                 #conteudoImpressao { flex: 1; }
                 .painel-acoes { position: fixed; top: 20px; left: calc(50% + 450px); transform: translateX(-50%); z-index: 9999; }
                 .btn-imprimir-guia { background-color: #000000; color: white; border: none; padding: 8px 15px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; font-family: sans-serif; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-                
                 .header-print { display: flex !important; flex-direction: column !important; align-items: flex-start !important; margin-bottom: 10px !important; border-bottom: 2px solid #ccc !important; padding-bottom: 0px !important; width: 100% !important; position: static !important; height: auto !important; }
                 .logo-img { max-height: 50px !important; width: auto !important; display: block !important; margin-top: 0 !important; }
                 .nome-loja-titulo { font-size: 18px !important; font-weight: bold !important; text-transform: uppercase !important; margin-top: 5px !important; margin-bottom: 0px !important; color: #333 !important; text-align: center !important; width: 100% !important; position: static !important; transform: none !important; }
@@ -3960,7 +3954,6 @@ async function gerarPDFouImprimir() {
     if (cabecalhoCapa) {
         var divFornCapa = novaJanela.document.createElement("div");
         divFornCapa.className = "fornecedor-impressao";
-        
         divFornCapa.style.width = "95%";
         divFornCapa.style.display = "flex";
         divFornCapa.style.justifyContent = "flex-end"; 
@@ -3971,7 +3964,6 @@ async function gerarPDFouImprimir() {
             divFornCapa.innerText = "Fornecedor: " + fornecedorLivreConferencia;
             divFornCapa.style.textAlign = "right";
         }
-        
         cabecalhoCapa.appendChild(divFornCapa);
     }
 
@@ -4319,44 +4311,44 @@ async function gerarPDFouImprimir() {
     }
 
     function limparTelaTalaoCompleta() {
-        if (!confirm("🧹 Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?")) return;
+        abrirModalConfirmacaoMalote(
+            "Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?",
+            function() {
+                fornecedorAtualTalao = "";
 
-        fornecedorAtualTalao = "";
+                const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
+                const solicitanteAtual = document.getElementById("talao_solicitante")?.value || localStorage.getItem("ultimoSolicitanteTalaoLider") || "";
 
-        // Salva a loja atual e o solicitante para não perder o padrão da máquina
-        const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
-        const solicitanteAtual = document.getElementById("talao_solicitante")?.value || localStorage.getItem("ultimoSolicitanteTalaoLider") || "";
+                document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
+                    el.value = "";
+                    if (el.dataset) {
+                        delete el.dataset.codigoServico;
+                        delete el.dataset.codigosServicos;
+                    }
+                });
 
+                document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
+                    chk.checked = false;
+                });
 
-        // Limpa todos os campos de texto, datas e os códigos selecionados nos modais
-        document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
-            el.value = "";
-            if (el.dataset) {
-                delete el.dataset.codigoServico;
-                delete el.dataset.codigosServicos;
-            }
-        });
+                const campoData = document.getElementById("data-atual");
+                if (campoData) campoData.value = obterDataBrasilia();
 
-        // Desmarca todos os checkboxes (serviços, formas e tipos de armação)
-        document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
-            chk.checked = false;
-        });
+                const campoOptica = document.getElementById("talao_optica");
+                if (campoOptica) campoOptica.value = lojaAtual;
+                const campoSolicitante = document.getElementById("talao_solicitante");
+                if (campoSolicitante) campoSolicitante.value = solicitanteAtual;
 
-        // Restaura a data de hoje, a loja padrão e limpa o arquivo .VCA
-        const campoData = document.getElementById("data-atual");
-        if (campoData) campoData.value = obterDataBrasilia();
+                if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
 
-        const campoOptica = document.getElementById("talao_optica");
-        if (campoOptica) campoOptica.value = lojaAtual;
-		const campoSolicitante = document.getElementById("talao_solicitante");
-        if (campoSolicitante) campoSolicitante.value = solicitanteAtual;
-
-
-        if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
-
-        document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
-        document.getElementById("talao_cod")?.focus();
+                document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
+                document.getElementById("talao_cod")?.focus();
+            },
+            "Limpar Talão",
+            "🧹"
+        );
     }
+
 
     // Limpa os códigos guardados do modal se o usuário apagar o campo manualmente
     ["talao_antireflexo", "talao_coloracao", "talao_outros"].forEach(id => {
@@ -4412,25 +4404,43 @@ async function gerarPDFouImprimir() {
 
 
    // Leitor de arquivos exclusivo para carregar o banco de dados pela aba de cadastro
-	
 function processarArquivoCSVCadastro(files) {
     var leitor = new FileReader();
     leitor.onload = function(evt) {
         var textoCSV = evt.target.result;
-        var linhas = textoCSV.split("\n");
-        
-        bancoDadosProdutos = []; 
+        var linhas = textoCSV.split(/\r?\n/);
+
+        bancoDadosProdutos = [];
         listaLojasConfiguradas = [];
         listaFornecedoresConfigurados = [];
         var novosTratamentos = [];
         var novasColoracoes = [];
         var novosServicosMontagem = [];
-        var secaoAtual = ""; 
+        var secaoAtual = "";
+
+        function parseLinhaCSV(linha) {
+            var resultado = [];
+            var atual = "";
+            var emAspas = false;
+            for (var c = 0; c < linha.length; c++) {
+                var ch = linha[c];
+                if (ch === '"') {
+                    emAspas = !emAspas;
+                } else if (ch === ',' && !emAspas) {
+                    resultado.push(atual.trim());
+                    atual = "";
+                } else {
+                    atual += ch;
+                }
+            }
+            resultado.push(atual.trim());
+            return resultado;
+        }
 
         for (var i = 0; i < linhas.length; i++) {
             var linhaLimpa = linhas[i].trim();
             if (linhaLimpa === "") continue;
-            
+
             if (linhaLimpa.includes("SEÇÃO FORNECEDORES")) { secaoAtual = "fornecedores"; continue; }
             if (linhaLimpa.includes("SEÇÃO LOJAS")) { secaoAtual = "lojas"; continue; }
             if (linhaLimpa.includes("SEÇÃO TRATAMENTOS")) { secaoAtual = "tratamentos"; continue; }
@@ -4438,9 +4448,7 @@ function processarArquivoCSVCadastro(files) {
             if (linhaLimpa.includes("SEÇÃO SERVIÇOS MONTAGEM")) { secaoAtual = "montagem"; continue; }
             if (linhaLimpa.includes("SEÇÃO LENTES")) { secaoAtual = "lentes"; continue; }
 
-            var colunas = linhaLimpa.split(",").map(function(item) {
-                return item.trim().replace(/^"|"$/g, '');
-            });
+            var colunas = parseLinhaCSV(linhaLimpa);
 
             if (secaoAtual === "fornecedores" && colunas.length >= 1) {
                 if (colunas[0].toLowerCase() === "nome") continue;
@@ -4448,7 +4456,10 @@ function processarArquivoCSVCadastro(files) {
             }
             else if (secaoAtual === "lojas" && colunas.length >= 2) {
                 if (colunas[0].toLowerCase() === "numero") continue;
-                listaLojasConfiguradas.push({ num: colunas[0].padStart(2, '0'), nome: colunas[1].toUpperCase() });
+                listaLojasConfiguradas.push({
+                    num: colunas[0].padStart(2, '0'),
+                    nome: colunas[1].toUpperCase()
+                });
             }
             else if (secaoAtual === "tratamentos" && colunas.length >= 2) {
                 if (colunas[0].toLowerCase() === "codigo") continue;
@@ -4474,24 +4485,20 @@ function processarArquivoCSVCadastro(files) {
                     fornecedor: colunas[2] ? colunas[2].toUpperCase() : "BRASLAB"
                 });
             }
-			
-			else if (secaoAtual === "lentes" && colunas.length >= 4) {
+            else if (secaoAtual === "lentes" && colunas.length >= 3) {
                 if (colunas[0].toLowerCase() === "web") continue;
-                bancoDadosProdutos.push({
-                    cod_web: colunas[0],
-                    codigo: colunas[1],
-                    descricao: colunas[2],
-                    fornecedor: colunas[3].toUpperCase()
-                });
-            }
+                var fornFinal = colunas.length >= 4 && colunas[colunas.length - 1]
+                    ? colunas[colunas.length - 1].toUpperCase()
+                    : "BRASLAB";
+                var descFinal = colunas.length > 4
+                    ? colunas.slice(2, colunas.length - 1).join(", ")
+                    : colunas[2];
 
-            else if (secaoAtual === "lentes" && colunas.length === 3) {
-                if (colunas[0].toLowerCase() === "web") continue;
                 bancoDadosProdutos.push({
                     cod_web: colunas[0],
                     codigo: colunas[1],
-                    descricao: colunas[2],
-                    fornecedor: "BRASLAB"
+                    descricao: descFinal,
+                    fornecedor: fornFinal
                 });
             }
         }
@@ -4513,59 +4520,65 @@ function processarArquivoCSVCadastro(files) {
             listaFornecedoresConfigurados.push({ nome: "BRASLAB" });
         }
 
-		
-		
         localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
         localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
         localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
-		
-		        // Envia Lentes, Lojas e Fornecedores importados direto para o Supabase
+
         (async function() {
-            if (listaFornecedoresConfigurados.length > 0) {
-                await dbSupabase.from("fornecedores").upsert(listaFornecedoresConfigurados.map(f => ({ nome: f.nome })), { onConflict: "nome" });
-            }
-            if (listaLojasConfiguradas.length > 0) {
-                await dbSupabase.from("lojas").upsert(listaLojasConfiguradas.map(l => ({ num: l.num, nome: l.nome })), { onConflict: "num" });
-            }
-            if (bancoDadosProdutos.length > 0) {
-                await dbSupabase.from("lentes").delete().neq("id", 0);
-                const lentesParaNuvem = bancoDadosProdutos.map(p => ({
-                    cod_web: p.cod_web || "",
-                    codigo: p.codigo,
-                    descricao: p.descricao,
-                    fornecedor: p.fornecedor || "BRASLAB"
-                }));
-                await dbSupabase.from("lentes").insert(lentesParaNuvem);
-            }
-            const todosServicosParaNuvem = [
-                ...bancoDadosTratamentos.map(t => ({ tipo: "tratamento", codigo: t.codigo, descricao: t.descricao, fornecedor: t.fornecedor || "BRASLAB" })),
-                ...bancoDadosColoracao.map(c => ({ tipo: "coloracao", codigo: c.codigo, descricao: c.descricao, fornecedor: c.fornecedor || "BRASLAB" })),
-                ...bancoDadosServicosMontagem.map(m => ({ tipo: "montagem", codigo: m.codigo, descricao: m.descricao, fornecedor: m.fornecedor || "BRASLAB" }))
-            ];
-
-            if (todosServicosParaNuvem.length > 0) {
-                await dbSupabase.from("servicos_adicionais").delete().neq("id", 0);
-                await dbSupabase.from("servicos_adicionais").insert(todosServicosParaNuvem);
+            if (!dbSupabase || !navigator.onLine) {
+                abrirModalAvisoSistema("Importado Localmente", "Dados salvos no computador (Modo Offline) com sucesso!", "sucesso");
+                return;
             }
 
-            alert("☁️ Lentes, lojas e fornecedores enviados para a nuvem com sucesso!");
+            try {
+                if (listaFornecedoresConfigurados.length > 0) {
+                    await dbSupabase.from("fornecedores").upsert(listaFornecedoresConfigurados.map(f => ({ nome: f.nome })), { onConflict: "nome" });
+                }
+                if (listaLojasConfiguradas.length > 0) {
+                    await dbSupabase.from("lojas").upsert(listaLojasConfiguradas.map(l => ({ num: l.num, nome: l.nome })), { onConflict: "num" });
+                }
+                if (bancoDadosProdutos.length > 0) {
+                    await dbSupabase.from("lentes").delete().neq("id", 0);
+                    const lentesParaNuvem = bancoDadosProdutos.map(p => ({
+                        cod_web: p.cod_web || "",
+                        codigo: p.codigo,
+                        descricao: p.descricao,
+                        fornecedor: p.fornecedor || "BRASLAB"
+                    }));
+                    await dbSupabase.from("lentes").insert(lentesParaNuvem);
+                }
+                const todosServicosParaNuvem = [
+                    ...bancoDadosTratamentos.map(t => ({ tipo: "tratamento", codigo: t.codigo, descricao: t.descricao, fornecedor: t.fornecedor || "BRASLAB" })),
+                    ...bancoDadosColoracao.map(c => ({ tipo: "coloracao", codigo: c.codigo, descricao: c.descricao, fornecedor: c.fornecedor || "BRASLAB" })),
+                    ...bancoDadosServicosMontagem.map(m => ({ tipo: "montagem", codigo: m.codigo, descricao: m.descricao, fornecedor: m.fornecedor || "BRASLAB" }))
+                ];
+
+                if (todosServicosParaNuvem.length > 0) {
+                    await dbSupabase.from("servicos_adicionais").delete().neq("id", 0);
+                    await dbSupabase.from("servicos_adicionais").insert(todosServicosParaNuvem);
+                }
+
+                abrirModalAvisoSistema("Backup Restaurado", "Lentes, lojas, fornecedores e serviços sincronizados na nuvem com sucesso!", "sucesso");
+            } catch (e) {
+                abrirModalAvisoSistema("Importado Localmente", "Salvo no navegador! A sincronização com a nuvem falhou por falta de conexão.", "aviso");
+            }
         })();
 
-        
-		activarLayoutBancoCarregado(bancoDadosProdutos.length);
+
+        activarLayoutBancoCarregado(bancoDadosProdutos.length);
         atualizarSelectsDeLojas();
         atualizarSelectsDeFornecedores();
         renderizarTabelaCadastroLojas();
         renderizarTabelaCadastroFornecedores();
         renderizarTabelaCadastroLentes();
-        
+
         if (typeof renderizarTabelaModal === "function") renderizarTabelaModal(bancoDadosProdutos);
         if (typeof renderizarTabelaTalao === "function") renderizarTabelaTalao(bancoDadosProdutos);
-        
-        alert("🎉 Backup restaurado com sucesso! Fornecedores, Lojas e Lentes sincronizados sem inversão.");
     };
     leitor.readAsText(files[0], "UTF-8");
 }
+
+
 
 
     // ========================================================
@@ -4576,23 +4589,19 @@ function salvarLentePeloCadastro() {
     var prod = document.getElementById("config_cad_produto").value.trim();
     var desc = document.getElementById("config_cad_descricao").value.trim();
     var forn = document.getElementById("config_cad_fornecedor").value; 
-    
     var textoBotao = document.getElementById("btnSalvarLenteCadastro").innerText.trim();
 
     if (web === "" || prod === "" || desc === "") {
-        alert("⚠️ Por favor, preencha todos os campos da lente!");
+        abrirModalAvisoSistema("Campos Obrigatórios", "Por favor, preencha todos os campos da lente!", "aviso");
         return;
     }
 
     var idNuvemLente = null;
 
-    // MODO ALTERAR: Atualiza o registro existente mantendo o mesmo ID
     if (textoBotao === "Alterar Lente") {
         if (indexSendoEditadoCadastro === null) {
             var indexEncontrado = bancoDadosProdutos.findIndex(p => p.codigo === prod || p.cod_web === web);
-            if (indexEncontrado !== -1) {
-                indexSendoEditadoCadastro = indexEncontrado;
-            }
+            if (indexEncontrado !== -1) indexSendoEditadoCadastro = indexEncontrado;
         }
 
         if (indexSendoEditadoCadastro !== null) {
@@ -4604,43 +4613,29 @@ function salvarLentePeloCadastro() {
                 descricao: desc,	
                 fornecedor: forn 
             };
-            alert("✏️ Lente alterada com sucesso no registro!");
+            abrirModalAvisoSistema("Lente Alterada", "Lente alterada com sucesso!", "sucesso");
         } else {
-            alert("❌ Erro: Não foi possível localizar o registro original para alteração.");
+            abrirModalAvisoSistema("Erro", "Não foi possível localizar o registro original para alteração.", "erro");
             return;
         }
-    } 
-    // MODO CADASTRAR NOVO: Bloqueia se o CÓD. WEB já existir
-    else {
+    } else {
         var duplicado = bancoDadosProdutos.find(item => item.cod_web === web);
         if (duplicado) {
-            alert("❌ Erro: Não é possível cadastrar! O CÓD. WEB '" + web + "' já está cadastrado no produto: " + duplicado.descricao + " (" + duplicado.codigo + ")");
+            abrirModalAvisoSistema("Código Duplicado", "O CÓD. WEB '" + web + "' já está cadastrado no produto: " + duplicado.descricao + " (" + duplicado.codigo + ")", "erro");
             return;
         }
         
         bancoDadosProdutos.push({ cod_web: web, codigo: prod, fornecedor: forn, descricao: desc });
-        alert("🎉 Nova lente cadastrada com sucesso!");
+        abrirModalAvisoSistema("Cadastrado!", "Nova lente cadastrada com sucesso!", "sucesso");
     }
 
     localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
 		
-    // Sincroniza a lente cadastrada ou editada direto no Supabase pelo ID
     (async function() {
         if (idNuvemLente) {
-            await dbSupabase.from("lentes").update({ 
-                cod_web: web, 
-                codigo: prod, 
-                descricao: desc, 
-                fornecedor: forn 
-            }).eq("id", idNuvemLente);
+            await dbSupabase.from("lentes").update({ cod_web: web, codigo: prod, descricao: desc, fornecedor: forn }).eq("id", idNuvemLente);
         } else {
-            const { data } = await dbSupabase.from("lentes").insert([{ 
-                cod_web: web, 
-                codigo: prod, 
-                descricao: desc, 
-                fornecedor: forn 
-            }]).select();
-            
+            const { data } = await dbSupabase.from("lentes").insert([{ cod_web: web, codigo: prod, descricao: desc, fornecedor: forn }]).select();
             if (data && data.length > 0) {
                 bancoDadosProdutos[bancoDadosProdutos.length - 1].id = data[0].id;
                 localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
@@ -4700,7 +4695,6 @@ function renderizarTabelaCadastroLentes() {
 
     tbody.innerHTML = "";
 
-
     var filtrados = bancoDadosProdutos.filter(p => {
         if (termo === "") return true;
         return (p.cod_web && p.cod_web.toLowerCase().includes(termo)) || p.codigo.toLowerCase().includes(termo) || p.descricao.toLowerCase().includes(termo);
@@ -4714,7 +4708,6 @@ function renderizarTabelaCadastroLentes() {
     var ordenados = [...filtrados].sort((a, b) => parseFloat(a.codigo) - parseFloat(b.codigo));
 
     ordenados.forEach(produto => {
-        // Encontra a posição exata e imutável dentro do banco de dados principal
         var indexReal = bancoDadosProdutos.findIndex(p => p.codigo === produto.codigo && p.cod_web === produto.cod_web);
         var linha = tbody.insertRow();
         linha.insertCell(0).innerText = produto.cod_web || "-";
@@ -4730,10 +4723,10 @@ function renderizarTabelaCadastroLentes() {
         btnEdit.type = "button";
         btnEdit.style.cssText = "background:#ffc107; color:#212529; padding:2px 6px; font-size:11px; margin-right:5px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
         btnEdit.onclick = function() {
-            indexSendoEditadoCadastro = indexReal; // Atribui o ID real perfeitamente
+            indexSendoEditadoCadastro = indexReal;
             document.getElementById("config_cad_web").value = produto.cod_web || "";
             document.getElementById("config_cad_produto").value = produto.codigo;
-			document.getElementById("config_cad_descricao").value = produto.descricao;
+            document.getElementById("config_cad_descricao").value = produto.descricao;
             document.getElementById("config_cad_fornecedor").value = produto.fornecedor || "BRASLAB";
             document.getElementById("btnSalvarLenteCadastro").innerText = "Alterar Lente";
             document.getElementById("config_cad_web").focus();
@@ -4744,14 +4737,22 @@ function renderizarTabelaCadastroLentes() {
         btnDel.type = "button";
         btnDel.style.cssText = "background:#cc0000; color:white; padding:2px 6px; font-size:11px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
         btnDel.onclick = function() {
-            if (confirm("Deseja remover permanentemente do sistema a lente:\n" + produto.descricao + "?")) {
-                bancoDadosProdutos.splice(indexReal, 1);
-                localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
-                atualizarStatusTalao(bancoDadosProdutos.length);
-                activarLayoutBancoCarregado(bancoDadosProdutos.length);
-                atualizarStatusCadastro(bancoDadosProdutos.length);
-                renderizarTabelaCadastroLentes();
-            }
+            abrirModalConfirmacaoConferencia(
+                "Deseja remover permanentemente do sistema a lente:\n" + produto.descricao + "?",
+                function() {
+                    bancoDadosProdutos.splice(indexReal, 1);
+                    localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
+                    atualizarStatusTalao(bancoDadosProdutos.length);
+                    activarLayoutBancoCarregado(bancoDadosProdutos.length);
+                    atualizarStatusCadastro(bancoDadosProdutos.length);
+                    renderizarTabelaCadastroLentes();
+                    abrirModalAvisoSistema("Excluído", "Lente removida com sucesso!", "sucesso");
+                },
+                null,
+                "Excluir Lente",
+                "🗑️",
+                "#cc0000"
+            );
         };
 
         celulaAcoes.appendChild(btnEdit);
@@ -4762,52 +4763,52 @@ function renderizarTabelaCadastroLentes() {
     // ========================================================
     // MOTOR DE GERENCIAMENTO DE CADASTROS - PARTE 3: LOJAS
     // ========================================================
-    function adicionarNovaLojaPeloCadastro() {
-        var num = document.getElementById("config_loja_num").value.trim().padStart(2, '0');
-        var nome = document.getElementById("config_loja_nome").value.trim().toUpperCase();
+function adicionarNovaLojaPeloCadastro() {
+    var num = document.getElementById("config_loja_num").value.trim().padStart(2, '0');
+    var nome = document.getElementById("config_loja_nome").value.trim().toUpperCase();
 
-        if (num === "" || num === "00" || nome === "") {
-            alert("⚠️ Por favor, digite um número válido e o nome da filial!");
-            return;
-        }
-
-        var jaExisteLoja = listaLojasConfiguradas.find((l, idx) => l.num === num && idx !== indexSendoEditadoLoja);
-        if (jaExisteLoja) {
-            alert("❌ Erro: Já existe uma filial cadastrada com o número " + num + " (" + jaExisteLoja.nome + ")!");
-            return;
-        }
-
-        var idNuvemLoja = null;
-
-        if (indexSendoEditadoLoja !== null) {
-            idNuvemLoja = listaLojasConfiguradas[indexSendoEditadoLoja].id || null;
-            listaLojasConfiguradas[indexSendoEditadoLoja] = { id: idNuvemLoja, num: num, nome: nome };
-            alert("✏️ Loja alterada com sucesso!");
-        } else {
-            listaLojasConfiguradas.push({ num: num, nome: nome });
-            alert("🏢 Nova filial incluída no sistema!");
-        }
-
-        localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
-
-        // Sincroniza a loja criada ou editada direto no Supabase
-        (async function() {
-            if (idNuvemLoja) {
-                await dbSupabase.from("lojas").update({ num: num, nome: nome }).eq("id", idNuvemLoja);
-            } else {
-                const { data } = await dbSupabase.from("lojas").upsert([{ num: num, nome: nome }], { onConflict: "num" }).select();
-                if (data && data.length > 0) {
-                    var lojaLocal = listaLojasConfiguradas.find(l => l.num === num);
-                    if (lojaLocal) lojaLocal.id = data[0].id;
-                    localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
-                }
-            }
-        })();
-
-        limparFormCadastroLojas();
-        atualizarSelectsDeLojas();
-        renderizarTabelaCadastroLojas();
+    if (num === "" || num === "00" || nome === "") {
+        abrirModalAvisoSistema("Campos Obrigatórios", "Por favor, digite um número válido e o nome da filial!", "aviso");
+        return;
     }
+
+    var jaExisteLoja = listaLojasConfiguradas.find((l, idx) => l.num === num && idx !== indexSendoEditadoLoja);
+    if (jaExisteLoja) {
+        abrirModalAvisoSistema("Loja Já Existe", "Já existe uma filial cadastrada com o número " + num + " (" + jaExisteLoja.nome + ")!", "erro");
+        return;
+    }
+
+    var idNuvemLoja = null;
+
+    if (indexSendoEditadoLoja !== null) {
+        idNuvemLoja = listaLojasConfiguradas[indexSendoEditadoLoja].id || null;
+        listaLojasConfiguradas[indexSendoEditadoLoja] = { id: idNuvemLoja, num: num, nome: nome };
+        abrirModalAvisoSistema("Loja Alterada", "Filial alterada com sucesso!", "sucesso");
+    } else {
+        listaLojasConfiguradas.push({ num: num, nome: nome });
+        abrirModalAvisoSistema("Loja Adicionada", "Nova filial incluída no sistema com sucesso!", "sucesso");
+    }
+
+    localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
+
+    (async function() {
+        if (idNuvemLoja) {
+            await dbSupabase.from("lojas").update({ num: num, nome: nome }).eq("id", idNuvemLoja);
+        } else {
+            const { data } = await dbSupabase.from("lojas").upsert([{ num: num, nome: nome }], { onConflict: "num" }).select();
+            if (data && data.length > 0) {
+                var lojaLocal = listaLojasConfiguradas.find(l => l.num === num);
+                if (lojaLocal) lojaLocal.id = data.id;
+                localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
+            }
+        }
+    })();
+
+    limparFormCadastroLojas();
+    atualizarSelectsDeLojas();
+    renderizarTabelaCadastroLojas();
+}
+
 
     // ========================================================
     // GERENCIAMENTO DE TRATAMENTOS, COLORAÇÃO E MONTAGEM NO CADASTRO
@@ -4863,58 +4864,58 @@ function renderizarTabelaCadastroLentes() {
         }
     }
 
-    function salvarServicoPeloCadastro(tipo) {
-        const cfg = obterConfigServicoCadastro(tipo);
-        const idxEdicao = cfg.getIdx();
-        const codigo = (cfg.inputCod?.value || "").trim();
-        const descricao = (cfg.inputDesc?.value || "").trim().toUpperCase();
-        const fornecedor = (cfg.inputForn?.value || "BRASLAB").trim().toUpperCase();
+function salvarServicoPeloCadastro(tipo) {
+    const cfg = obterConfigServicoCadastro(tipo);
+    const idxEdicao = cfg.getIdx();
+    const codigo = (cfg.inputCod?.value || "").trim();
+    const descricao = (cfg.inputDesc?.value || "").trim().toUpperCase();
+    const fornecedor = (cfg.inputForn?.value || "BRASLAB").trim().toUpperCase();
 
-        if (!codigo || !descricao) {
-            alert("⚠️ Preencha o Código e a Descrição antes de salvar!");
-            return;
-        }
-
-        // Permite o mesmo código se for de fornecedor diferente, bloqueia apenas se repetir código + fornecedor
-        const duplicado = cfg.lista.find((item, idx) =>
-            item.codigo === codigo &&
-            (item.fornecedor || "BRASLAB").toUpperCase() === fornecedor &&
-            idx !== idxEdicao
-        );
-        if (duplicado) {
-            alert(`❌ Já existe um item cadastrado para ${fornecedor} com o código "${codigo}" (${duplicado.descricao})!`);
-            return;
-        }
-
-        let idNuvemServico = null;
-        if (idxEdicao !== null) {
-            idNuvemServico = cfg.lista[idxEdicao].id || null;
-            cfg.lista[idxEdicao] = { id: idNuvemServico, codigo, descricao, fornecedor };
-            alert("✏️ Cadastro alterado com sucesso!");
-        } else {
-            cfg.lista.push({ codigo, descricao, fornecedor });
-            alert("✅ Novo item cadastrado com sucesso!");
-        }
-
-        localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
-
-        if (dbSupabase) {
-            (async function() {
-                const itemSalvo = idxEdicao !== null ? cfg.lista[idxEdicao] : cfg.lista[cfg.lista.length - 1];
-                if (idNuvemServico) {
-                    await dbSupabase.from("servicos_adicionais").update({ codigo, descricao, fornecedor }).eq("id", idNuvemServico);
-                } else {
-                    const { data } = await dbSupabase.from("servicos_adicionais").insert([{ tipo, codigo, descricao, fornecedor }]).select();
-                    if (data && data.length > 0 && itemSalvo) {
-                        itemSalvo.id = data.id;
-                        localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
-                    }
-                }
-            })();
-        }
-
-        limparFormCadastroServico(tipo);
+    if (!codigo || !descricao) {
+        abrirModalAvisoSistema("Campos Obrigatórios", "Preencha o Código e a Descrição antes de salvar!", "aviso");
+        return;
     }
+
+    const duplicado = cfg.lista.find((item, idx) =>
+        item.codigo === codigo &&
+        (item.fornecedor || "BRASLAB").toUpperCase() === fornecedor &&
+        idx !== idxEdicao
+    );
+    if (duplicado) {
+        abrirModalAvisoSistema("Código Duplicado", `Já existe um item cadastrado para ${fornecedor} com o código "${codigo}" (${duplicado.descricao})!`, "erro");
+        return;
+    }
+
+    let idNuvemServico = null;
+    if (idxEdicao !== null) {
+        idNuvemServico = cfg.lista[idxEdicao].id || null;
+        cfg.lista[idxEdicao] = { id: idNuvemServico, codigo, descricao, fornecedor };
+        abrirModalAvisoSistema("Cadastro Alterado", "Item alterado com sucesso!", "sucesso");
+    } else {
+        cfg.lista.push({ codigo, descricao, fornecedor });
+        abrirModalAvisoSistema("Cadastrado!", "Novo item cadastrado com sucesso!", "sucesso");
+    }
+
+    localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
+
+    if (dbSupabase) {
+        (async function() {
+            const itemSalvo = idxEdicao !== null ? cfg.lista[idxEdicao] : cfg.lista[cfg.lista.length - 1];
+            if (idNuvemServico) {
+                await dbSupabase.from("servicos_adicionais").update({ codigo, descricao, fornecedor }).eq("id", idNuvemServico);
+            } else {
+                const { data } = await dbSupabase.from("servicos_adicionais").insert([{ tipo, codigo, descricao, fornecedor }]).select();
+                if (data && data.length > 0 && itemSalvo) {
+                    itemSalvo.id = data.id;
+                    localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
+                }
+            }
+        })();
+    }
+
+    limparFormCadastroServico(tipo);
+}
+
 
     function limparFormCadastroServico(tipo) {
         const cfg = obterConfigServicoCadastro(tipo);
@@ -4951,57 +4952,59 @@ function renderizarTabelaCadastroLentes() {
         renderizarTabelaServicosCadastroModal(filtrados);
     }
 
-    function renderizarTabelaServicosCadastroModal(dados) {
-        const tbody = document.getElementById("listaServicosCadastroModal");
-        if (!tbody) return;
-        tbody.innerHTML = "";
+function renderizarTabelaServicosCadastroModal(dados) {
+    const tbody = document.getElementById("listaServicosCadastroModal");
+    if (!tbody) return;
+    tbody.innerHTML = "";
 
-        const cfg = obterConfigServicoCadastro(tipoModalServicoCadAtual);
+    const cfg = obterConfigServicoCadastro(tipoModalServicoCadAtual);
 
-        if (!dados || dados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="no-data">Nenhum item encontrado.</td></tr>';
-            return;
-        }
+    if (!dados || dados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="no-data">Nenhum item encontrado.</td></tr>';
+        return;
+    }
 
-        const dadosOrdenados = [...dados].sort((a, b) => (parseInt(a.codigo, 10) || 0) - (parseInt(b.codigo, 10) || 0));
-        dadosOrdenados.forEach(item => {
-            const fornItem = (item.fornecedor || "BRASLAB").toUpperCase();
-            const indexReal = cfg.lista.findIndex(x =>
-                x.codigo === item.codigo &&
-                x.descricao === item.descricao &&
-                (x.fornecedor || "BRASLAB").toUpperCase() === fornItem
-            );
+    const dadosOrdenados = [...dados].sort((a, b) => (parseInt(a.codigo, 10) || 0) - (parseInt(b.codigo, 10) || 0));
+    dadosOrdenados.forEach(item => {
+        const fornItem = (item.fornecedor || "BRASLAB").toUpperCase();
+        const indexReal = cfg.lista.findIndex(x =>
+            x.codigo === item.codigo &&
+            x.descricao === item.descricao &&
+            (x.fornecedor || "BRASLAB").toUpperCase() === fornItem
+        );
 
-            const tr = tbody.insertRow();
-            tr.insertCell(0).innerText = item.codigo;
-            tr.insertCell(1).innerText = item.descricao;
-            tr.insertCell(2).innerText = fornItem;
+        const tr = tbody.insertRow();
+        tr.insertCell(0).innerText = item.codigo;
+        tr.insertCell(1).innerText = item.descricao;
+        tr.insertCell(2).innerText = fornItem;
 
-            const tdAcoes = tr.insertCell(3);
-            tdAcoes.style.textAlign = "right";
-            tdAcoes.style.paddingRight = "25px";
+        const tdAcoes = tr.insertCell(3);
+        tdAcoes.style.textAlign = "right";
+        tdAcoes.style.paddingRight = "25px";
 
-            const btnEdit = document.createElement("button");
-            btnEdit.innerHTML = "✏️";
-            btnEdit.type = "button";
-            btnEdit.className = "btn-modal-action btn-modal-edit";
-            btnEdit.onclick = function(e) {
-                e.stopPropagation();
-                cfg.setIdx(indexReal);
-                if (cfg.inputCod) cfg.inputCod.value = item.codigo;
-                if (cfg.inputDesc) cfg.inputDesc.value = item.descricao;
-                if (cfg.inputForn) cfg.inputForn.value = fornItem;
-                if (cfg.btnSalvar) cfg.btnSalvar.innerText = cfg.textoAlt;
-                fecharModalServicosCadastro();
-            };
+        const btnEdit = document.createElement("button");
+        btnEdit.innerHTML = "✏️";
+        btnEdit.type = "button";
+        btnEdit.className = "btn-modal-action btn-modal-edit";
+        btnEdit.onclick = function(e) {
+            e.stopPropagation();
+            cfg.setIdx(indexReal);
+            if (cfg.inputCod) cfg.inputCod.value = item.codigo;
+            if (cfg.inputDesc) cfg.inputDesc.value = item.descricao;
+            if (cfg.inputForn) cfg.inputForn.value = fornItem;
+            if (cfg.btnSalvar) cfg.btnSalvar.innerText = cfg.textoAlt;
+            fecharModalServicosCadastro();
+        };
 
-            const btnDel = document.createElement("button");
-            btnDel.innerHTML = "🗑️";
-            btnDel.type = "button";
-            btnDel.className = "btn-modal-action btn-modal-delete";
-            btnDel.onclick = function(e) {
-                e.stopPropagation();
-                if (confirm(`Deseja excluir permanentemente "${item.codigo} - ${item.descricao} (${fornItem})"?`)) {
+        const btnDel = document.createElement("button");
+        btnDel.innerHTML = "🗑️";
+        btnDel.type = "button";
+        btnDel.className = "btn-modal-action btn-modal-delete";
+        btnDel.onclick = function(e) {
+            e.stopPropagation();
+            abrirModalConfirmacaoConferencia(
+                `Deseja excluir permanentemente "${item.codigo} - ${item.descricao} (${fornItem})"?`,
+                function() {
                     cfg.lista.splice(indexReal, 1);
                     localStorage.setItem(cfg.chaveStorage, JSON.stringify(cfg.lista));
                     if (dbSupabase) {
@@ -5017,137 +5020,72 @@ function renderizarTabelaCadastroLentes() {
                         })();
                     }
                     filtrarServicosCadastroModal();
-                }
-            };
-
-            tdAcoes.appendChild(btnEdit);
-            tdAcoes.appendChild(btnDel);
-        });
-    }
-
-
-
-function renderizarTabelaCadastroLojas() {
-    var termo = document.getElementById("filtro_cadastro_lojas").value.toLowerCase().trim();
-    var tbody = document.getElementById("corpoTabelaLojasCadastro");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    var filtradas = listaLojasConfiguradas.filter(l => {
-        if (termo === "") return true;
-        return l.num.includes(termo) || l.nome.toLowerCase().includes(termo);
-    });
-
-    if (filtradas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #666; font-style: italic; padding: 15px;">Nenhuma loja localizada.</td></tr>';
-        return;
-    }
-
-    var ordenadas = [...filtradas].sort((a, b) => parseInt(a.num, 10) - parseInt(b.num, 10));
-
-    ordenadas.forEach(loja => {
-        var indexReal = listaLojasConfiguradas.findIndex(l => l.num === loja.num);
-        var linha = tbody.insertRow();
-        linha.insertCell(0).innerText = loja.num;
-        linha.insertCell(1).innerText = loja.nome;
-
-        var celulaAcoes = linha.insertCell(2);
-        celulaAcoes.style.textAlign = "center";
-
-        var btnEdit = document.createElement("button");
-        btnEdit.innerHTML = "✏️";
-        btnEdit.type = "button";
-        btnEdit.style.cssText = "background:#ffc107; color:#212529; padding:2px 6px; font-size:11px; margin-right:5px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
-        
-        btnEdit.onclick = function() {
-            indexSendoEditadoLoja = indexReal;
-            document.getElementById("config_loja_num").value = loja.num;
-            document.getElementById("config_loja_nome").value = loja.nome;
-            
-            // CORREÇÃO: Mantém o padrão verde e ajusta o hover para o verde-escuro
-            var btnSalvarLoja = document.getElementById("btnSalvarLojaCadastro");
-            if (btnSalvarLoja) {
-                btnSalvarLoja.innerText = "✏️ Alterar Loja";
-                btnSalvarLoja.style.setProperty("background-color", "#38a169", "important");
-                btnSalvarLoja.style.setProperty("color", "#ffffff", "important");
-                btnSalvarLoja.setAttribute("onmouseover", "this.style.setProperty('background-color', '#276f49', 'important')");
-                btnSalvarLoja.setAttribute("onmouseout", "this.style.setProperty('background-color', '#38a169', 'important')");
-            }
-            document.getElementById("config_loja_num").focus();
+                    abrirModalAvisoSistema("Excluído", "Item removido com sucesso!", "sucesso");
+                },
+                null,
+                "Excluir Serviço",
+                "🗑️",
+                "#cc0000"
+            );
         };
 
-        var btnDel = document.createElement("button");
-        btnDel.innerHTML = "🗑️";
-        btnDel.type = "button";
-        btnDel.style.cssText = "background:#cc0000; color:white; padding:2px 6px; font-size:11px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
-        btnDel.onclick = function() {
-            if (confirm("Deseja apagar permanentemente a loja " + loja.num + " - " + loja.nome + "?")) {
-                listaLojasConfiguradas.splice(indexReal, 1);
-                localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
-                limparFormCadastroLojas();
-                atualizarSelectsDeLojas();
-                renderizarTabelaCadastroLojas();
-            }
-        };
-
-        celulaAcoes.appendChild(btnEdit);
-        celulaAcoes.appendChild(btnDel);
+        tdAcoes.appendChild(btnEdit);
+        tdAcoes.appendChild(btnDel);
     });
 }
 
-    function salvarFornecedorPeloCadastro() {
-        var nome = document.getElementById("config_fornecedor_nome").value.trim().toUpperCase();
-        var textoBotao = document.getElementById("btnSalvarFornecedorCadastro").innerText.trim();
 
-        if (nome === "") {
-            alert("⚠️ Por favor, digite o nome do fornecedor!");
-            return;
-        }
+function salvarFornecedorPeloCadastro() {
+    var nome = document.getElementById("config_fornecedor_nome").value.trim().toUpperCase();
+    var textoBotao = document.getElementById("btnSalvarFornecedorCadastro").innerText.trim();
 
-        var jaExisteForn = listaFornecedoresConfigurados.find((f, idx) => f.nome === nome && idx !== indexSendoEditadoFornecedor);
-        if (jaExisteForn) {
-            alert("❌ Erro: Já existe um fornecedor cadastrado com o nome " + nome + "!");
-            return;
-        }
-
-        var idNuvemForn = null;
-
-        // Verifica o texto do botão ("Alterar Forn.") ou o índice em edição
-        if (textoBotao.includes("Alterar Forn.") || indexSendoEditadoFornecedor !== null) {
-            if (indexSendoEditadoFornecedor !== null) {
-                idNuvemForn = listaFornecedoresConfigurados[indexSendoEditadoFornecedor].id || null;
-                listaFornecedoresConfigurados[indexSendoEditadoFornecedor] = { id: idNuvemForn, nome: nome };
-                alert("✏️ Fornecedor alterado com sucesso!");
-            } else {
-                alert("❌ Erro: Não foi possível localizar o fornecedor original para alteração.");
-                return;
-            }
-        } else {
-            listaFornecedoresConfigurados.push({ nome: nome });
-            alert("🏭 Novo fornecedor incluído no sistema!");
-        }
-
-        localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
-
-        // Sincroniza o fornecedor criado ou editado direto no Supabase
-        (async function() {
-            if (idNuvemForn) {
-                await dbSupabase.from("fornecedores").update({ nome: nome }).eq("id", idNuvemForn);
-            } else {
-                const { data } = await dbSupabase.from("fornecedores").upsert([{ nome: nome }], { onConflict: "nome" }).select();
-                if (data && data.length > 0) {
-                    var fornLocal = listaFornecedoresConfigurados.find(f => f.nome === nome);
-                    if (fornLocal) fornLocal.id = data.id;
-                    localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
-                }
-            }
-        })();
-
-        limparFormCadastroFornecedores();
-        atualizarSelectsDeFornecedores();
-        if (typeof renderizarTabelaCadastroFornecedores === "function") renderizarTabelaCadastroFornecedores();
+    if (nome === "") {
+        abrirModalAvisoSistema("Campo Obrigatório", "Por favor, digite o nome do fornecedor!", "aviso");
+        return;
     }
+
+    var jaExisteForn = listaFornecedoresConfigurados.find((f, idx) => f.nome === nome && idx !== indexSendoEditadoFornecedor);
+    if (jaExisteForn) {
+        abrirModalAvisoSistema("Fornecedor Duplicado", "Já existe um fornecedor cadastrado com o nome " + nome + "!", "erro");
+        return;
+    }
+
+    var idNuvemForn = null;
+
+    if (textoBotao.includes("Alterar Forn.") || indexSendoEditadoFornecedor !== null) {
+        if (indexSendoEditadoFornecedor !== null) {
+            idNuvemForn = listaFornecedoresConfigurados[indexSendoEditadoFornecedor].id || null;
+            listaFornecedoresConfigurados[indexSendoEditadoFornecedor] = { id: idNuvemForn, nome: nome };
+            abrirModalAvisoSistema("Fornecedor Alterado", "Fornecedor alterado com sucesso!", "sucesso");
+        } else {
+            abrirModalAvisoSistema("Erro", "Não foi possível localizar o fornecedor original para alteração.", "erro");
+            return;
+        }
+    } else {
+        listaFornecedoresConfigurados.push({ nome: nome });
+        abrirModalAvisoSistema("Fornecedor Adicionado", "Novo fornecedor incluído no sistema com sucesso!", "sucesso");
+    }
+
+    localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
+
+    (async function() {
+        if (idNuvemForn) {
+            await dbSupabase.from("fornecedores").update({ nome: nome }).eq("id", idNuvemForn);
+        } else {
+            const { data } = await dbSupabase.from("fornecedores").upsert([{ nome: nome }], { onConflict: "nome" }).select();
+            if (data && data.length > 0) {
+                var fornLocal = listaFornecedoresConfigurados.find(f => f.nome === nome);
+                if (fornLocal) fornLocal.id = data.id;
+                localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
+            }
+        }
+    })();
+
+    limparFormCadastroFornecedores();
+    atualizarSelectsDeFornecedores();
+    if (typeof renderizarTabelaCadastroFornecedores === "function") renderizarTabelaCadastroFornecedores();
+}
+
 
 
 
@@ -5163,67 +5101,75 @@ function renderizarTabelaCadastroLojas() {
             btnSalvar.setAttribute("onmouseout", "this.style.setProperty('background-color', '#38a169', 'important')");
         }
     }
-    function renderizarTabelaCadastroFornecedores() {
-        var tbody = document.getElementById("corpoTabelaFornecedoresCadastro");
-        if (!tbody) return;
-        tbody.innerHTML = "";
+function renderizarTabelaCadastroFornecedores() {
+    var tbody = document.getElementById("corpoTabelaFornecedoresCadastro");
+    if (!tbody) return;
+    tbody.innerHTML = "";
 
-        if (listaFornecedoresConfigurados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #666; font-style: italic; padding: 15px;">Nenhum fornecedor configurado.</td></tr>';
-            return;
-        }
+    if (listaFornecedoresConfigurados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #666; font-style: italic; padding: 15px;">Nenhum fornecedor configurado.</td></tr>';
+        return;
+    }
 
-        var ordenados = [...listaFornecedoresConfigurados].sort((a, b) => a.nome.localeCompare(b.nome));
+    var ordenados = [...listaFornecedoresConfigurados].sort((a, b) => a.nome.localeCompare(b.nome));
 
-        ordenados.forEach(forn => {
-            var indexReal = listaFornecedoresConfigurados.findIndex(f => f.nome === forn.nome);
-            var linha = tbody.insertRow();
-            linha.insertCell(0).innerText = forn.nome;
+    ordenados.forEach(forn => {
+        var indexReal = listaFornecedoresConfigurados.findIndex(f => f.nome === forn.nome);
+        var linha = tbody.insertRow();
+        linha.insertCell(0).innerText = forn.nome;
 
-            var celulaAcoes = linha.insertCell(1);
-            celulaAcoes.style.textAlign = "center";
+        var celulaAcoes = linha.insertCell(1);
+        celulaAcoes.style.textAlign = "center";
 
-            var btnEdit = document.createElement("button");
-            btnEdit.innerHTML = "✏️";
-            btnEdit.type = "button";
-            btnEdit.style.cssText = "background:#ffc107; color:#212529; padding:2px 6px; font-size:11px; margin-right:5px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
+        var btnEdit = document.createElement("button");
+        btnEdit.innerHTML = "✏️";
+        btnEdit.type = "button";
+        btnEdit.style.cssText = "background:#ffc107; color:#212529; padding:2px 6px; font-size:11px; margin-right:5px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
+        
+        btnEdit.onclick = function() {
+            indexSendoEditadoFornecedor = indexReal;
+            document.getElementById("config_fornecedor_nome").value = forn.nome;
             
-            btnEdit.onclick = function() {
-                indexSendoEditadoFornecedor = indexReal;
-                document.getElementById("config_fornecedor_nome").value = forn.nome;
-                
-                var btnSalvar = document.getElementById("btnSalvarFornecedorCadastro");
-                if (btnSalvar) {
-                    btnSalvar.innerText = "✏️ Alterar Forn.";
-                    btnSalvar.style.setProperty("background-color", "#38a169", "important");
-                    btnSalvar.style.setProperty("color", "#ffffff", "important");
-                }
-                fecharModalFornecedoresCadastro();
-                document.getElementById("config_fornecedor_nome").focus();
-            };
+            var btnSalvar = document.getElementById("btnSalvarFornecedorCadastro");
+            if (btnSalvar) {
+                btnSalvar.innerText = "✏️ Alterar Forn.";
+                btnSalvar.style.setProperty("background-color", "#38a169", "important");
+                btnSalvar.style.setProperty("color", "#ffffff", "important");
+            }
+            fecharModalFornecedoresCadastro();
+            document.getElementById("config_fornecedor_nome").focus();
+        };
 
-            var btnDel = document.createElement("button");
-            btnDel.innerHTML = "🗑️";
-            btnDel.type = "button";
-            btnDel.style.cssText = "background:#cc0000; color:white; padding:2px 6px; font-size:11px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
-            btnDel.onclick = function() {
-                if (forn.nome === "BRASLAB") {
-                    alert("❌ O fornecedor padrão 'BRASLAB' não pode ser removido do sistema!");
-                    return;
-                }
-                if (confirm("Deseja apagar permanentemente o fornecedor " + forn.nome + "?\n⚠️ Atenção: Lentes vinculadas a ele ficarão órfãs.")) {
+        var btnDel = document.createElement("button");
+        btnDel.innerHTML = "🗑️";
+        btnDel.type = "button";
+        btnDel.style.cssText = "background:#cc0000; color:white; padding:2px 6px; font-size:11px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
+        btnDel.onclick = function() {
+            if (forn.nome === "BRASLAB") {
+                abrirModalAvisoSistema("Ação Bloqueada", "O fornecedor padrão 'BRASLAB' não pode ser removido do sistema!", "erro");
+                return;
+            }
+            abrirModalConfirmacaoConferencia(
+                "Deseja apagar permanentemente o fornecedor " + forn.nome + "?",
+                function() {
                     listaFornecedoresConfigurados.splice(indexReal, 1);
                     localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
                     limparFormCadastroFornecedores();
                     atualizarSelectsDeFornecedores();
                     renderizarTabelaCadastroFornecedores();
-                }
-            };
+                    abrirModalAvisoSistema("Excluído", "Fornecedor removido com sucesso!", "sucesso");
+                },
+                null,
+                "Excluir Fornecedor",
+                "🗑️",
+                "#cc0000"
+            );
+        };
 
-            celulaAcoes.appendChild(btnEdit);
-            celulaAcoes.appendChild(btnDel);
-        });
-    }
+        celulaAcoes.appendChild(btnEdit);
+        celulaAcoes.appendChild(btnDel);
+    });
+}
 
     // Funções de Controle de Abertura/Fechamento do Modal Exclusivo
     function abrirModalFornecedoresCadastro() {
@@ -5244,62 +5190,60 @@ function renderizarTabelaCadastroLojas() {
         renderizarTabelaFornecedoresCadastroModal(filtrados);
     }
 
-    function renderizarTabelaFornecedoresCadastroModal(dados) {
-        var tbody = document.getElementById("listaFornecedoresCadastroModal");
-        if (!tbody) return;
-        tbody.innerHTML = "";
+function renderizarTabelaFornecedoresCadastroModal(dados) {
+    var tbody = document.getElementById("listaFornecedoresCadastroModal");
+    if (!tbody) return;
+    tbody.innerHTML = "";
 
-        if (dados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2" class="no-data">Nenhum fornecedor encontrado.</td></tr>';
-            return;
-        }
+    if (dados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" class="no-data">Nenhum fornecedor encontrado.</td></tr>';
+        return;
+    }
 
-        var ordenados = [...dados].sort((a, b) => a.nome.localeCompare(b.nome));
+    var ordenados = [...dados].sort((a, b) => a.nome.localeCompare(b.nome));
 
-        ordenados.forEach(function(forn) {
-            var indexReal = listaFornecedoresConfigurados.findIndex(f => f.nome === forn.nome);
-            var linha = tbody.insertRow();
-            linha.insertCell(0).innerText = forn.nome;
-            
-            var celulaAcoes = linha.insertCell(1);
-            celulaAcoes.style.textAlign = "right";
-            celulaAcoes.style.paddingRight = "25px";
-            
-            var btnEdit = document.createElement("button");
-            btnEdit.innerHTML = "✏️";
-            btnEdit.type = "button";
-            btnEdit.className = "btn-modal-action btn-modal-edit";
-            btnEdit.onclick = function(e) {
-                e.stopPropagation();
-                indexSendoEditadoFornecedor = indexReal;
-                document.getElementById("config_fornecedor_nome").value = forn.nome;
-                
-                var btnSalvar = document.getElementById("btnSalvarFornecedorCadastro");
-                if (btnSalvar) {
-                    btnSalvar.innerText = "✏️ Alterar Forn.";
-                }
-                fecharModalFornecedoresCadastro();
-                document.getElementById("config_fornecedor_nome").focus();
-            };
+    ordenados.forEach(function(forn) {
+        var indexReal = listaFornecedoresConfigurados.findIndex(f => f.nome === forn.nome);
+        var linha = tbody.insertRow();
+        linha.insertCell(0).innerText = forn.nome;
+        
+        var celulaAcoes = linha.insertCell(1);
+        celulaAcoes.style.textAlign = "right";
+        celulaAcoes.style.paddingRight = "25px";
+        
+        var btnEdit = document.createElement("button");
+        btnEdit.innerHTML = "✏️";
+        btnEdit.type = "button";
+        btnEdit.className = "btn-modal-action btn-modal-edit";
+        btnEdit.onclick = function(e) {
+            e.stopPropagation();
+            indexSendoEditadoFornecedor = indexReal;
+            document.getElementById("config_fornecedor_nome").value = forn.nome;
+            var btnSalvar = document.getElementById("btnSalvarFornecedorCadastro");
+            if (btnSalvar) btnSalvar.innerText = "✏️ Alterar Forn.";
+            fecharModalFornecedoresCadastro();
+            document.getElementById("config_fornecedor_nome").focus();
+        };
 
-            var btnDel = document.createElement("button");
-            btnDel.innerHTML = "🗑️";
-            btnDel.type = "button";
-            btnDel.className = "btn-modal-action btn-modal-delete";
-            btnDel.onclick = function(e) {
-                e.stopPropagation();
-                if (forn.nome === "BRASLAB") {
-                    alert("❌ O fornecedor padrão 'BRASLAB' não pode ser removido!");
-                    return;
-                }
-                if (confirm("Deseja apagar permanentemente o fornecedor " + forn.nome + "?")) {
+        var btnDel = document.createElement("button");
+        btnDel.innerHTML = "🗑️";
+        btnDel.type = "button";
+        btnDel.className = "btn-modal-action btn-modal-delete";
+        btnDel.onclick = function(e) {
+            e.stopPropagation();
+            if (forn.nome === "BRASLAB") {
+                abrirModalAvisoSistema("Ação Bloqueada", "O fornecedor padrão 'BRASLAB' não pode ser removido!", "erro");
+                return;
+            }
+            abrirModalConfirmacaoConferencia(
+                "Deseja apagar permanentemente o fornecedor " + forn.nome + "?",
+                function() {
                     var idParaDeletar = forn.id;
                     var nomeParaDeletar = forn.nome;
 
                     listaFornecedoresConfigurados.splice(indexReal, 1);
                     localStorage.setItem("FornecedoresConfiguradosLider", JSON.stringify(listaFornecedoresConfigurados));
 
-                    // Apaga o fornecedor diretamente na nuvem
                     (async function() {
                         if (idParaDeletar) {
                             await dbSupabase.from("fornecedores").delete().eq("id", idParaDeletar);
@@ -5311,134 +5255,155 @@ function renderizarTabelaCadastroLojas() {
                     limparFormCadastroFornecedores();
                     atualizarSelectsDeFornecedores();
                     filtrarFornecedoresCadastroModal();
-                }
-            };
+                    abrirModalAvisoSistema("Excluído", "Fornecedor removido com sucesso!", "sucesso");
+                },
+                null,
+                "Excluir Fornecedor",
+                "🗑️",
+                "#cc0000"
+            );
+        };
+
+        celulaAcoes.appendChild(btnEdit);
+        celulaAcoes.appendChild(btnDel);
+    });
+}
 
 
-            celulaAcoes.appendChild(btnEdit);
-            celulaAcoes.appendChild(btnDel);
-        });
+function renderizarTabelaCadastroLojas() {
+    var tbody = document.getElementById("corpoTabelaLojasCadastro");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    if (listaLojasConfiguradas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #666; font-style: italic; padding: 15px;">Nenhuma filial configurada.</td></tr>';
+        return;
     }
 
-    function renderizarTabelaCadastroLojas() {
-        var tbody = document.getElementById("corpoTabelaLojasCadastro");
-        if (!tbody) return;
-        tbody.innerHTML = "";
+    var ordenadas = [...listaLojasConfiguradas].sort((a, b) => parseInt(a.num, 10) - parseInt(b.num, 10));
 
-        if (listaLojasConfiguradas.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #666; font-style: italic; padding: 15px;">Nenhuma filial configurada.</td></tr>';
-            return;
-        }
+    ordenadas.forEach(loja => {
+        var indexReal = listaLojasConfiguradas.findIndex(l => l.num === loja.num);
+        var linha = tbody.insertRow();
+        linha.insertCell(0).innerText = loja.num;
+        linha.insertCell(1).innerText = loja.nome;
 
-        var ordenadas = [...listaLojasConfiguradas].sort((a, b) => parseInt(a.num, 10) - parseInt(b.num, 10));
+        var celulaAcoes = linha.insertCell(2);
+        celulaAcoes.style.textAlign = "center";
 
-        ordenadas.forEach(loja => {
-            var indexReal = listaLojasConfiguradas.findIndex(l => l.num === loja.num);
-            var linha = tbody.insertRow();
-            linha.insertCell(0).innerText = loja.num;
-            linha.insertCell(1).innerText = loja.nome;
+        var btnEdit = document.createElement("button");
+        btnEdit.innerHTML = "✏️";
+        btnEdit.type = "button";
+        btnEdit.style.cssText = "background:#ffc107; color:#212529; padding:2px 6px; font-size:11px; margin-right:5px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
+        btnEdit.onclick = function() {
+            indexSendoEditadoLoja = indexReal;
+            document.getElementById("config_loja_num").value = loja.num;
+            document.getElementById("config_loja_nome").value = loja.nome;
+            
+            var btnSalvarLoja = document.getElementById("btnSalvarLojaCadastro");
+            if (btnSalvarLoja) {
+                btnSalvarLoja.innerText = "✏️ Alterar Loja";
+            }
+            document.getElementById("config_loja_num").focus();
+        };
 
-            var celulaAcoes = linha.insertCell(2);
-            celulaAcoes.style.textAlign = "center";
-
-            var btnEdit = document.createElement("button");
-            btnEdit.innerHTML = "✏️";
-            btnEdit.type = "button";
-            btnEdit.style.cssText = "background:#ffc107; color:#212529; padding:2px 6px; font-size:11px; margin-right:5px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
-            btnEdit.onclick = function() {
-                indexSendoEditadoLoja = indexReal;
-                document.getElementById("config_loja_num").value = loja.num;
-                document.getElementById("config_loja_nome").value = loja.nome;
-                
-                var btnSalvarLoja = document.getElementById("btnSalvarLojaCadastro");
-                if (btnSalvarLoja) {
-                    btnSalvarLoja.innerText = "✏️ Alterar Loja";
-                }
-                document.getElementById("config_loja_num").focus();
-            };
-
-            var btnDel = document.createElement("button");
-            btnDel.innerHTML = "🗑️";
-            btnDel.type = "button";
-            btnDel.style.cssText = "background:#cc0000; color:white; padding:2px 6px; font-size:11px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
-            btnDel.onclick = function() {
-                if (confirm("Deseja apagar permanentemente a loja " + loja.num + " - " + loja.nome + "?")) {
+        var btnDel = document.createElement("button");
+        btnDel.innerHTML = "🗑️";
+        btnDel.type = "button";
+        btnDel.style.cssText = "background:#cc0000; color:white; padding:2px 6px; font-size:11px; border-radius:4px; cursor:pointer; border:none; font-weight:bold;";
+        btnDel.onclick = function() {
+            abrirModalConfirmacaoConferencia(
+                "Deseja apagar permanentemente a loja " + loja.num + " - " + loja.nome + "?",
+                function() {
                     listaLojasConfiguradas.splice(indexReal, 1);
                     localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
                     limparFormCadastroLojas();
                     atualizarSelectsDeLojas();
                     renderizarTabelaCadastroLojas();
-                }
-            };
+                    abrirModalAvisoSistema("Excluído", "Filial removida com sucesso!", "sucesso");
+                },
+                null,
+                "Excluir Filial",
+                "🗑️",
+                "#cc0000"
+            );
+        };
 
-            celulaAcoes.appendChild(btnEdit);
-            celulaAcoes.appendChild(btnDel);
-        });
-    }
+        celulaAcoes.appendChild(btnEdit);
+        celulaAcoes.appendChild(btnDel);
+    });
+}
+
 
 function exportarNovosProdutosCSV() {
     if (bancoDadosProdutos.length === 0 && listaLojasConfiguradas.length === 0 && listaFornecedoresConfigurados.length === 0) {
-        alert("⚠️ Não há dados cadastrados para exportar!");
+        abrirModalAvisoSistema("Atenção", "Não há dados cadastrados para exportar!", "aviso");
         return;
     }
-    
-    // 1. Grava os FORNECEDORES no topo do arquivo de backup
+
+    function ordenarPorFornecedorECodigo(a, b) {
+        var fornA = String(a.fornecedor || "BRASLAB").toUpperCase().trim();
+        var fornB = String(b.fornecedor || "BRASLAB").toUpperCase().trim();
+        var compForn = fornA.localeCompare(fornB, 'pt-BR', { sensitivity: 'base' });
+        if (compForn !== 0) return compForn;
+
+        return String(a.codigo || "").localeCompare(String(b.codigo || ""), 'pt-BR', { numeric: true });
+    }
+
+    function escaparCSV(valor) {
+        var str = String(valor || "").trim();
+        if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    }
+
+    // 1. SEÇÃO FORNECEDORES
     var csvConteudo = "--- SEÇÃO FORNECEDORES ---\nnome\n";
-    listaFornecedoresConfigurados.forEach(function(f) {
-        var nome = f.nome || "";
-        if (nome.includes(",")) nome = '"' + nome + '"';
-        csvConteudo += nome + "\n";
+    var fornecedoresOrdenados = [...listaFornecedoresConfigurados].sort((a, b) =>
+        String(a.nome || "").localeCompare(String(b.nome || ""), 'pt-BR', { sensitivity: 'base' })
+    );
+    fornecedoresOrdenados.forEach(function(f) {
+        csvConteudo += escaparCSV(f.nome) + "\n";
     });
 
-    // 2. Grava as LOJAS na sequência
+    // 2. SEÇÃO LOJAS
     csvConteudo += "--- SEÇÃO LOJAS ---\nnumero,loja\n";
     var lojasOrdenadas = [...listaLojasConfiguradas].sort((a, b) => parseInt(a.num, 10) - parseInt(b.num, 10));
     lojasOrdenadas.forEach(function(l) {
-        var num = l.num || "";
-        var nome = l.nome || "";
-        if (nome.includes(",")) nome = '"' + nome + '"';
-        csvConteudo += num + "," + nome + "\n";
+        csvConteudo += escaparCSV(l.num) + "," + escaparCSV(l.nome) + "\n";
     });
-    
-    // 2.5. Grava os TRATAMENTOS
+
+    // 3. SEÇÃO TRATAMENTOS (Ordenado por Fornecedor e depois Código crescente)
     csvConteudo += "--- SEÇÃO TRATAMENTOS ---\ncodigo,descricao,fornecedor\n";
-    bancoDadosTratamentos.forEach(function(t) {
-        var desc = (t.descricao || "").includes(",") ? '"' + t.descricao + '"' : (t.descricao || "");
-        csvConteudo += (t.codigo || "") + "," + desc + "," + (t.fornecedor || "BRASLAB") + "\n";
+    [...bancoDadosTratamentos].sort(ordenarPorFornecedorECodigo).forEach(function(t) {
+        csvConteudo += escaparCSV(t.codigo) + "," + escaparCSV(t.descricao) + "," + escaparCSV(t.fornecedor || "BRASLAB") + "\n";
     });
 
-    // 2.6. Grava a COLORAÇÃO
+    // 4. SEÇÃO COLORAÇÃO (Ordenado por Fornecedor e depois Código crescente)
     csvConteudo += "--- SEÇÃO COLORAÇÃO ---\ncodigo,descricao,fornecedor\n";
-    bancoDadosColoracao.forEach(function(c) {
-        var desc = (c.descricao || "").includes(",") ? '"' + c.descricao + '"' : (c.descricao || "");
-        csvConteudo += (c.codigo || "") + "," + desc + "," + (c.fornecedor || "BRASLAB") + "\n";
+    [...bancoDadosColoracao].sort(ordenarPorFornecedorECodigo).forEach(function(c) {
+        csvConteudo += escaparCSV(c.codigo) + "," + escaparCSV(c.descricao) + "," + escaparCSV(c.fornecedor || "BRASLAB") + "\n";
     });
 
-    // 2.7. Grava os SERVIÇOS MONTAGEM
+    // 5. SEÇÃO SERVIÇOS MONTAGEM (Ordenado por Fornecedor e depois Código crescente)
     csvConteudo += "--- SEÇÃO SERVIÇOS MONTAGEM ---\ncodigo,descricao,fornecedor\n";
-    bancoDadosServicosMontagem.forEach(function(m) {
-        var desc = (m.descricao || "").includes(",") ? '"' + m.descricao + '"' : (m.descricao || "");
-        csvConteudo += (m.codigo || "") + "," + desc + "," + (m.fornecedor || "BRASLAB") + "\n";
+    [...bancoDadosServicosMontagem].sort(ordenarPorFornecedorECodigo).forEach(function(m) {
+        csvConteudo += escaparCSV(m.codigo) + "," + escaparCSV(m.descricao) + "," + escaparCSV(m.fornecedor || "BRASLAB") + "\n";
     });
 
+    // 6. SEÇÕES DE LENTES POR FORNECEDOR (Fornecedores em A-Z e Lentes em Código crescente)
+    var lentesOrdenadas = [...bancoDadosProdutos].sort(ordenarPorFornecedorECodigo);
+    var fornecedoresLentes = [...new Set(lentesOrdenadas.map(p => (p.fornecedor || "BRASLAB").toUpperCase().trim()))];
 
-	// 3. Grava as LENTES separadas por seção de fornecedor
-	var lentesOrdenadas = [...bancoDadosProdutos].sort((a, b) => parseFloat(a.codigo) - parseFloat(b.codigo));
-	var fornecedoresLentes = [...new Set(lentesOrdenadas.map(p => (p.fornecedor || "BRASLAB").toUpperCase()))];
-	
-	fornecedoresLentes.forEach(function(fornAtual) {
-		csvConteudo += "--- SEÇÃO LENTES " + fornAtual + " ---\nweb,codigo,descricao,fornecedor\n";
-		lentesOrdenadas.filter(p => (p.fornecedor || "BRASLAB").toUpperCase() === fornAtual).forEach(function(p) {
-			var web = p.cod_web || "";
-			var cod = p.codigo || "";
-			var forn = p.fornecedor || "BRASLAB";
-			var desc = p.descricao || "";
-			if (desc.includes(",")) desc = '"' + desc + '"';
-			if (forn.includes(",")) forn = '"' + forn + '"';
-			csvConteudo += web + "," + cod + "," + desc + "," + forn + "\n";
-		});
-	});
-
+    fornecedoresLentes.forEach(function(fornAtual) {
+        csvConteudo += "--- SEÇÃO LENTES " + fornAtual + " ---\nweb,codigo,descricao,fornecedor\n";
+        lentesOrdenadas
+            .filter(p => (p.fornecedor || "BRASLAB").toUpperCase().trim() === fornAtual)
+            .forEach(function(p) {
+                csvConteudo += escaparCSV(p.cod_web) + "," + escaparCSV(p.codigo) + "," + escaparCSV(p.descricao) + "," + escaparCSV(fornAtual) + "\n";
+            });
+    });
 
     var blob = new Blob([csvConteudo], { type: 'text/csv;charset=utf-8;' });
     var link = document.createElement("a");
@@ -5449,7 +5414,11 @@ function exportarNovosProdutosCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    abrirModalAvisoSistema("Exportação Concluída", "Arquivo 'produtos_atualizado.csv' exportado por fornecedor e código crescente!", "sucesso");
 }
+
+
 
     // ========================================================
     // LOGICA DOS NOVOS MODAIS DA ABA DE CADASTRO (ANTI-CONFLITO)
@@ -5570,27 +5539,34 @@ function renderizarTabelaLentesCadastroModal(dados) {
         btnDel.className = "btn-modal-action btn-modal-delete";
         btnDel.onclick = function(e) {
             e.stopPropagation();
-            if (confirm("Deseja remover permanentemente do sistema a lente:\n" + produto.descricao + "?")) {
-                var idParaDeletar = produto.id;
-                var codParaDeletar = produto.codigo;
-                
-                bancoDadosProdutos.splice(indexReal, 1);
-                localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
-                
-                // Apaga a lente diretamente na nuvem pelo ID
-                (async function() {
-                    if (idParaDeletar) {
-                        await dbSupabase.from("lentes").delete().eq("id", idParaDeletar);
-                    } else {
-                        await dbSupabase.from("lentes").delete().eq("codigo", codParaDeletar);
-                    }
-                })();
+            abrirModalConfirmacaoConferencia(
+                "Deseja remover permanentemente do sistema a lente:\n" + produto.descricao + "?",
+                function() {
+                    var idParaDeletar = produto.id;
+                    var codParaDeletar = produto.codigo;
+                    
+                    bancoDadosProdutos.splice(indexReal, 1);
+                    localStorage.setItem("BDotica", JSON.stringify(bancoDadosProdutos));
+                    
+                    (async function() {
+                        if (idParaDeletar) {
+                            await dbSupabase.from("lentes").delete().eq("id", idParaDeletar);
+                        } else {
+                            await dbSupabase.from("lentes").delete().eq("codigo", codParaDeletar);
+                        }
+                    })();
 
-                atualizarStatusTalao(bancoDadosProdutos.length);
-                activarLayoutBancoCarregado(bancoDadosProdutos.length);
-                atualizarStatusCadastro(bancoDadosProdutos.length);
-                filtrarLentesCadastroModal();
-            }
+                    atualizarStatusTalao(bancoDadosProdutos.length);
+                    activarLayoutBancoCarregado(bancoDadosProdutos.length);
+                    atualizarStatusCadastro(bancoDadosProdutos.length);
+                    filtrarLentesCadastroModal();
+                    abrirModalAvisoSistema("Excluído", "Lente removida com sucesso!", "sucesso");
+                },
+                null,
+                "Excluir Lente",
+                "🗑️",
+                "#cc0000"
+            );
         };
         
         linha.ondblclick = function() {
@@ -5609,6 +5585,7 @@ function renderizarTabelaLentesCadastroModal(dados) {
         celulaAcoes.appendChild(btnDel);
     });
 }
+
 
     // --- RENDERIZAR TABELA DE LOJAS NO MODAL ---
 function renderizarTabelaLojasCadastroModal(dados) {
@@ -5662,28 +5639,34 @@ function renderizarTabelaLojasCadastroModal(dados) {
         btnDel.className = "btn-modal-action btn-modal-delete";
         btnDel.onclick = function(e) {
             e.stopPropagation();
-            if (confirm("Deseja apagar permanentemente a loja " + loja.num + " - " + loja.nome + "?")) {
-                var idParaDeletar = loja.id;
-                var numParaDeletar = loja.num;
+            abrirModalConfirmacaoConferencia(
+                "Deseja apagar permanentemente a loja " + loja.num + " - " + loja.nome + "?",
+                function() {
+                    var idParaDeletar = loja.id;
+                    var numParaDeletar = loja.num;
 
-                listaLojasConfiguradas.splice(indexReal, 1);
-                localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
+                    listaLojasConfiguradas.splice(indexReal, 1);
+                    localStorage.setItem("LojasConfiguradasLider", JSON.stringify(listaLojasConfiguradas));
 
-                // Apaga a loja diretamente na nuvem
-                (async function() {
-                    if (idParaDeletar) {
-                        await dbSupabase.from("lojas").delete().eq("id", idParaDeletar);
-                    } else {
-                        await dbSupabase.from("lojas").delete().eq("num", numParaDeletar);
-                    }
-                })();
+                    (async function() {
+                        if (idParaDeletar) {
+                            await dbSupabase.from("lojas").delete().eq("id", idParaDeletar);
+                        } else {
+                            await dbSupabase.from("lojas").delete().eq("num", numParaDeletar);
+                        }
+                    })();
 
-                limparFormCadastroLojas();
-                atualizarSelectsDeLojas();
-                filtrarLojasCadastroModal();
-            }
+                    limparFormCadastroLojas();
+                    atualizarSelectsDeLojas();
+                    filtrarLojasCadastroModal();
+                    abrirModalAvisoSistema("Excluído", "Filial removida com sucesso!", "sucesso");
+                },
+                null,
+                "Excluir Filial",
+                "🗑️",
+                "#cc0000"
+            );
         };
-
         
         linha.ondblclick = function() {
             indexSendoEditadoLoja = indexReal;
@@ -5707,6 +5690,7 @@ function renderizarTabelaLojasCadastroModal(dados) {
         celulaAcoes.appendChild(btnDel);
     });
 }
+
     // ========================================================
     // ALTERNAR ENTRE AS OPÇÕES NA TELA CADASTRO
     // ========================================================
@@ -5723,28 +5707,23 @@ function renderizarTabelaLojasCadastroModal(dados) {
 function imprimirCapaDiretaDoRelatorio() {
     var nomeConferente = document.getElementById("conferenteInput").value.trim();
     if (nomeConferente === "") {
-        alert("⚠️ Atenção! Por favor, preencha o NOME DO CONFERENTE (na aba Conferência) antes de Imprimir a Capa!");
+        abrirModalAvisoSistema("Conferente Obrigatório", "Por favor, preencha o NOME DO CONFERENTE (na aba Conferência) antes de Imprimir a Capa!", "aviso");
         alternarAba('planilha');
-        document.getElementById("conferenteInput").focus();
+        setTimeout(() => document.getElementById("conferenteInput").focus(), 100);
         return;
     }
 
     var linhasRelatorio = document.querySelectorAll("#relatorios table tbody tr");
     if (linhasRelatorio.length === 0 || (linhasRelatorio.length === 1 && linhasRelatorio[0].innerText.includes("🔍"))) {
-        alert("⚠️ Não há dados filtrados na tabela de relatórios para gerar a capa!");
+        abrirModalAvisoSistema("Atenção", "Não há dados filtrados na tabela de relatórios para gerar a capa!", "aviso");
         return;
     }
 
     var novaJanela = window.open('', '_blank');
-    
     var selectRelatorio = document.getElementById("rep_select_loja");
     var textoLoja = selectRelatorio.options[selectRelatorio.selectedIndex].text;
-    
-    if (selectRelatorio.value === "TODAS") {
-        textoLoja = "TODAS AS LOJAS";
-    }
+    if (selectRelatorio.value === "TODAS") textoLoja = "TODAS AS LOJAS";
 
-    // VARIÁVEL LIVRE: Mude o nome do fornecedor padrão da Capa do Relatório aqui quando quiser
     var fornecedorLivreCapa = document.getElementById("rep_filtro_fornecedor")?.value === "TODOS" ? "BRASLAB" : (document.getElementById("rep_filtro_fornecedor")?.value || "BRASLAB");
 
     novaJanela.document.write(`
@@ -5787,37 +5766,29 @@ function imprimirCapaDiretaDoRelatorio() {
         </html>
     `);
 
-    // Injeta a div do Fornecedor cirurgicamente dentro do cabeçalho antes que a linha divisória feche
     var containerCapa = novaJanela.document.getElementById("conteudoImpressao");
     var cabecalhoCapa = containerCapa ? containerCapa.querySelector(".header-print") : null;
     if (cabecalhoCapa) {
         var divFornCapa = novaJanela.document.createElement("div");
         divFornCapa.className = "fornecedor-impressao";
-        
-        // Alinhamento inteligente na mesma linha puxando tudo para a direita
         divFornCapa.style.width = "95%";
         divFornCapa.style.display = "flex";
         divFornCapa.style.justifyContent = "flex-end"; 
 
         if (fornecedorLivreCapa.toUpperCase().trim() === "BRASLAB") {
-            // Logotipo alinhado à direita com margem inferior fina para encostar na linha de forma elegante
-         divFornCapa.innerHTML = '<img src="formas/logo_braslab.png" style="max-height: 32px; width: auto; display: block; object-fit: contain; transform: translateY(-15px); margin-bottom: -17px;">';
+            divFornCapa.innerHTML = '<img src="formas/logo_braslab.png" style="max-height: 32px; width: auto; display: block; object-fit: contain; transform: translateY(-15px); margin-bottom: -17px;">';
         } else {
             divFornCapa.innerText = "Fornecedor: " + fornecedorLivreCapa;
             divFornCapa.style.textAlign = "right";
         }
-        
         cabecalhoCapa.appendChild(divFornCapa);
     }
 
-
     var tbodyDestino = novaJanela.document.getElementById("corpoTabelaCapa");
-    
     linhasRelatorio.forEach(function(linha) {
         var celulas = linha.getElementsByTagName("td");
         if(celulas.length >= 10) {
             var novaLinha = tbodyDestino.insertRow();
-            
             novaLinha.insertCell(0).innerText = celulas[0].innerText; 
             novaLinha.insertCell(1).innerText = celulas[1].innerText; 
             novaLinha.insertCell(2).innerText = celulas[2].innerText; 
@@ -5831,12 +5802,8 @@ function imprimirCapaDiretaDoRelatorio() {
     });
 
     novaJanela.document.close();
-    
-    setTimeout(function() {
-        novaJanela.print();
-    }, 250);
+    setTimeout(function() { novaJanela.print(); }, 250);
 }
-
 
 
 // Variável de controle para o estado do botão
@@ -5868,54 +5835,57 @@ function alternarModoEdicaoRelatorio() {
 }
 
 async function excluirRegistroRelatorio(idNuvem, os, loja, cod_produto, descricao, valor_nf, nf, dataOriginal) {
-    if (confirm("⚠️ Deseja remover permanentemente a OS: " + os + " | Produto: " + cod_produto + " | Valor NF: R$ " + valor_nf + " | NF: " + nf + "?")) {
-        
-        if (idNuvem) {
-            const { error } = await dbSupabase.from("relatorios").delete().eq("id", idNuvem);
-            if (error) {
-                alert("❌ Erro ao apagar na nuvem: " + error.message);
-                return;
+    abrirModalConfirmacaoConferencia(
+        "Deseja remover permanentemente a OS: " + os + " | Produto: " + cod_produto + " | Valor NF: R$ " + valor_nf + " | NF: " + nf + "?",
+        async function() {
+            if (idNuvem) {
+                const { error } = await dbSupabase.from("relatorios").delete().eq("id", idNuvem);
+                if (error) {
+                    abrirModalAvisoSistema("Erro ao Excluir", "Não foi possível apagar na nuvem: " + error.message, "erro");
+                    return;
+                }
+                historicoProducao = historicoProducao.filter(item => item.id !== idNuvem);
+            } else {
+                historicoProducao = historicoProducao.filter(function(item) {
+                    return !(String(item.os).trim() === String(os).trim() &&
+                             String(item.loja).padStart(2, '0') === String(loja).padStart(2, '0') && 
+                             String(item.cod_produto).trim() === String(cod_produto).trim() &&
+                             String(item.descricao).trim() === String(descricao).trim() &&
+                             String(item.valor_nf).trim() === String(valor_nf).trim() &&
+                             String(item.nf).trim() === String(nf).trim() && 
+                             item.data === dataOriginal);
+                });
             }
-            historicoProducao = historicoProducao.filter(item => item.id !== idNuvem);
-        } else {
-            historicoProducao = historicoProducao.filter(function(item) {
-                return !(String(item.os).trim() === String(os).trim() &&
-                         String(item.loja).padStart(2, '0') === String(loja).padStart(2, '0') && 
-                         String(item.cod_produto).trim() === String(cod_produto).trim() &&
-                         String(item.descricao).trim() === String(descricao).trim() &&
-                         String(item.valor_nf).trim() === String(valor_nf).trim() &&
-                         String(item.nf).trim() === String(nf).trim() && 
-                         item.data === dataOriginal);
-            });
-        }
 
-        localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
-        if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
-        
-        var estadoEdicaoSalvo = modoEdicaoRelatorioAtivo;
-        filtrarHistoricoProducao();
-        if (estadoEdicaoSalvo) {
-            modoEdicaoRelatorioAtivo = false;
-            alternarModoEdicaoRelatorio();
+            localStorage.setItem("HistoricoProducaoLider", JSON.stringify(historicoProducao));
+            if (typeof atualizarLayoutHistorico === "function") atualizarLayoutHistorico(historicoProducao.length);
+            
+            var estadoEdicaoSalvo = modoEdicaoRelatorioAtivo;
+            filtrarHistoricoProducao();
+            if (estadoEdicaoSalvo) {
+                modoEdicaoRelatorioAtivo = false;
+                alternarModoEdicaoRelatorio();
+            }
+            
         }
-    }
+    );
 }
+
 
 
 // Remove permanentemente o banco de dados de lentes e filiais configuradas do computador
 function limparBancoDadosCadastro() {
-    if (confirm("⚠️ ATENÇÃO CRÍTICA!\nVocê tem certeza que deseja apagar DEFINITIVAMENTE todas as lentes e filiais cadastradas neste navegador?")) {
-        if (confirm("🚨 CONFIRMAÇÃO FINAL:\nEsta ação limpará o banco local e não poderá ser desfeita. Deseja prosseguir?")) {
-            
-            // Remove as tabelas do LocalStorage
+    abrirModalConfirmacaoConferencia(
+        "Você tem certeza que deseja apagar DEFINITIVAMENTE todas as lentes e filiais cadastradas neste navegador?",
+        function() {
             localStorage.removeItem("BDotica");
             localStorage.removeItem("LojasConfiguradasLider");
+            localStorage.removeItem("FornecedoresConfiguradosLider");
             
-            // Reseta as variáveis em memória para listas vazias
             bancoDadosProdutos = [];
             listaLojasConfiguradas = [];
+            listaFornecedoresConfigurados = [{ nome: "BRASLAB" }];
             
-            // Atualiza os indicadores de status visual
             var statusMalote = document.getElementById("statusBancoMalote");
             if (statusMalote) { statusMalote.innerText = "⚠️ Sem CSV"; statusMalote.style.color = "#856404"; }
             
@@ -5925,25 +5895,26 @@ function limparBancoDadosCadastro() {
             var statusCad = document.getElementById("statusBancoCadastro");
             if (statusCad) { statusCad.innerText = "⚠️ Sem CSV"; statusCad.style.color = "#856404"; }
             
-            // Limpa as visualizações de formulários e atualiza os seletores/tabelas vazios
             limparFormCadastroLentes();
             limparFormCadastroLojas();
+            limparFormCadastroFornecedores();
             atualizarSelectsDeLojas();
             
             if (typeof renderizarTabelaModal === "function") renderizarTabelaModal(bancoDadosProdutos);
             if (typeof renderizarTabelaTalao === "function") renderizarTabelaTalao(bancoDadosProdutos);
             if (typeof renderizarTabelaCadastroLentes === "function") renderizarTabelaCadastroLentes();
             if (typeof renderizarTabelaCadastroLojas === "function") renderizarTabelaCadastroLojas();
-            
-            alert("🗑️ Banco de dados de cadastros (Lentes e Lojas) completamente limpo!");
-        }
-    }
-	        localStorage.removeItem("FornecedoresConfiguradosLider");
-            listaFornecedoresConfigurados = [{ nome: "BRASLAB" }];
-            limparFormCadastroFornecedores();
             if (typeof renderizarTabelaCadastroFornecedores === "function") renderizarTabelaCadastroFornecedores();
-
+            
+            abrirModalAvisoSistema("Banco Limpo", "Banco de dados de cadastros (Lentes e Lojas) completamente limpo!", "sucesso");
+        },
+        null,
+        "Limpar Banco Local",
+        "🗑️",
+        "#cc0000"
+    );
 }
+
     // ========================================================
     // FORMATADOR AUTOMÁTICO DE VALOR MOEDAS (VALOR NF)
     // ========================================================
@@ -6772,38 +6743,49 @@ function limparBancoDadosCadastro() {
     // Excluir vários marcados de uma vez
     var btnExcluirLoteMR = document.getElementById("btnExcluirSelecionadosMalote");
     if (btnExcluirLoteMR) {
-        btnExcluirLoteMR.onclick = async function() {
+        btnExcluirLoteMR.onclick = function() {
             var marcados = Array.from(document.querySelectorAll(".mr-check-item:checked"));
             if (marcados.length === 0) return;
 
-            if (!confirm("⚠️ Deseja excluir permanentemente os " + marcados.length + " itens selecionados?")) return;
+            abrirModalConfirmacaoMalote(
+                "Deseja excluir permanentemente os " + marcados.length + " itens selecionados?",
+                async function() {
+                    var idsParaApagar = marcados.map(chk => parseInt(chk.value, 10));
+                    const { error } = await dbSupabase.from("malotes_enviados").delete().in("id", idsParaApagar);
 
-            var idsParaApagar = marcados.map(chk => parseInt(chk.value, 10));
-            const { error } = await dbSupabase.from("malotes_enviados").delete().in("id", idsParaApagar);
+                    if (error) {
+                        abrirModalAvisoSistema("Erro ao Excluir", "Não foi possível excluir selecionados: " + error.message, "erro");
+                        return;
+                    }
 
-            if (error) {
-                alert("❌ Erro ao excluir selecionados: " + error.message);
-                return;
-            }
-
-            listaMalotesRecebidosAtual = listaMalotesRecebidosAtual.filter(item => !idsParaApagar.includes(item.id));
-            renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+                    listaMalotesRecebidosAtual = listaMalotesRecebidosAtual.filter(item => !idsParaApagar.includes(item.id));
+                    renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+                    abrirModalAvisoSistema("Excluído", "Itens selecionados removidos com sucesso!", "sucesso");
+                },
+                "Excluir Selecionados",
+                "🗑️"
+            );
         };
     }
 
     // Excluir item individual pela lixeira
-    async function excluirUnicoMaloteRecebido(idRegistro, osNum) {
-        if (!confirm("⚠️ Deseja excluir o envio da OS " + osNum + "?")) return;
+    function excluirUnicoMaloteRecebido(idRegistro, osNum) {
+        abrirModalConfirmacaoMalote(
+            "Deseja excluir o envio da OS " + osNum + "?",
+            async function() {
+                const { error } = await dbSupabase.from("malotes_enviados").delete().eq("id", idRegistro);
+                if (error) {
+                    abrirModalAvisoSistema("Erro ao Excluir", "Não foi possível excluir: " + error.message, "erro");
+                    return;
+                }
 
-        const { error } = await dbSupabase.from("malotes_enviados").delete().eq("id", idRegistro);
-        if (error) {
-            alert("❌ Erro ao excluir: " + error.message);
-            return;
-        }
-
-        listaMalotesRecebidosAtual = listaMalotesRecebidosAtual.filter(item => item.id !== idRegistro);
-        renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+                listaMalotesRecebidosAtual = listaMalotesRecebidosAtual.filter(item => item.id !== idRegistro);
+                renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
+                
+            }
+        );
     }
+
 
 
     // Edição discreta direto na linha ao clicar no lápis (✏️)
@@ -6849,7 +6831,7 @@ function limparBancoDadosCadastro() {
 
             const { error } = await dbSupabase.from("malotes_enviados").update(dadosAtualizados).eq("id", item.id);
             if (error) {
-                alert("❌ Erro ao salvar edição: " + error.message);
+                abrirModalAvisoSistema("Erro ao Salvar", "Não foi possível salvar a edição: " + error.message, "erro");
                 return;
             }
 
@@ -6857,6 +6839,7 @@ function limparBancoDadosCadastro() {
             tr.dataset.editando = "false";
             renderizarTabelaMalotesRecebidos(listaMalotesRecebidosAtual);
         };
+
 
         var btnCancelar = document.createElement("button");
         btnCancelar.type = "button";
@@ -7159,12 +7142,19 @@ function limparBancoDadosCadastro() {
 
 
     async function excluirTalaoRecebido(idRegistro, osNum) {
-        if (!confirm(`⚠️ Deseja excluir o talão recebido da OS ${osNum}?`)) return;
-        const { error } = await dbSupabase.from("taloes_enviados").delete().eq("id", idRegistro);
-        if (!error) {
-            listaTaloesRecebidosCache = listaTaloesRecebidosCache.filter(x => x.id !== idRegistro);
-            renderizarTabelaTaloesRecebidos(listaTaloesRecebidosCache);
-        }
+        abrirModalConfirmacaoMalote(
+            `Deseja excluir o talão recebido da OS ${osNum}?`,
+            async function() {
+                const { error } = await dbSupabase.from("taloes_enviados").delete().eq("id", idRegistro);
+                if (error) {
+                    abrirModalAvisoSistema("Erro ao Excluir", "Não foi possível excluir: " + error.message, "erro");
+                    return;
+                }
+                listaTaloesRecebidosCache = listaTaloesRecebidosCache.filter(x => x.id !== idRegistro);
+                renderizarTabelaTaloesRecebidos(listaTaloesRecebidosCache);
+                filtrarTaloesRecebidos();
+			}
+        );
     }
 
 	
