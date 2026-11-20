@@ -617,14 +617,18 @@
     <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); width: 100%; max-width: 360px; text-align: center;">
         <img src="formas/logo_lider.png" alt="Ótica Líder" style="max-height: 55px; margin-bottom: 15px;">
         <h3 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Acesso Restrito — Laboratório</h3>
-        <input type="email" id="loginEmail" placeholder="E-mail de acesso" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
-        <input type="password" id="loginSenha" placeholder="Senha" onkeydown="if(event.key==='Enter') fazerLoginSupabase()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
-        <button type="button" id="btnEntrarSupabase" onclick="fazerLoginSupabase()" style="width: 100%; background: #0056b3; color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar no Sistema</button>
-        <div id="msgErroLogin" style="color: #cc0000; font-size: 12px; font-weight: bold; margin-top: 10px; display: none;"></div>
-		<button type="button" id="btnModoOfflineLocal" onclick="document.getElementById('telaLoginOverlay').style.display='none'; atualizarStatusConexaoMalote(false);" style="display: none; width: 100%; background: #6c757d; color: white; padding: 8px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 12px;">🔌 Entrar em Modo Offline (Local)</button>
+        
+        <form onsubmit="event.preventDefault(); fazerLoginSupabase();" style="margin: 0;">
+            <input type="email" id="loginEmail" name="username" autocomplete="username" placeholder="E-mail de acesso" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
+            <input type="password" id="loginSenha" name="password" autocomplete="current-password" placeholder="Senha" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
+            <button type="submit" id="btnEntrarSupabase" style="width: 100%; background: #0056b3; color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Entrar no Sistema</button>
+        </form>
 
+        <div id="msgErroLogin" style="color: #cc0000; font-size: 12px; font-weight: bold; margin-top: 10px; display: none;"></div>
+        <button type="button" id="btnModoOfflineLocal" onclick="document.getElementById('telaLoginOverlay').style.display='none'; atualizarStatusConexaoMalote(false);" style="display: none; width: 100%; background: #6c757d; color: white; padding: 8px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 12px;">🔌 Entrar em Modo Offline (Local)</button>
     </div>
 </div>
+
 
 
 <div class="tabs-nav">
@@ -1513,7 +1517,7 @@
                 <div class="shapes-title" style="text-align: left; margin-bottom: 2px;">INFORMAÇÕES DO USUÁRIO:</div>
                 <div class="top-grid" style="grid-template-columns: 3fr 1fr;">
                     <div class="field-box">NOME:<input type="text" id="talao_nome_cliente_pedido" name="talao_nome_cliente_pedido" autocomplete="one-time-code"></div>
-                    <div class="field-box">INICIAIS:<input type="text" id="talao_iniciais_usuario" name="talao_iniciais_usuario" autocomplete="one-time-code"></div>
+                    <div class="field-box">INICIAIS:<input type="text" id="talao_iniciais_usuario" name="talao_iniciais_usuario" readonly onfocus="this.removeAttribute('readonly');""></div>
                 </div>
                 <div class="top-grid" style="grid-template-columns: 1.8fr 1.6fr 0.6fr; margin-bottom: 0;">
                     <div class="field-box">Usuário de qual lente?:<input type="text" id="talao_lente_antiga" name="talao_lente_antiga"></div>
