@@ -607,6 +607,12 @@
         .no-print, #dropdownOpticasTalaoCustom { display: none !important; }
         .talao-sidebar-dock, .btn-limpar-tela-talao-topo { display: none !important; }
     }
+	
+	   /* Força visualização em MAIÚSCULO apenas nos campos digitáveis do Talão */
+        #talao input[type="text"],
+        #talao textarea {
+            text-transform: uppercase !important;
+        }
 
 
     </style>
@@ -1536,11 +1542,10 @@
                 <h2 style="margin: 0; color: #333; font-size: 20px;">📥 Talões Recebidos das Lojas</h2>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span id="contadorTaloesRecebidos" style="font-size: 12px; font-weight: bold; color: #0056b3;">0 talões</span>
-                    <button type="button" onclick="if(typeof carregarTaloesRecebidos === 'function') carregarTaloesRecebidos()" style="background-color: #0056b3; font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 6px;">🔄 Atualizar Lista</button>
                     <span id="statusTaloesRecebidos" style="font-size: 12px; font-weight: bold; color: #155724;">☁️ Sincronizado</span>
                 </div>
-
             </div>
+
 
             <!-- Painel de Filtros (Mesmo padrão visual de Malotes Recebidos) -->
             <div style="background: #f1f3f5; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; border: 1px solid #dee2e6;">
@@ -1569,6 +1574,7 @@
                 </div>
 
                 <div style="display: flex; gap: 8px;">
+                    <button type="button" onclick="if(typeof carregarTaloesRecebidos === 'function') carregarTaloesRecebidos()" class="btn-submit" style="height: 35px; padding: 0 16px; font-size: 12px;">🔄 Atualizar Lista</button>
                     <button type="button" onclick="limparFiltrosRecebidos()" class="btn-clear" style="height: 35px; padding: 0 16px; font-size: 12px;">🔄 Limpar</button>
                 </div>
 
@@ -7602,6 +7608,26 @@ function limparBancoDadosCadastro() {
         inputOS.value = prefixoNovo + numeroPuro;
     }
 
+    // ========================================================
+    // CONVERSÃO AUTOMÁTICA PARA MAIÚSCULAS APENAS NO TALÃO
+    // ========================================================
+    document.addEventListener("input", function (event) {
+        const campo = event.target;
+        // Verifica se o campo está dentro da aba #talao e se é de texto
+        if (campo && campo.closest("#talao") && (campo.tagName === "INPUT" && campo.type === "text" || campo.tagName === "TEXTAREA")) {
+            const inicio = campo.selectionStart;
+            const fim = campo.selectionEnd;
+            const textoMaiusculo = campo.value.toUpperCase();
+            
+            if (campo.value !== textoMaiusculo) {
+                campo.value = textoMaiusculo;
+                // Mantém o cursor exatamente onde a pessoa estava digitando
+                if (typeof campo.setSelectionRange === "function") {
+                    campo.setSelectionRange(inicio, fim);
+                }
+            }
+        }
+    });
 
 
 </script>
