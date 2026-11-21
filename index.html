@@ -442,7 +442,7 @@
         #malote .logo-img { max-height: 45px !important; width: auto !important; display: block !important; margin-top: -20px !important; }
         #malote .nome-loja-titulo { font-size: 18px !important; font-weight: bold !important; text-transform: uppercase !important; margin-top: 5px !important; margin-bottom: 0px !important; color: #333 !important; text-align: center !important; width: 100% !important; position: relative !important; left: auto !important; transform: none !important; }
         #malote .mensagem-malote-print { display: block !important; font-size: 12px !important; font-weight: bold !important; text-align: center !important; margin-bottom: 15px !important; text-transform: uppercase !important; color: #000 !important; }
-        #malote .table-container { margin-top: 0px !important; }
+        #malote .table-container { margin-top: 0px !important; } .btn-edit-inline { display: none !important; }
         #malote table { width: 100% !important; border-collapse: collapse !important; margin-top: 2px !important; }
         #malote th { border: 1px solid #000 !important; padding: 6px !important; text-align: center !important; font-size: 13px !important; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-weight: bold !important; text-transform: uppercase !important; }
         #malote td { border: 1px solid #000 !important; padding: 5px 6px !important; text-align: center !important; font-size: 12px !important; }
@@ -6136,41 +6136,9 @@ function limparBancoDadosCadastro() {
             e.preventDefault();
             var tbody = document.getElementById("corpoTabelaMalote");
             var novaLinha = tbody.insertRow();
-
+			
             novaLinha.insertCell(0).innerText = document.getElementById("malote_os").value.trim();
-
-            var celulaWeb = novaLinha.insertCell(1);
-            var containerWeb = document.createElement("div");
-            containerWeb.className = "cell-web-container";
-            var spanTexto = document.createElement("span");
-            spanTexto.innerText = document.getElementById("malote_cod_web").value.trim();
-
-            var btnLapis = document.createElement("button");
-            btnLapis.type = "button";
-            btnLapis.className = "btn-edit-inline";
-            btnLapis.innerHTML = "✏️";
-            btnLapis.onclick = function() {
-                if (containerWeb.querySelector("input")) return;
-                var inputTemp = document.createElement("input");
-                inputTemp.type = "text";
-                inputTemp.className = "input-edit-inline";
-                inputTemp.value = spanTexto.innerText;
-                function salvarEd() {
-                    spanTexto.innerText = inputTemp.value.trim();
-                    inputTemp.replaceWith(spanTexto);
-                    btnLapis.style.display = "inline-flex";
-                }
-                inputTemp.onblur = salvarEd;
-                inputTemp.onkeydown = function(evt) { if (evt.key === "Enter") salvarEd(); };
-                spanTexto.replaceWith(inputTemp);
-                btnLapis.style.display = "none";
-                inputTemp.focus();
-            };
-
-            containerWeb.appendChild(spanTexto);
-            containerWeb.appendChild(btnLapis);
-            celulaWeb.appendChild(containerWeb);
-
+			novaLinha.insertCell(1).innerText = document.getElementById("malote_cod_web").value.trim();
             novaLinha.insertCell(2).innerText = document.getElementById("malote_cod_produto").value.trim();
             novaLinha.insertCell(3).innerText = document.getElementById("malote_descricao").value.trim();
             novaLinha.insertCell(4).innerText = document.getElementById("malote_nome_cliente").value.trim() .toUpperCase();
