@@ -1506,7 +1506,16 @@
                         <div class="shape-item"><img src="formas/forma21.png" class="lens-shape"><input type="checkbox" id="f-9" name="f-9"><label for="f-9">21</label></div>
                     </div>
 
-                    <div class="shapes-title" style="text-align: left; margin-bottom: 4px;">TIPO DE ARMAÇÃO:</div>
+                    <div style="display: flex; align-items: center; margin-bottom: 4px;">
+						<div class="shapes-title" style="text-align: left; margin-bottom: 0;">TIPO DE ARMAÇÃO:</div>
+						<div style="display: flex; align-items: right; gap: 8px; font-size: 9px; font-weight: bold; color: var(--talao-color); margin-left: 10px;">
+							<span>( ARMAÇÃO É CLIPON ? </span>
+							<label class="checkbox-item" style="cursor: pointer;"><input type="radio" name="arm_clipon" id="arm_clipon_sim" value="sim"> Sim</label>
+							<label class="checkbox-item" style="cursor: pointer;"><input type="radio" name="arm_clipon" id="arm_clipon_nao" value="nao"> Não</label>
+							<span>)</span>
+						</div>
+					</div>
+					
                     <div class="armacao-grid">
                         <div class="checkbox-item"><input type="checkbox" id="arm_acetato" name="arm_acetato"> Acetato</div>
                         <div class="checkbox-item"><input type="checkbox" id="arm_nylon" name="arm_nylon"> Nylon</div>
@@ -1517,9 +1526,9 @@
                         <div class="checkbox-item"><input type="checkbox" id="arm_seguranca" name="arm_seguranca"> Segurança</div>
                         <div class="checkbox-item"><input type="checkbox" id="arm_optyl" name="arm_optyl"> Optyl</div>
                     </div>
-                    <div class="field-box">Armação / Modelo / Cor / Marca:<input type="text" id="talao_modelo_armacao" name="talao_modelo_armacao"></div>
+                    <div class="field-box">Condições do Aro / Armação / Modelo / Cor / Marca / <input type="text" id="talao_modelo_armacao" name="talao_modelo_armacao"></div>
                 </div>
-                <div class="field-box" style="margin-bottom: 4px;">Condições do aro / Alteração de Modelo:<input type="text" id="talao_condicoes_aro" name="talao_condicoes_aro"></div>
+                <div class="field-box" style="margin-bottom: 4px;">Observações / Alteração de Modelo:<input type="text" id="observacoes_modelo" name="observacoes_modelo"></div>
                 <div class="shapes-title" style="text-align: left; margin-bottom: 2px;">INFORMAÇÕES DO USUÁRIO:</div>
                 <div class="top-grid" style="grid-template-columns: 3fr 1fr;">
                     <div class="field-box">NOME:<input type="text" id="talao_nome_cliente_pedido" name="talao_nome_cliente_pedido" autocomplete="one-time-code"></div>
@@ -4337,9 +4346,10 @@ async function gerarPDFouImprimir() {
                     }
                 });
 
-                document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
+                document.querySelectorAll("#talao input[type='checkbox'], #talao input[type='radio']").forEach(chk => {
                     chk.checked = false;
                 });
+
 
                 const campoData = document.getElementById("data-atual");
                 if (campoData) campoData.value = obterDataBrasilia();
@@ -6926,9 +6936,10 @@ function limparBancoDadosCadastro() {
             if (el.id) camposTexto[el.id] = el.value;
         });
         const checkboxes = {};
-        document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
+        document.querySelectorAll("#talao input[type='checkbox'], #talao input[type='radio']").forEach(chk => {
             if (chk.id) checkboxes[chk.id] = chk.checked;
         });
+
         return {
             camposTexto,
             checkboxes,
@@ -7081,9 +7092,10 @@ function limparBancoDadosCadastro() {
                 }
             }
         });
-        document.querySelectorAll("#talao input[type='checkbox']").forEach(chk => {
+        document.querySelectorAll("#talao input[type='checkbox'], #talao input[type='radio']").forEach(chk => {
             if (chk.id) chk.checked = Boolean(checkboxes[chk.id]);
         });
+
 
         // Restaura os códigos selecionados nos modais de Antireflexo, Coloração e Outros/Montagem
         const elTrat = document.getElementById("talao_antireflexo");
@@ -7222,8 +7234,10 @@ function limparBancoDadosCadastro() {
             base: pegarVal("talao_base"),
             formaArmacao: formaSelecionada,
             tipoArmacao: tipoArmacaoBraslab,
+            armacaoClipon: pegarChk("arm_clipon_sim") ? "sim" : (pegarChk("arm_clipon_nao") ? "nao" : ""),
             modeloArmacaoTexto: pegarVal("talao_modelo_armacao"),
-            condicoesAro: pegarVal("talao_condicoes_aro"),
+
+            observacoesModelo: pegarVal("observacoes_modelo"),
             od: {
                 esf: pegarVal(`${origemGrau}_od_esf`),
                 cil: pegarVal(`${origemGrau}_od_cil`),
@@ -7351,8 +7365,10 @@ function limparBancoDadosCadastro() {
             formaArmacao: formaSelecionada,
             arquivoVCA: window.arquivoVCATalaoAtual || null,
             tipoArmacao: tipoArmacaoBraslab,
+            armacaoClipon: pegarChk("arm_clipon_sim") ? "sim" : (pegarChk("arm_clipon_nao") ? "nao" : ""),
             modeloArmacaoTexto: pegarVal("talao_modelo_armacao"),
-            condicoesAro: pegarVal("talao_condicoes_aro"),
+
+            observacoesModelo: pegarVal("observacoes_modelo"),
             od: {
                 esf: pegarVal(`${origemGrau}_od_esf`),
                 cil: pegarVal(`${origemGrau}_od_cil`),
@@ -7595,6 +7611,18 @@ function limparBancoDadosCadastro() {
                 }
             }
         }
+    });
+	
+    // Permite desmarcar os radio buttons de Clipon ao clicar na bolinha já selecionada
+    document.querySelectorAll('input[name="arm_clipon"]').forEach(radio => {
+        radio.addEventListener('mousedown', function() {
+            this.dataset.estavaMarcado = this.checked ? "true" : "false";
+        });
+        radio.addEventListener('click', function() {
+            if (this.dataset.estavaMarcado === "true") {
+                this.checked = false;
+            }
+        });
     });
 
 
