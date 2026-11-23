@@ -1482,12 +1482,21 @@
                             <img src="formas/diagrama_oculos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Óculos">
                         </div>
                     </div>
-
+					
+					<!-- CAIXAS DV, AP e AF MAIS À DIREITA E QUASE ENCOSTANDO NO ÍCONE ABAIXO -->
+                    <div class="top-grid" style="position: absolute; top: 65%; left: 62%; transform: translate(-50%, -50%); z-index: 5; width: 62%; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 3px; margin-bottom: 0;">
+                        <div class="field-box" style="font-size: 9px;">Dist. Vértice (DV):<input type="text" id="med_dv" name="med_dv"></div>
+                        <div class="field-box" style="font-size: 9px;">Âng. Pantoscópico (AP):<input type="text" id="med_ap" name="med_ap"></div>
+                        <div class="field-box" style="font-size: 9px;">Âng. Frontal (AF):<input type="text" id="med_af" name="med_af"></div>
+                    </div>
+					
+					
                     <!-- LINHA 2: Diagrama Ângulos + Bloco Clipon embaixo (quase encostando na linha) -->
                     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 6px; margin-bottom: 0; align-items: end;">
                         <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
                             <img src="formas/diagrama_angulos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Ângulos">
                         </div>
+						
                         <div style="display: flex; align-items: center; justify-content: center; gap: 10px; height: auto; padding-bottom: 0px;">
                             <img src="formas/clipon.svg" style="width: 42px; height: auto; object-fit: contain; display: block; margin-left: -100px;" alt="Armação Clipon">
                             <div style="display: flex; align-items: center; gap: 8px; font-size: 9.5px; font-weight: bold; color: var(--talao-color); white-space: nowrap;">
@@ -1496,13 +1505,6 @@
                                 <label class="checkbox-item" style="cursor: pointer; font-size: 9.5px;"><input type="radio" name="arm_clipon" id="arm_clipon_nao" value="nao"> Não</label>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- CAIXAS DV, AP e AF MAIS À DIREITA E QUASE ENCOSTANDO NO ÍCONE ABAIXO -->
-                    <div class="top-grid" style="position: absolute; top: 65%; left: 62%; transform: translate(-50%, -50%); z-index: 5; width: 62%; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 3px; margin-bottom: 0;">
-                        <div class="field-box" style="font-size: 9px;">Dist. Vértice (DV):<input type="text" id="med_dv" name="med_dv"></div>
-                        <div class="field-box" style="font-size: 9px;">Âng. Pantoscópico (AP):<input type="text" id="med_ap" name="med_ap"></div>
-                        <div class="field-box" style="font-size: 9px;">Âng. Frontal (AF):<input type="text" id="med_af" name="med_af"></div>
                     </div>
 
                 </div>
