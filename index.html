@@ -1469,28 +1469,44 @@
                 </table>
             </div>
 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; margin-bottom: 4px; align-items: center;">
-                    <div class="top-grid" style="grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 0;">
-                        <div class="field-box" style="font-size: 9px;">Vertical (V):<input type="text" id="med_v" name="med_v"></div>
-                        <div class="field-box" style="font-size: 9px;">Horizontal (H):<input type="text" id="med_h" name="med_h"></div>
-                        <div class="field-box" style="font-size: 9px;">Diagonal M. (M):<input type="text" id="med_m" name="med_m"></div>
-                        <div class="field-box" style="font-size: 9px;">Ponte (P):<input type="text" id="med_p" name="med_p"></div>
+                <div style="position: relative; margin-bottom: 4px;">
+                    <!-- LINHA 1: Vertical, Horizontal, Diagonal, Ponte + Diagrama Óculos -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; margin-bottom: 9px; align-items: center;">
+                        <div class="top-grid" style="grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 0;">
+                            <div class="field-box" style="font-size: 9px;">Vertical (V):<input type="text" id="med_v" name="med_v"></div>
+                            <div class="field-box" style="font-size: 9px;">Horizontal (H):<input type="text" id="med_h" name="med_h"></div>
+                            <div class="field-box" style="font-size: 9px;">Diagonal M. (M):<input type="text" id="med_m" name="med_m"></div>
+                            <div class="field-box" style="font-size: 9px;">Ponte (P):<input type="text" id="med_p" name="med_p"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
+                            <img src="formas/diagrama_oculos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Óculos">
+                        </div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
-                        <img src="formas/diagrama_oculos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Óculos">
-                    </div>
-                </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 6px; margin-bottom: 4px; align-items: center;">
-                    <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
-                        <img src="formas/diagrama_angulos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Ângulos">
+                    <!-- LINHA 2: Diagrama Ângulos + Bloco Clipon embaixo (quase encostando na linha) -->
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 6px; margin-bottom: 0; align-items: end;">
+                        <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
+                            <img src="formas/diagrama_angulos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Ângulos">
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; height: auto; padding-bottom: 0px;">
+                            <img src="formas/clipon.svg" style="width: 42px; height: auto; object-fit: contain; display: block; margin-left: -100px;" alt="Armação Clipon">
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 9.5px; font-weight: bold; color: var(--talao-color); white-space: nowrap;">
+                                <span>Armação é Clipon?</span>
+                                <label class="checkbox-item" style="cursor: pointer; font-size: 9.5px;"><input type="radio" name="arm_clipon" id="arm_clipon_sim" value="sim"> Sim</label>
+                                <label class="checkbox-item" style="cursor: pointer; font-size: 9.5px;"><input type="radio" name="arm_clipon" id="arm_clipon_nao" value="nao"> Não</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="top-grid" style="grid-template-columns: 1fr 1.2fr 1.2fr; gap: 3px; margin-bottom: 0;">
+
+                    <!-- CAIXAS DV, AP e AF MAIS À DIREITA E QUASE ENCOSTANDO NO ÍCONE ABAIXO -->
+                    <div class="top-grid" style="position: absolute; top: 65%; left: 62%; transform: translate(-50%, -50%); z-index: 5; width: 62%; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 3px; margin-bottom: 0;">
                         <div class="field-box" style="font-size: 9px;">Dist. Vértice (DV):<input type="text" id="med_dv" name="med_dv"></div>
                         <div class="field-box" style="font-size: 9px;">Âng. Pantoscópico (AP):<input type="text" id="med_ap" name="med_ap"></div>
                         <div class="field-box" style="font-size: 9px;">Âng. Frontal (AF):<input type="text" id="med_af" name="med_af"></div>
                     </div>
+
                 </div>
+
 
                 <div class="shapes-container">
                     <div class="shapes-title">Selecionar a forma aproximada da armação (apenas lentes surfaçadas).</div>
@@ -1506,15 +1522,7 @@
                         <div class="shape-item"><img src="formas/forma21.png" class="lens-shape"><input type="checkbox" id="f-9" name="f-9"><label for="f-9">21</label></div>
                     </div>
 
-                    <div style="display: flex; align-items: center; margin-bottom: 4px;">
-						<div class="shapes-title" style="text-align: left; margin-bottom: 0;">TIPO DE ARMAÇÃO:</div>
-						<div style="display: flex; align-items: right; gap: 8px; font-size: 9px; font-weight: bold; color: var(--talao-color); margin-left: 10px;">
-							<span>( ARMAÇÃO É CLIPON ? </span>
-							<label class="checkbox-item" style="cursor: pointer;"><input type="radio" name="arm_clipon" id="arm_clipon_sim" value="sim"> Sim</label>
-							<label class="checkbox-item" style="cursor: pointer;"><input type="radio" name="arm_clipon" id="arm_clipon_nao" value="nao"> Não</label>
-							<span>)</span>
-						</div>
-					</div>
+                    <div class="shapes-title" style="text-align: left; margin-bottom: 4px;">TIPO DE ARMAÇÃO:</div>
 					
                     <div class="armacao-grid">
                         <div class="checkbox-item"><input type="checkbox" id="arm_acetato" name="arm_acetato"> Acetato</div>
