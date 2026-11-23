@@ -1482,21 +1482,19 @@
                             <img src="formas/diagrama_oculos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Óculos">
                         </div>
                     </div>
-					
-					<!-- CAIXAS DV, AP e AF MAIS À DIREITA E QUASE ENCOSTANDO NO ÍCONE ABAIXO -->
+
+                    <!-- CAIXAS DV, AP e AF MAIS À DIREITA E QUASE ENCOSTANDO NO ÍCONE ABAIXO -->
                     <div class="top-grid" style="position: absolute; top: 65%; left: 62%; transform: translate(-50%, -50%); z-index: 5; width: 62%; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 3px; margin-bottom: 0;">
                         <div class="field-box" style="font-size: 9px;">Dist. Vértice (DV):<input type="text" id="med_dv" name="med_dv"></div>
                         <div class="field-box" style="font-size: 9px;">Âng. Pantoscópico (AP):<input type="text" id="med_ap" name="med_ap"></div>
                         <div class="field-box" style="font-size: 9px;">Âng. Frontal (AF):<input type="text" id="med_af" name="med_af"></div>
                     </div>
-					
-					
+
                     <!-- LINHA 2: Diagrama Ângulos + Bloco Clipon embaixo (quase encostando na linha) -->
                     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 6px; margin-bottom: 0; align-items: end;">
                         <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
                             <img src="formas/diagrama_angulos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Ângulos">
                         </div>
-						
                         <div style="display: flex; align-items: center; justify-content: center; gap: 10px; height: auto; padding-bottom: 0px;">
                             <img src="formas/clipon.svg" style="width: 42px; height: auto; object-fit: contain; display: block; margin-left: -100px;" alt="Armação Clipon">
                             <div style="display: flex; align-items: center; gap: 8px; font-size: 9.5px; font-weight: bold; color: var(--talao-color); white-space: nowrap;">
@@ -1508,7 +1506,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="shapes-container">
                     <div class="shapes-title">Selecionar a forma aproximada da armação (apenas lentes surfaçadas).</div>
@@ -4340,43 +4337,43 @@ async function gerarPDFouImprimir() {
     }
 
     function limparTelaTalaoCompleta() {
-        abrirModalConfirmacaoMalote(
-            "Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?",
-            function() {
-                fornecedorAtualTalao = "";
+        if (!confirm("🧹 Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?")) return;
 
-                const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
-                const solicitanteAtual = document.getElementById("talao_solicitante")?.value || localStorage.getItem("ultimoSolicitanteTalaoLider") || "";
+        fornecedorAtualTalao = "";
 
-                document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
-                    el.value = "";
-                    if (el.dataset) {
-                        delete el.dataset.codigoServico;
-                        delete el.dataset.codigosServicos;
-                    }
-                });
-
-                document.querySelectorAll("#talao input[type='checkbox'], #talao input[type='radio']").forEach(chk => {
-                    chk.checked = false;
-                });
+        // Salva a loja atual e o solicitante para não perder o padrão da máquina
+        const lojaAtual = document.getElementById("talao_optica")?.value || localStorage.getItem("ultimaLojaTalaoLider") || "";
+        const solicitanteAtual = document.getElementById("talao_solicitante")?.value || localStorage.getItem("ultimoSolicitanteTalaoLider") || "";
 
 
-                const campoData = document.getElementById("data-atual");
-                if (campoData) campoData.value = obterDataBrasilia();
+        // Limpa todos os campos de texto, datas e os códigos selecionados nos modais
+        document.querySelectorAll("#talao input[type='text'], #talao input[type='date']").forEach(el => {
+            el.value = "";
+            if (el.dataset) {
+                delete el.dataset.codigoServico;
+                delete el.dataset.codigosServicos;
+            }
+        });
 
-                const campoOptica = document.getElementById("talao_optica");
-                if (campoOptica) campoOptica.value = lojaAtual;
-                const campoSolicitante = document.getElementById("talao_solicitante");
-                if (campoSolicitante) campoSolicitante.value = solicitanteAtual;
+        // Desmarca todos os checkboxes (serviços, formas e tipos de armação)
+        document.querySelectorAll("#talao input[type='checkbox'], #talao input[type='radio']").forEach(chk => {
+        chk.checked = false;
+        });      
 
-                if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
+        // Restaura a data de hoje, a loja padrão e limpa o arquivo .VCA
+        const campoData = document.getElementById("data-atual");
+        if (campoData) campoData.value = obterDataBrasilia();
 
-                document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
-                document.getElementById("talao_cod")?.focus();
-            },
-            "Limpar Talão",
-            "🧹"
-        );
+        const campoOptica = document.getElementById("talao_optica");
+        if (campoOptica) campoOptica.value = lojaAtual;
+		const campoSolicitante = document.getElementById("talao_solicitante");
+        if (campoSolicitante) campoSolicitante.value = solicitanteAtual;
+
+
+        if (typeof limparArquivoVCATalao === "function") limparArquivoVCATalao();
+
+        document.querySelectorAll('#talao .format-grau').forEach(aplicarCorGrauTalao);
+        document.getElementById("talao_cod")?.focus();
     }
 
 
