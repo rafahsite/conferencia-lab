@@ -7578,85 +7578,76 @@ function limparBancoDadosCadastro() {
                 return match ? match[1].trim() : "";
             };
 
-            const extrairNumeroVCA = (chaves) => {
+            const extrairMaiorValorVCA = (chaves) => {
                 for (const chave of chaves) {
                     const regex = new RegExp("^" + chave + "\\s*=\\s*([^\\r\\n]+)", "im");
                     const match = conteudo.match(regex);
                     if (match && match[1]) {
-                        const primeiroValor = match[1].split(";")[0].trim();
-                        const num = parseFloat(primeiroValor.replace(",", "."));
-                        if (!isNaN(num) && num > 0) {
-                            return num.toFixed(1).replace(".", ",");
+                        const valores = match[1]
+                            .split(";")
+                            .map(v => parseFloat(v.trim().replace(",", ".")))
+                            .filter(n => !isNaN(n) && n > 0);
+                        if (valores.length > 0) {
+                            return Math.max(...valores).toFixed(1).replace(".", ",");
                         }
                     }
                 }
                 return "";
             };
 
-            const vbox = extrairNumeroVCA(["VBOX", "MVA"]);
-            const hbox = extrairNumeroVCA(["HBOX", "MHA"]);
-            // 1. Tenta ler FED/DMA apenas se não contiver "?"
+            const vbox = extrairMaiorValorVCA(["VBOX", "MVA"]);
+            const hbox = extrairMaiorValorVCA(["HBOX", "MHA"]);
+
+            // Calcula a Diagonal Maior (DMA) sempre pelos pontos do contorno R= igual ao site da Braslab
             let fed = "";
-            const matchFed = conteudo.match(/^(?:FED|DMA)\s*=\s*([^\r\n]+)/im);
-            if (matchFed && matchFed[1] && !matchFed[1].includes("?")) {
-                const partesFed = matchFed[1].split(";").map(v => parseFloat(v.trim().replace(",", "."))).filter(n => !isNaN(n) && n > 0);
-                if (partesFed.length > 0) {
-                    fed = Math.max(...partesFed).toFixed(1).replace(".", ",");
+            const blocosOlho = conteudo.split(/TRCFMT\s*=/i);
+            const trechoLente = blocosOlho.length > 1 ? blocosOlho[1] : conteudo;
+
+            const raios = [];
+            const angulos = [];
+
+            trechoLente.split(/\r?\n/).forEach(linha => {
+                const l = linha.trim();
+                if (/^R\s*=/i.test(l)) {
+                    l.replace(/^R\s*=\s*/i, "").split(";").forEach(v => {
+                        const n = parseFloat(v.trim().replace(",", "."));
+                        if (!isNaN(n) && n > 0) raios.push(n);
+                    });
+                } else if (/^A\s*=/i.test(l)) {
+                    l.replace(/^A\s*=\s*/i, "").split(";").forEach(v => {
+                        const n = parseFloat(v.trim().replace(",", "."));
+                        if (!isNaN(n)) angulos.push(n);
+                    });
                 }
-            }
+            });
 
-            // 2. Calcula a maior diagonal real pelos pontos do contorno (dá exatos 52,5)
-            if (!fed) {
-                const blocosOlho = conteudo.split(/TRCFMT\s*=/i);
-                const trechoLente = blocosOlho.length > 1 ? blocosOlho[1] : conteudo;
-
-                const raios = [];
-                const angulos = [];
-
-                trechoLente.split(/\r?\n/).forEach(linha => {
-                    const l = linha.trim();
-                    if (/^R\s*=/i.test(l)) {
-                        l.replace(/^R\s*=\s*/i, "").split(";").forEach(v => {
-                            const n = parseFloat(v.trim().replace(",", "."));
-                            if (!isNaN(n) && n > 0) raios.push(n);
-                        });
-                    } else if (/^A\s*=/i.test(l)) {
-                        l.replace(/^A\s*=\s*/i, "").split(";").forEach(v => {
-                            const n = parseFloat(v.trim().replace(",", "."));
-                            if (!isNaN(n)) angulos.push(n);
-                        });
-                    }
+            if (raios.length > 2) {
+                const escala = Math.max(...raios) > 500 ? 100 : 1;
+                const pontos = raios.map((r, idx) => {
+                    const rad = angulos.length === raios.length
+                        ? (angulos[idx] * Math.PI) / 180
+                        : (2 * Math.PI * idx) / raios.length;
+                    const mm = r / escala;
+                    return { x: mm * Math.cos(rad), y: mm * Math.sin(rad) };
                 });
 
-                if (raios.length > 2) {
-                    const escala = Math.max(...raios) > 500 ? 100 : 1;
-                    const pontos = raios.map((r, idx) => {
-                        const rad = angulos.length === raios.length
-                            ? (angulos[idx] * Math.PI) / 180
-                            : (2 * Math.PI * idx) / raios.length;
-                        const mm = r / escala;
-                        return { x: mm * Math.cos(rad), y: mm * Math.sin(rad) };
-                    });
-
-                    let maxDist2 = 0;
-                    for (let i = 0; i < pontos.length; i++) {
-                        for (let j = i + 1; j < pontos.length; j++) {
-                            const dx = pontos[i].x - pontos[j].x;
-                            const dy = pontos[i].y - pontos[j].y;
-                            const d2 = dx * dx + dy * dy;
-                            if (d2 > maxDist2) maxDist2 = d2;
-                        }
+                let maxDist2 = 0;
+                for (let i = 0; i < pontos.length; i++) {
+                    for (let j = i + 1; j < pontos.length; j++) {
+                        const dx = pontos[i].x - pontos[j].x;
+                        const dy = pontos[i].y - pontos[j].y;
+                        const d2 = dx * dx + dy * dy;
+                        if (d2 > maxDist2) maxDist2 = d2;
                     }
+                }
 
-                    const maiorDiag = Math.sqrt(maxDist2);
-                    if (maiorDiag > 0 && maiorDiag < 100) {
-                        fed = maiorDiag.toFixed(1).replace(".", ",");
-                    }
+                const maiorDiag = Math.sqrt(maxDist2);
+                if (maiorDiag > 0 && maiorDiag < 100) {
+                    fed = maiorDiag.toFixed(1).replace(".", ",");
                 }
             }
 
-
-            const dbl  = extrairNumeroVCA(["DBL", "PONTE"]);
+            const dbl = extrairMaiorValorVCA(["DBL", "PONTE"]);
 
             const preencherMedida = (idCampo, valor) => {
                 if (!valor) return;
