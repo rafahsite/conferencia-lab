@@ -186,7 +186,7 @@
             background: #d94145 !important; 
         }
         #talao .btn-print-top:active { 
-            transform: translateY(-30%) scale(0.95); 
+            transform: translateY(-30%) scale(1.15); 
         }
 
         .talao-container .header { text-align: center; margin-bottom: 2px; position: relative; }
@@ -614,6 +614,57 @@
             text-transform: uppercase !important;
         }
 
+        /* EFEITO DE ZOOM E TARJA VERDE NA IMAGEM DO ÓCULOS (TALÃO) */
+        .oculos-upload-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 65px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .oculos-upload-wrapper:hover {
+            transform: scale(1.08);
+        }
+        .tarja-vca-oculos {
+            display: none;
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: #ffffff;
+            font-size: 10.1px;
+            font-weight: bold;
+            padding: 1px 5px;
+            border-radius: 3px;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 10;
+            pointer-events: none;
+            text-transform: none;
+            line-height: 1.1;
+			
+        }
+
+        @media print {
+            .tarja-vca-oculos {
+                display: none !important;
+            }
+        }
+
+        .vca-svg-contorno {
+            width: 100%;
+            height: 100%;
+            max-height: 62px;
+            display: block;
+            margin: 0 auto;
+			transform: translateY(-4px);
+        }
+        .oculos-upload-wrapper.com-desenho-vca .img-oculos-generica {
+            display: none !important;
+        }
 
     </style>
 </head>
@@ -1372,9 +1423,9 @@
                 <div class="logo" style="margin-top: 0px; margin-bottom: -1px;">
                     <img src="formas/logo_lider_transparente.png" alt="Logo" style="max-height: 38px; width: auto; display: inline-block; vertical-align: top;">
                 </div>
-                <button type="button" class="btn-print-top" onclick="imprimirTalaoComNome()">🖨️ Imprimir</button>
-                <button type="button" class="btn-print-top" id="btnCopiarBraslab" onclick="copiarTalaoParaBraslab()" style="right: 88px; left: auto; background: #0056b3 !important;">📋 Braslab</button>
-                <button type="button" class="btn-print-top" id="btnEnviarTalao" onclick="enviarTalao()" style="left: 90px; right: auto; background: #28a745 !important;">📤 Enviar Talão</button>
+                <button type="button" class="btn-print-top" onmousedown="if(event.button===0) imprimirTalaoComNome()">🖨️ Imprimir</button>
+                <button type="button" class="btn-print-top" id="btnCopiarBraslab" onmousedown="if(event.button===0) copiarTalaoParaBraslab()" style="right: 88px; left: auto; background: #0056b3 !important;">📋 Copiar</button>
+                <button type="button" class="btn-print-top" id="btnEnviarTalao" onmousedown="if(event.button===0) enviarTalao()" style="left: 90px; right: auto; background: #28a745 !important;">📤 Enviar Talão</button>
 
             </div>
 
@@ -1478,9 +1529,13 @@
                             <div class="field-box" style="font-size: 9px;">Diagonal M. (M):<input type="text" id="med_m" name="med_m"></div>
                             <div class="field-box" style="font-size: 9px;">Ponte (P):<input type="text" id="med_p" name="med_p"></div>
                         </div>
-                        <div style="display: flex; align-items: center; justify-content: center; height: 65px;">
-                            <img src="formas/diagrama_oculos.png" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Óculos">
+                        <div id="boxOculosUploadWrapper" class="oculos-upload-wrapper" onclick="document.getElementById('inputArquivoVCATalao').click()" title="Clique para fazer upload do arquivo .VCA / .OMA">
+                            <img src="formas/diagrama_oculos.png" class="img-oculos-generica" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Diagrama Óculos">
+                            <div id="vcaContornoContainer" style="display:none; width:100%; height:100%;"></div>
+                            <div id="tarjaVcaOculos" class="tarja-vca-oculos"></div>
                         </div>
+
+
                     </div>
 
                     <!-- CAIXAS DV, AP e AF MAIS À DIREITA E QUASE ENCOSTANDO NO ÍCONE ABAIXO -->
@@ -4337,7 +4392,7 @@ async function gerarPDFouImprimir() {
     }
 
     function limparTelaTalaoCompleta() {
-        if (!confirm("🧹 Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?")) return;
+     //   if (!confirm("🧹 Deseja limpar todos os campos preenchidos na tela do Talão de Pedidos?")) return;
 
         fornecedorAtualTalao = "";
 
@@ -7429,6 +7484,80 @@ function limparBancoDadosCadastro() {
             alert(`Copiado (${tipoReceitaAviso})! ${infoFormaAviso} | Tipo: ${tipoArmacaoBraslab || "Nenhum"}`);
         }
     }
+	
+	    function desenharContornoVCATalao(conteudo, ponteMm) {
+        const container = document.getElementById("vcaContornoContainer");
+        const box = document.getElementById("boxOculosUploadWrapper");
+        if (!container || !box) return;
+
+        const blocos = conteudo.split(/TRCFMT\s*=/i).slice(1);
+        let raiosE = [], raiosD = [];
+
+        const extrairRaios = (texto) => {
+            const arr = [];
+            texto.split(/\r?\n/).forEach(l => {
+                if (/^R\s*=/i.test(l.trim())) {
+                    l.replace(/^R\s*=\s*/i, "").split(";").forEach(v => {
+                        const n = parseFloat(v.trim().replace(",", "."));
+                        if (!isNaN(n) && n > 0) arr.push(n);
+                    });
+                }
+            });
+            return arr;
+        };
+
+        blocos.forEach(b => {
+            const cabecalho = (b.split(/\r?\n/)[0] || "").toUpperCase();
+            const r = extrairRaios(b);
+            if (cabecalho.includes(";L;")) raiosE = r;
+            else if (cabecalho.includes(";R;")) raiosD = r;
+            else if (raiosE.length === 0) raiosE = r;
+        });
+
+        if (raiosE.length < 10 && raiosD.length < 10) return;
+        if (raiosE.length === 0) raiosE = [...raiosD];
+        if (raiosD.length === 0) raiosD = [...raiosE];
+
+        const gerarPontos = (raios) => {
+            const esc = Math.max(...raios) > 500 ? 100 : 1;
+            const pts = raios.map((r, i) => {
+                const ang = (2 * Math.PI * i) / raios.length;
+                return { x: (r / esc) * Math.cos(ang), y: -(r / esc) * Math.sin(ang) };
+            });
+            const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+            const minX = Math.min(...xs), maxX = Math.max(...xs);
+            const minY = Math.min(...ys), maxY = Math.max(...ys);
+            const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+            return {
+                pts: pts.map(p => ({ x: p.x - cx, y: p.y - cy })),
+                w: maxX - minX,
+                h: maxY - minY
+            };
+        };
+
+        const aroD = gerarPontos(raiosD);
+        const aroE = gerarPontos(raiosE);
+        const ponte = parseFloat(String(ponteMm || "18").replace(",", ".")) || 18;
+        const deslocamento = (aroD.w / 2) + (ponte / 2);
+
+        const pathD = aroD.pts.map((p, i) => `${i === 0 ? "M" : "L"}${(p.x - deslocamento).toFixed(2)},${p.y.toFixed(2)}`).join(" ") + " Z";
+        const pathE = aroE.pts.map((p, i) => `${i === 0 ? "M" : "L"}${(p.x + deslocamento).toFixed(2)},${p.y.toFixed(2)}`).join(" ") + " Z";
+
+        const larguraTotal = aroD.w + aroE.w + ponte + 10;
+        const alturaTotal = Math.max(aroD.h, aroE.h) + 10;
+
+        container.innerHTML = `
+            <svg class="vca-svg-contorno" viewBox="${(-larguraTotal / 2).toFixed(1)} ${(-alturaTotal / 2).toFixed(1)} ${larguraTotal.toFixed(1)} ${alturaTotal.toFixed(1)}">
+                <path d="${pathD}" fill="#00a8cc" fill-opacity="0.22" stroke="#008fb3" stroke-width="1.6"/>
+                <path d="${pathE}" fill="#00a8cc" fill-opacity="0.22" stroke="#008fb3" stroke-width="1.6"/>
+                <line x1="${(-ponte / 2 - 1).toFixed(1)}" y1="${(-alturaTotal * 0.22).toFixed(1)}" x2="${(ponte / 2 + 1).toFixed(1)}" y2="${(-alturaTotal * 0.22).toFixed(1)}" stroke="#008fb3" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+        `;
+
+        container.style.display = "block";
+        box.classList.add("com-desenho-vca");
+    }
+
 
 
 	    function processarArquivoVCATalao(input) {
@@ -7449,21 +7578,99 @@ function limparBancoDadosCadastro() {
                 return match ? match[1].trim() : "";
             };
 
-            const hbox = extrairTagVCA("HBOX");
-            const vbox = extrairTagVCA("VBOX");
-            const dbl = extrairTagVCA("DBL");
-            const fed = extrairTagVCA("FED");
+            const extrairNumeroVCA = (chaves) => {
+                for (const chave of chaves) {
+                    const regex = new RegExp("^" + chave + "\\s*=\\s*([^\\r\\n]+)", "im");
+                    const match = conteudo.match(regex);
+                    if (match && match[1]) {
+                        const primeiroValor = match[1].split(";")[0].trim();
+                        const num = parseFloat(primeiroValor.replace(",", "."));
+                        if (!isNaN(num) && num > 0) {
+                            return num.toFixed(1).replace(".", ",");
+                        }
+                    }
+                }
+                return "";
+            };
 
-            const preencherMedida = (nomeCampo, valor) => {
+            const vbox = extrairNumeroVCA(["VBOX", "MVA"]);
+            const hbox = extrairNumeroVCA(["HBOX", "MHA"]);
+            // 1. Tenta ler FED/DMA apenas se não contiver "?"
+            let fed = "";
+            const matchFed = conteudo.match(/^(?:FED|DMA)\s*=\s*([^\r\n]+)/im);
+            if (matchFed && matchFed[1] && !matchFed[1].includes("?")) {
+                const partesFed = matchFed[1].split(";").map(v => parseFloat(v.trim().replace(",", "."))).filter(n => !isNaN(n) && n > 0);
+                if (partesFed.length > 0) {
+                    fed = Math.max(...partesFed).toFixed(1).replace(".", ",");
+                }
+            }
+
+            // 2. Calcula a maior diagonal real pelos pontos do contorno (dá exatos 52,5)
+            if (!fed) {
+                const blocosOlho = conteudo.split(/TRCFMT\s*=/i);
+                const trechoLente = blocosOlho.length > 1 ? blocosOlho[1] : conteudo;
+
+                const raios = [];
+                const angulos = [];
+
+                trechoLente.split(/\r?\n/).forEach(linha => {
+                    const l = linha.trim();
+                    if (/^R\s*=/i.test(l)) {
+                        l.replace(/^R\s*=\s*/i, "").split(";").forEach(v => {
+                            const n = parseFloat(v.trim().replace(",", "."));
+                            if (!isNaN(n) && n > 0) raios.push(n);
+                        });
+                    } else if (/^A\s*=/i.test(l)) {
+                        l.replace(/^A\s*=\s*/i, "").split(";").forEach(v => {
+                            const n = parseFloat(v.trim().replace(",", "."));
+                            if (!isNaN(n)) angulos.push(n);
+                        });
+                    }
+                });
+
+                if (raios.length > 2) {
+                    const escala = Math.max(...raios) > 500 ? 100 : 1;
+                    const pontos = raios.map((r, idx) => {
+                        const rad = angulos.length === raios.length
+                            ? (angulos[idx] * Math.PI) / 180
+                            : (2 * Math.PI * idx) / raios.length;
+                        const mm = r / escala;
+                        return { x: mm * Math.cos(rad), y: mm * Math.sin(rad) };
+                    });
+
+                    let maxDist2 = 0;
+                    for (let i = 0; i < pontos.length; i++) {
+                        for (let j = i + 1; j < pontos.length; j++) {
+                            const dx = pontos[i].x - pontos[j].x;
+                            const dy = pontos[i].y - pontos[j].y;
+                            const d2 = dx * dx + dy * dy;
+                            if (d2 > maxDist2) maxDist2 = d2;
+                        }
+                    }
+
+                    const maiorDiag = Math.sqrt(maxDist2);
+                    if (maiorDiag > 0 && maiorDiag < 100) {
+                        fed = maiorDiag.toFixed(1).replace(".", ",");
+                    }
+                }
+            }
+
+
+            const dbl  = extrairNumeroVCA(["DBL", "PONTE"]);
+
+            const preencherMedida = (idCampo, valor) => {
                 if (!valor) return;
-                const campo = document.querySelector(`#talao input[name="${nomeCampo}"], #talao input[id*="${nomeCampo}"]`);
+                const campo = document.getElementById(idCampo);
                 if (campo) campo.value = valor;
             };
 
-            preencherMedida("medida_v", vbox);
-            preencherMedida("medida_h", hbox);
-            preencherMedida("medida_m", fed);
-            preencherMedida("medida_p", dbl);
+            preencherMedida("med_v", vbox);
+            preencherMedida("med_h", hbox);
+            preencherMedida("med_m", fed);
+            preencherMedida("med_p", dbl);
+			desenharContornoVCATalao(conteudo, dbl);
+
+
 
             const statusEl = document.getElementById("statusArquivoVCATalao");
             if (statusEl) {
@@ -7471,14 +7678,20 @@ function limparBancoDadosCadastro() {
                 statusEl.style.display = "block";
             }
 
-            if (typeof abrirModalAvisoSistema === "function") {
-                abrirModalAvisoSistema(
-                    "Arquivo Carregado",
-                    "Arquivo '" + arquivo.name + "' importado com sucesso!" +
-                    (hbox || vbox || dbl ? "\n\nMedidas preenchidas automaticamente (V: " + (vbox || "-") + " | H: " + (hbox || "-") + " | P: " + (dbl || "-") + ")." : ""),
-                    "sucesso"
-                );
+            const tarjaOculos = document.getElementById("tarjaVcaOculos");
+            if (tarjaOculos) {
+                tarjaOculos.innerText = "✅ MODELO CARREGADO " + arquivo.name;
+                tarjaOculos.style.display = "block";
             }
+
+        //    if (typeof abrirModalAvisoSistema === "function") {
+        //        abrirModalAvisoSistema(
+        //            "Arquivo Carregado",
+        //            "Arquivo '" + arquivo.name + "' importado com sucesso!" +
+        //            (hbox || vbox || dbl ? "\n\nMedidas preenchidas automaticamente (V: " + (vbox || "-") + " | H: " + (hbox || "-") + " | P: " + (dbl || "-") + ")." : ""),
+        //            "sucesso"
+        //        );
+        //    }
             input.value = "";
         };
         leitor.readAsText(arquivo);
@@ -7495,7 +7708,25 @@ function limparBancoDadosCadastro() {
             statusEl.innerText = "";
             statusEl.style.display = "none";
         }
+
+        const tarjaOculos = document.getElementById("tarjaVcaOculos");
+        if (tarjaOculos) {
+            tarjaOculos.innerText = "";
+            tarjaOculos.style.display = "none";
+        }
+		
+		        const containerContorno = document.getElementById("vcaContornoContainer");
+        if (containerContorno) {
+            containerContorno.innerHTML = "";
+            containerContorno.style.display = "none";
+        }
+        const boxOculos = document.getElementById("boxOculosUploadWrapper");
+        if (boxOculos) {
+            boxOculos.classList.remove("com-desenho-vca");
+        }
+
     }
+
 
     function navegarDropdownOpticaTalao(e) {
         const box = document.getElementById("dropdownOpticasTalaoCustom");
